@@ -1,0 +1,75 @@
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Куб зрелости работы с АИ: три грани по носителю практики — сотрудник, процесс, организация; каждая грань — матрица 7 измерений на 5 уровней с порогом артикулируемости между уровнями 2 и 3.</h2>
+<style>
+.cw{font-family:var(--font-sans);color:var(--text-primary)}
+.cw table{border-collapse:collapse;width:100%;font-size:11.5px;line-height:1.35}
+.cw th{border:1px solid var(--border);padding:6px;background:var(--surface-1);text-align:left;vertical-align:top;font-size:11.5px}
+.cw td{border:1px solid var(--border);padding:6px;color:var(--text-secondary);vertical-align:top}
+.cw .grp{writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;font-size:10px;color:var(--text-muted);letter-spacing:.5px;padding:4px 2px}
+.cw .dim b{color:var(--text-primary)}
+.cw .t3{border-left:3px solid var(--text-accent)}
+.cw .sub{font-weight:400;color:var(--text-muted)}
+.cw .tabs{display:flex;gap:6px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.cw .tab{padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:12px;font-family:inherit}
+.cw .tab[aria-pressed="true"]{background:var(--surface-1);border-color:var(--border-strong);color:var(--text-primary);font-weight:600}
+.cw .note{font-size:10.5px;color:var(--text-muted);margin-left:auto}
+.cw .leg{margin-top:6px;font-size:10.5px;color:var(--text-muted)}
+.cw .face{overflow-x:auto}
+</style>
+<div class="cw">
+<div class="tabs" role="tablist">
+<button class="tab" aria-pressed="true" onclick="cwShow('faceE',this)">E — сотрудник</button>
+<button class="tab" aria-pressed="false" onclick="cwShow('faceP',this)">P — процесс</button>
+<button class="tab" aria-pressed="false" onclick="cwShow('faceO',this)">O — организация</button>
+<span class="note">слово = носитель·измерение·уровень: E-C3 · P-R4 · O-T2</span>
+</div>
+
+<div class="face" id="faceE">
+<table>
+<thead><tr><th></th><th style="min-width:110px">Измерение</th><th>L1 Стихийный<br><span class="sub">везение</span></th><th>L2 Повторяемый<br><span class="sub">личный рецепт</span></th><th class="t3">L3 Осознанный<br><span class="sub">передаваемый метод</span></th><th>L4 Управляемый<br><span class="sub">калиброванный контроль</span></th><th>L5 Развивающийся<br><span class="sub">самообновление</span></th></tr></thead>
+<tbody>
+<tr><td class="grp" rowspan="2">ДО ЗАПРОСА</td><td class="dim"><b>Truth</b><br>что можно спросить</td><td>Спрашивает наугад; «АИ может всё» или «игрушка»</td><td>Держится за 2–3 задачи, где однажды сработало</td><td class="t3">Карта своих задач: делегируемо / частично / нет</td><td>Заранее предсказывает шанс успеха — и угадывает</td><td>Зондирует новые классы задач, делится находками</td></tr>
+<tr><td class="dim"><b>Deep</b><br>границы задачи</td><td>Одна фраза «как получится»; границ не видит</td><td>«Длинные запросы лучше» — но не знает почему</td><td class="t3">Декомпозиция; явная рамка: что входит, допущения</td><td>Двигает границы, проверяет краевые случаи</td><td>Рамирует новые домены, помогает другим</td></tr>
+<tr><td class="grp" rowspan="2">ЗАПРОС</td><td class="dim"><b>Connect</b><br>контекст</td><td>Контекста не даёт: модель «сама знает»</td><td>Вставляет куски документов, когда вспомнит</td><td class="t3">Знает нужный контекст по типу задачи, готовит заранее</td><td>Дозирует, обновляет, чистит; понимает влияние</td><td>Переиспользуемые заготовки — себе и команде</td></tr>
+<tr><td class="dim"><b>Service</b><br>промпт и выбор модели</td><td>Один стиль запроса в любую систему</td><td>«Эта лучше для кода» — по привычке</td><td class="t3">Осознанный выбор системы и режима под задачу</td><td>Сравнивает системы на своих задачах; промпт под модель</td><td>Отслеживает изменения моделей, консультирует коллег</td></tr>
+<tr><td class="grp" rowspan="2">ПОСЛЕ ОТВЕТА</td><td class="dim"><b>Knowledge</b><br>работа с ответом</td><td>Копирует как есть или отбрасывает целиком</td><td>Правит руками; изредка «перепиши короче»</td><td class="t3">Трансформации: формат, тон, структура, аудитория</td><td>Цепочки: черновик → критика → переработка → оформление</td><td>Библиотека форматов; ответ — сырьё в процессе</td></tr>
+<tr><td class="dim"><b>Evolution</b><br>итерации</td><td>Один запрос — один ответ; неудача = «не умеет»</td><td>Переспрашивает бессистемно, быстро бросает</td><td class="t3">2–3 цикла уточнений — норма, время заложено</td><td>Знает, когда уточнять, начать заново, остановиться</td><td>Итерации обновляют заготовки — циклы короче</td></tr>
+<tr><td class="grp">СКВОЗНОЕ</td><td class="dim"><b>Responsibility</b><br>валидация</td><td>Верит на слово или отвергает по ощущению</td><td>Проверяет «если важно», без критериев</td><td class="t3">Знает типовые сбои; факты и цифры — вручную</td><td>Протокол по типам задач; модель как самопроверка — зная пределы</td><td>Делит делегируемое и неделегируемое; учит других</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="face" id="faceP" style="display:none">
+<table>
+<thead><tr><th></th><th style="min-width:110px">Измерение</th><th>L1 Стихийный<br><span class="sub">стихийно</span></th><th>L2 Повторяемый<br><span class="sub">очаги практики</span></th><th class="t3">L3 Осознанный<br><span class="sub">встроено в процесс</span></th><th>L4 Управляемый<br><span class="sub">процесс измеряется</span></th><th>L5 Развивающийся<br><span class="sub">самооптимизация</span></th></tr></thead>
+<tbody>
+<tr><td class="grp" rowspan="2">ДО ЗАПРОСА</td><td class="dim"><b>Truth</b><br>делегируемость шагов</td><td>Нигде не зафиксирована — каждый решает сам</td><td>Отдельные исполнители знают «свои» шаги</td><td class="t3">Шаги процесса помечены: делегируемо / частично / нет</td><td>Делегируемость подтверждена данными по шагам</td><td>Граница пересматривается при выходе новых моделей</td></tr>
+<tr><td class="dim"><b>Deep</b><br>рамки задач в шагах</td><td>Формулировки стихийны, у каждого свои</td><td>Личные шаблоны у отдельных исполнителей</td><td class="t3">Для АИ-шагов описаны: вход, выход, допущения</td><td>Рамки тестируются на краевых случаях; отклонения регламентированы</td><td>Рамки эволюционируют по накопленным сбоям</td></tr>
+<tr><td class="grp" rowspan="2">ЗАПРОС</td><td class="dim"><b>Connect</b><br>источники контекста</td><td>Из головы исполнителя</td><td>Личные подборки документов</td><td class="t3">Источники для каждого АИ-шага определены</td><td>Контекст версионируется; устаревание отслеживается</td><td>Заготовки — переиспользуемый актив процесса</td></tr>
+<tr><td class="dim"><b>Service</b><br>промпты процесса</td><td>Кто чем привык; не закреплено</td><td>Удачные промпты пересылают друг другу</td><td class="t3">Промпты и выбор модели по шагам документированы</td><td>Промпты тестируются при смене моделей; выбор обоснован</td><td>Библиотека промптов поддерживается «как код»</td></tr>
+<tr><td class="grp" rowspan="2">ПОСЛЕ ОТВЕТА</td><td class="dim"><b>Knowledge</b><br>форматы в потоке</td><td>Каждый оформляет выход как умеет</td><td>Неформальные образцы «как у коллеги»</td><td class="t3">Форматы выходов и их место в потоке определены</td><td>Цепочки обработки встроены в процесс</td><td>Процесс порождает форматы и отдаёт другим процессам</td></tr>
+<tr><td class="dim"><b>Evolution</b><br>циклы в плане</td><td>Итерации «за свой счёт», планом не предусмотрены</td><td>Все итерируют, но план этого не знает</td><td class="t3">Циклы уточнений заложены в сроки процесса</td><td>Длина и стоимость циклов измеряются</td><td>Заготовки систематически сокращают циклы</td></tr>
+<tr><td class="grp">СКВОЗНОЕ</td><td class="dim"><b>Responsibility</b><br>контрольные точки</td><td>Валидация «по совести», ничья</td><td>Проверяют «важное», критериев нет</td><td class="t3">Точки: где человек обязателен, где допустима модель</td><td>Протокол по типам артефактов; метрики брака</td><td>Граница закреплена, аудируема; инциденты обновляют протокол</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="face" id="faceO" style="display:none">
+<table>
+<thead><tr><th></th><th style="min-width:110px">Измерение</th><th>L1 Стихийный<br><span class="sub">тень</span></th><th>L2 Повторяемый<br><span class="sub">локальные инициативы</span></th><th class="t3">L3 Осознанный<br><span class="sub">норма + enablement</span></th><th>L4 Управляемый<br><span class="sub">управляемый портфель</span></th><th>L5 Развивающийся<br><span class="sub">обучающаяся организация</span></th></tr></thead>
+<tbody>
+<tr><td class="grp" rowspan="2">ДО ЗАПРОСА</td><td class="dim"><b>Truth</b><br>карта применимости</td><td>Организация не знает, где у неё АИ; использование теневое</td><td>Отдельные команды знают свои случаи</td><td class="t3">Карта применимости по функциям и ролям</td><td>Карта подтверждена метриками портфеля</td><td>Новые области зондируются; карта живая</td></tr>
+<tr><td class="dim"><b>Deep</b><br>язык задач</td><td>Нет языка описания задач для АИ</td><td>Локальные жаргоны команд</td><td class="t3">Общий стандарт формулирования задач и границ</td><td>Стандарт проверяется на краевых случаях и рисках</td><td>Язык развивается, впитывая новые типы задач</td></tr>
+<tr><td class="grp" rowspan="2">ЗАПРОС</td><td class="dim"><b>Connect</b><br>доступ к знаниям</td><td>Данные заперты; каждый копипастит на свой страх</td><td>Стихийные вики и общие папки</td><td class="t3">Правила: какие знания и как можно передавать АИ</td><td>Инфраструктура: доступы, свежесть, конфиденциальность измеряются</td><td>Контекст — стратегический актив, наращивается</td></tr>
+<tr><td class="dim"><b>Service</b><br>парк систем</td><td>Shadow AI: кто во что горазд</td><td>Де-факто стандарт «все сидят в X»</td><td class="t3">Каталог одобренных систем; критерии выбора</td><td>Парк оценивается на задачах организации</td><td>Портфель моделей; пилоты; влияние на вендоров</td></tr>
+<tr><td class="grp" rowspan="2">ПОСЛЕ ОТВЕТА</td><td class="dim"><b>Knowledge</b><br>нормы оформления</td><td>Общих норм нет</td><td>Образцы живут внутри команд</td><td class="t3">Корпоративные форматы и шаблоны выходов</td><td>Качество выходов измеряется; форматы в документообороте</td><td>Библиотека форматов мигрирует между командами</td></tr>
+<tr><td class="dim"><b>Evolution</b><br>экономика итераций</td><td>Итерации невидимы или наказуемы</td><td>Терпимы неформально</td><td class="t3">Нормативы и обучение признают циклы уточнений</td><td>Стоимость цикла против выигрыша измеряется</td><td>Инвестиции в сокращение циклов</td></tr>
+<tr><td class="grp">СКВОЗНОЕ</td><td class="dim"><b>Responsibility</b><br>рамка ответственности</td><td>Не определена; инцидент ищет стрелочника</td><td>Негласные понятия «что можно»</td><td class="t3">Политика: что не делегируется; кто подписывается</td><td>Комплаенс измеряется; доверие калибруется по классам задач</td><td>Рамка аудируема внешне, обновляется проактивно</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="leg"><span style="display:inline-block;width:12px;border-top:3px solid var(--text-accent);vertical-align:middle;margin-right:4px"></span>колонка L3 — лестница институционализации: «могу объяснить» (E) → «записано в процессе» (P) → «закреплено как норма» (O) · профиль = 21 слово, уровни не усредняются</div>
+</div>
+<script>
+function cwShow(id,btn){document.querySelectorAll('.cw .face').forEach(function(f){f.style.display='none'});document.querySelectorAll('.cw .tab').forEach(function(b){b.setAttribute('aria-pressed','false')});document.getElementById(id).style.display='block';btn.setAttribute('aria-pressed','true')}
+</script>

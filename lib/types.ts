@@ -70,11 +70,15 @@ export type KnotView = {
   question: string;
   angle: string;
   lane: string;
+  threshold: number;
+  budget?: number;
   state: string;
   grade: number;
   ready: boolean;
   readyOffset?: number;
   unknown: boolean;
+  returned: boolean;
+  returnOffset?: number;
   tacts: WindingTact[];
   evidence: EvidenceExcerpt[];
   answers: { text: string; vector: string; offset: number }[];
@@ -100,6 +104,9 @@ export type SceneView = {
   operatorId: OperatorId;
   selectedOffset: number;
   requestUid?: string;
+  closeBindId?: string;
+  closeInstruction?: string;
+  returnTo?: string;
   status: "projecting" | "active" | "candidate" | "integrated";
   knots: KnotView[];
   candidate?: IntegrationCandidate;
@@ -160,10 +167,11 @@ export type TurnBody = {
   focusRef?: string;
 };
 
+// "integrate" is deliberately absent: a scene's close bind publishes itself
+// when its barrier settles (Vol. 06 §4); the human decision is acceptance.
 export type DecisionBody =
   | { kind: "evidence"; knotId: string; query?: string }
   | { kind: "deepen"; knotId: string }
-  | { kind: "integrate"; bindId: string }
   | { kind: "accept"; bindId: string; candidateOffset: number }
   | { kind: "markUnknown"; knotId: string }
   | { kind: "finish" }

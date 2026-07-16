@@ -40,9 +40,12 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
   };
 
   const scenes = new Map<string, SceneView>();
+  const scenesByCloseBind = new Map<string, SceneView>();
   const knots = new Map<string, KnotView>();
   const openUids = new Map<string, string>(); // uid → owner id
   let failures = 0;
+
+  const sceneOfUid = (uid: string): SceneView | undefined => scenes.get(uid.split("#")[0]);
 
   for (const tuple of tuples) {
     if (tuple.kind === "sys.knot.ready") {
@@ -54,6 +57,56 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
       }
       continue;
     }
+
+    // Sown topology records: the knot definitions and the closing bind of a
+    // scene, stamped emittedBy with the sowing service uid (Vol. 06 §7).
+    if (tuple.kind === "sys.knot.defined") {
+      const payload = tuple.payload as {
+        id: string;
+        config?: {
+          wind?: { lane?: string; budget?: number };
+          condition?: { questions?: string[]; threshold_grade?: number };
+        };
+        emittedBy?: string;
+      };
+      const scene = payload.emittedBy ? sceneOfUid(payload.emittedBy) : undefined;
+      const knot: KnotView = {
+        knotId: payload.id,
+        bindId: scene?.bindId ?? "",
+        question: payload.config?.condition?.questions?.[0] ?? payload.id,
+        angle: "",
+        lane: payload.config?.wind?.lane ?? "",
+        threshold: payload.config?.condition?.threshold_grade ?? 0.7,
+        budget: payload.config?.wind?.budget,
+        state: "",
+        grade: 0,
+        ready: false,
+        unknown: false,
+        returned: false,
+        tacts: [],
+        evidence: [],
+        answers: []
+      };
+      knots.set(knot.knotId, knot);
+      scene?.knots.push(knot);
+      continue;
+    }
+    if (tuple.kind === "sys.descriptor.defined") {
+      const payload = tuple.payload as {
+        id: string;
+        operator?: { service?: { instruction?: string }; return_to?: string };
+        emittedBy?: string;
+      };
+      const scene = payload.emittedBy ? sceneOfUid(payload.emittedBy) : undefined;
+      if (scene) {
+        scene.closeBindId = payload.id;
+        scene.closeInstruction = payload.operator?.service?.instruction;
+        scene.returnTo = payload.operator?.return_to;
+        scenesByCloseBind.set(payload.id, scene);
+      }
+      continue;
+    }
+
     const type = factType(tuple);
     if (!type) continue;
     const d = data(tuple);
@@ -112,38 +165,20 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
         failures += 1;
         break;
       }
+      case "learning.knot.seeded": {
+        const knot = knots.get(String(d.knot ?? ""));
+        if (knot) knot.angle = String(d.angle ?? knot.angle);
+        break;
+      }
       case "learning.scene.unfolded": {
         const uid = String(d.uid ?? "");
         openUids.delete(uid);
-        const bindId = String(d.bindId ?? "");
-        const scene = scenes.get(bindId);
-        const result = (d.result ?? {}) as {
-          title?: string;
-          purpose?: string;
-          knots?: { knotId: string; question: string; angle: string; lane: string }[];
-        };
+        const scene = scenes.get(String(d.bindId ?? ""));
+        const result = (d.result ?? {}) as { title?: string; purpose?: string };
         if (scene) {
           scene.title = result.title ?? scene.title;
           scene.purpose = result.purpose ?? "";
           scene.status = "active";
-          for (const item of result.knots ?? []) {
-            const knot: KnotView = {
-              knotId: item.knotId,
-              bindId,
-              question: item.question,
-              angle: item.angle,
-              lane: item.lane,
-              state: "",
-              grade: 0,
-              ready: false,
-              unknown: false,
-              tacts: [],
-              evidence: [],
-              answers: []
-            };
-            knots.set(knot.knotId, knot);
-            scene.knots.push(knot);
-          }
         }
         break;
       }
@@ -217,12 +252,16 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
         if (knot && d.mark === "unknown") knot.unknown = true;
         break;
       }
-      case "learning.integration.candidate": {
+      case "learning.integration.candidate":
+      case "learning.integration.returned": {
         const uid = String(d.uid ?? "");
         openUids.delete(uid);
-        const scene = scenes.get(String(d.bindId ?? ""));
+        // Published by the scene's close bind; the owning scene is resolved
+        // through the close-bind registration, never by adjacency.
+        const closeBindId = String(d.bindId ?? "");
+        const scene = scenesByCloseBind.get(closeBindId) ?? scenes.get(closeBindId);
         const result = (d.result ?? {}) as Partial<IntegrationCandidate>;
-        if (scene) {
+        if (scene && !scene.candidate) {
           scene.candidate = {
             offset: tuple.offset,
             uid,
@@ -232,6 +271,13 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
             uncertainties: result.uncertainties ?? []
           };
           scene.status = "candidate";
+        }
+        if (type === "learning.integration.returned") {
+          const parentKnot = knots.get(String(d.parentKnotId ?? ""));
+          if (parentKnot) {
+            parentKnot.returned = true;
+            parentKnot.returnOffset = tuple.offset;
+          }
         }
         break;
       }
@@ -252,15 +298,13 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
             contributions: scene.candidate.contributions,
             openQuestions: scene.candidate.openQuestions
           };
+          if (scene.sourceKnotId) {
+            const parentKnot = knots.get(scene.sourceKnotId);
+            if (parentKnot) parentKnot.returnedValueId = valueId;
+            value.returnedToKnotId = scene.sourceKnotId;
+          }
           projection.values.push(value);
         }
-        break;
-      }
-      case "learning.integration.returned": {
-        const knot = knots.get(String(d.parentKnotId ?? ""));
-        const value = projection.values.find((v) => v.valueId === String(d.valueId ?? ""));
-        if (knot) knot.returnedValueId = String(d.valueId ?? "");
-        if (value) value.returnedToKnotId = String(d.parentKnotId ?? "");
         break;
       }
       case "learning.session.result.candidate": {
@@ -298,10 +342,16 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
   return projection;
 }
 
+// A knot is settled when it is ready, explicitly unknown, or has received its
+// child scene's returned integration — the barrier condition of the scene's
+// close bind.
+export function knotSettled(knot: KnotView): boolean {
+  return knot.ready || knot.unknown || knot.returned;
+}
+
 // Deterministic completion gate over the projection (the result contract of
 // the "Understand the machine" petal): the root scene must be integrated and
-// accepted; every knot of every integrated scene must be ready, explicitly
-// unknown, or satisfied by a returned child value.
+// accepted; every knot of every integrated scene must be settled.
 export function evaluateCompletion(projection: SessionProjection): string[] {
   const reasons: string[] = [];
   const rootScenes = projection.scenes.filter((s) => !s.parentBindId);
@@ -311,15 +361,16 @@ export function evaluateCompletion(projection: SessionProjection): string[] {
   }
   const integratedRoot = rootScenes.some((s) => s.status === "integrated");
   if (!integratedRoot) {
-    reasons.push("The root scene has no accepted integration yet — integrate and accept it.");
+    reasons.push(
+      "The root scene has no accepted integration yet — the close bind publishes its candidate when every knot settles; accept it."
+    );
   }
   for (const scene of projection.scenes) {
     if (scene.status !== "integrated") continue;
     for (const knot of scene.knots) {
-      const settled = knot.ready || knot.unknown || Boolean(knot.returnedValueId);
-      if (!settled) {
+      if (!knotSettled(knot)) {
         reasons.push(
-          `Knot "${knot.question}" is neither ready nor explicitly unknown — answer it, mark it unknown, or integrate its child scene.`
+          `Knot "${knot.question}" is neither ready nor explicitly unknown — answer it, mark it unknown, or let its child scene return.`
         );
       }
     }

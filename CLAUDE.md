@@ -29,12 +29,63 @@ not to be weakened implicitly.
      `evidence` on another (real spec excerpts with volume/section refs),
      `deepen` a third into a child scene whose integration returns to the
      parent knot;
-  7. integrate the scene (`fold`) — candidate with contribution map and open
-     questions; accept — released to the left rail;
+  7. the scene's close bind publishes its integration itself once every knot
+     is ready, returned, or explicitly unknown (barrier auto-settlement) —
+     a candidate with contribution map and open questions; the human decision
+     is accept — released to the left rail;
   8. finish under the result contract — attested completion, final document
      projection with provenance and preserved open questions;
   9. open the trace — the tuple log with correlations; a page refresh
      replays the same scene from the log (no browser-private truth).
+
+## Thinking rails (Nest alignment)
+
+Check every analysis, UI decision and API shape against these rails; they are
+derived from the specification set and `spec/` and are not to be weakened.
+
+1. **The log is immutable.** A user action is exactly one of: a read-model
+   reference (no log effect), a new committed fact (ingress), or new topology
+   records (authoring). Nothing ever edits what is committed.
+2. **A knot card is a projection** — derived from the definition tuple, the
+   winding protocol tuples and readiness snapshots. Registers (STATE, GRADE,
+   SLOTS) are never programme-addressable (Vol. 02 §4.7).
+3. **Buttons are fact factories.** Each shapes a fact (type, discriminators,
+   correlation) so declared collection rules route it. A targeted answer is a
+   discriminated fact; plain text is an ambient fact any matching clew winds.
+4. **Declared form, no retroactive delivery.** What a knot can hear is fixed
+   at registration; facts committed before registration are never delivered
+   (Vol. 02 §5.1). Including prior values in a new scene = re-presentation
+   (fresh facts carrying refs) or embedding at authoring, sealed as a source
+   snapshot.
+5. **Return sockets are declared at birth.** A knot consumes a future child's
+   return only through a rule it already carries (`where` target = own id);
+   otherwise the return is gathered by a later-authored bind as a demand.
+   Re-registration replaces the definition and resets the clew — never an
+   "edit" tool.
+6. **Deepen is topology authoring** (records → close → heads, `emittedBy`
+   stamped, registration before facts) — categorically heavier than fact
+   ingress; it carries attribution, reachability, termination and deserves
+   distinguished UI.
+7. **The machine is self-moving.** Readiness reifies automatically; a bind's
+   rendezvous projects at its barrier without human action. Human acts are:
+   supplying facts, acceptance/judgement, authoring. Keep the four transitions
+   distinct: knot ready ≠ bind completed ≠ human accepted ≠ session completed.
+8. **The left rail holds bind publications** (released integration tuples,
+   referenced by offset) — never knot wound states.
+9. **Ambient facts reach off-screen clews** whenever key + match + where +
+   ordering allow; keep the surface quiet but make the ripple inspectable.
+10. **When in doubt, ask:** which tuples exist, which are being created, and
+    which projection shows them (Vol. 08 §8 derivation discipline).
+
+## Simulation liberties (current, documented)
+
+- The internal agent (Together AI via `lib/guide.ts`) plays the planner/
+  winding/fold services; `lib/machine.ts` is the declared-form wrapper that
+  expands agent plans into records. The external session API is the future
+  swap surface for a real Nest VM.
+- Seed heads do not project winding intentions (grades stay 0 until learner
+  material or a return arrives); close binds carry no gates yet; unknown-marks
+  stand in for barrier re-scoping.
 
 ## Project frame: The Algorithmic Company
 

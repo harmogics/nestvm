@@ -351,18 +351,15 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                 </span>
                 <h2>{focusedScene.title}</h2>
                 {focusedScene.purpose && <p className="purpose">{focusedScene.purpose}</p>}
-                <div className="scene-actions">
-                  {focusedScene.status !== "integrated" && (
-                    <button
-                      type="button"
-                      className="op-btn primary"
-                      disabled={busy || completed}
-                      onClick={() => decide({ kind: "integrate", bindId: focusedScene.bindId })}
-                    >
-                      {focusedScene.candidate ? "Re-integrate" : "Integrate the scene"}
-                    </button>
-                  )}
-                </div>
+                {focusedScene.status === "active" && focusedScene.knots.length > 0 && (
+                  <p className="barrier-note">
+                    close bind {focusedScene.closeBindId ?? "—"} · barrier{" "}
+                    {focusedScene.knots.filter((k) => k.ready || k.unknown || k.returned).length} /{" "}
+                    {focusedScene.knots.length} settled — it publishes its integration itself once
+                    every knot is ready, returned, or explicitly unknown
+                    {focusedScene.returnTo ? `; the return is addressed to ${focusedScene.returnTo}` : ""}
+                  </p>
+                )}
               </div>
 
               <div className="knot-list">
@@ -376,14 +373,20 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                     key={knot.knotId}
                   >
                     <div className="knot-meta">
-                      <span className="angle">{knot.angle}</span>
+                      <span className="angle">{knot.angle || knot.lane}</span>
                       {knot.ready && <span className="ready-chip">ready</span>}
+                      {knot.returned && !knot.ready && <span className="ready-chip">returned</span>}
                       {knot.unknown && <span className="unknown-chip">explicitly unknown</span>}
                       <span className="grade-meter">
                         <span className="bar">
-                          <b className={knot.grade >= 0.7 ? "hot" : ""} style={{ width: `${Math.round(knot.grade * 100)}%` }} />
+                          <b
+                            className={knot.grade >= knot.threshold ? "hot" : ""}
+                            style={{ width: `${Math.round(knot.grade * 100)}%` }}
+                          />
                         </span>
-                        <span>grade {knot.grade.toFixed(2)}</span>
+                        <span>
+                          grade {knot.grade.toFixed(2)} / {knot.threshold.toFixed(2)}
+                        </span>
                       </span>
                     </div>
                     <p className="knot-question">{knot.question}</p>
@@ -400,9 +403,11 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                         ))}
                       </div>
                     )}
-                    {knot.returnedValueId && (
+                    {knot.returned && (
                       <p className="returned-note">
-                        ↩ child scene integrated — value {knot.returnedValueId} returned to this knot
+                        ↩ the child scene&rsquo;s integration returned to this knot
+                        {knot.returnedValueId ? ` (released as ${knot.returnedValueId})` : ""}
+                        {knot.returnOffset !== undefined ? ` · offset ${knot.returnOffset}` : ""}
                       </p>
                     )}
                     <div className="knot-actions">
@@ -469,7 +474,11 @@ export function Workbench({ sessionId }: { sessionId: string }) {
 
               {focusedScene.candidate && focusedScene.status !== "integrated" && (
                 <div className="candidate-panel">
-                  <span className="eyebrow">Integration candidate — seams preserved</span>
+                  <span className="eyebrow">
+                    {focusedScene.returnTo
+                      ? `Published by ${focusedScene.closeBindId} — already returned to ${focusedScene.returnTo}; accepting releases it to the left rail`
+                      : `Published by ${focusedScene.closeBindId} at its barrier — seams preserved`}
+                  </span>
                   <h3>{focusedScene.title}</h3>
                   <p className="statement">{focusedScene.candidate.statement}</p>
                   {focusedScene.candidate.contributions.length > 0 && (

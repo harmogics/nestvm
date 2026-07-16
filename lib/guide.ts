@@ -6,10 +6,14 @@
 
 type GuideSource = "together" | "simulation";
 
-export type UnfoldResult = {
+// The agent's authoring output: a bounded scene plan. The model supplies
+// content only; lib/machine.ts expands the plan through the declared template
+// into sys.knot.defined / sys.descriptor.defined records and head facts.
+export type ScenePlan = {
   title: string;
   purpose: string;
-  knots: { question: string; angle: string }[];
+  knots: { question: string; angle: string; threshold_grade: number; budget: number }[];
+  close_instruction: string;
 };
 
 export type WindResult = {
@@ -74,36 +78,63 @@ function focusPhrase(text: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// unfold — form a scene of question knots over the root or a deepened knot
+// authorScene — the internal simulating agent playing the planner service:
+// it authors the content of a bounded child figure (questions, angles,
+// thresholds, budgets, closing instruction). The declared form — record
+// shapes, ids, collect rules, return sockets, emit targets — is fixed by the
+// template in lib/machine.ts and is never the model's to change.
 // ---------------------------------------------------------------------------
 
-export async function unfoldScene(input: {
+function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
+
+export async function authorScene(input: {
   subjectLabel: string;
   rootText: string;
   emphasis?: string;
   focusQuestion?: string;
   focusState?: string;
-}): Promise<Guided<UnfoldResult>> {
-  const system = `You are the guide of a study workbench for the Nest virtual machine specification. Unfold the learner's material into 3 or 4 question knots — the questions an adequate understanding must be able to answer, not tasks. Write British English. Return only JSON: {"title": string, "purpose": string, "knots": [{"question": string, "angle": string}]}. "title" names the scene in the learner's own domain language (max 9 words). "purpose" is one sentence on what this scene settles. Each "angle" is 2-5 words naming the direction of perception (e.g. "failure behaviour", "load-bearing rule"). Never request or reveal hidden chain-of-thought.`;
+  sources?: string[];
+}): Promise<Guided<ScenePlan>> {
+  const system = `You are the planner service of a study workbench for the Nest virtual machine specification. Your task is one bounded act of semantic authoring: unfold the given material into a scene of 3 or 4 question knots and one closing instruction. A knot's question is the test an adequate understanding must pass — not a task, not a heading. Write British English. Return only JSON, exactly this shape:
+{"title": string, "purpose": string, "knots": [{"question": string, "angle": string, "threshold_grade": number, "budget": number}], "close_instruction": string}
+Constraints: "title" names the scene in the learner's own domain language (max 9 words). "purpose" is one sentence on what this scene settles. "angle" is 2-5 words naming the direction of perception (e.g. "failure behaviour", "load-bearing rule"). "threshold_grade" is the readiness bar in [0.55, 0.85] — set it higher for questions where a shallow answer is dangerous. "budget" is the winding budget in [2, 6]. "close_instruction" tells the closing service how to integrate the ripened understandings, seams preserved. You author content only; the record forms, sockets and emit targets are fixed by the machine. Never request or reveal hidden chain-of-thought.`;
   const user = [
     `Subject under study: ${input.subjectLabel}`,
     input.focusQuestion
       ? `The learner deepens this knot: ${input.focusQuestion}\nIts current understanding: ${input.focusState || "(none yet)"}`
       : `The learner's root material: ${input.rootText}`,
-    `Form the question knots.`
-  ].join("\n");
+    input.emphasis?.trim() ? `The learner's emphasis for this unfold: ${input.emphasis.trim()}` : "",
+    input.sources && input.sources.length > 0
+      ? `Released values available as sources:\n${input.sources.map((s) => `- ${s}`).join("\n")}`
+      : "",
+    `Author the scene plan.`
+  ]
+    .filter(Boolean)
+    .join("\n");
 
-  const raw = (await callTogether(system, user)) as UnfoldResult | null;
-  if (raw && Array.isArray(raw.knots) && raw.knots.length > 0) {
+  const raw = (await callTogether(system, user)) as ScenePlan | null;
+  if (raw && Array.isArray(raw.knots) && raw.knots.length > 0 && typeof raw.title === "string") {
     return {
       source: "together",
       result: {
-        title: String(raw.title || "Unfolded inquiry"),
-        purpose: String(raw.purpose || ""),
-        knots: raw.knots.slice(0, 4).map((k) => ({
-          question: String(k.question || "").trim(),
-          angle: String(k.angle || "angle").trim()
-        }))
+        title: String(raw.title || "Unfolded inquiry").trim(),
+        purpose: String(raw.purpose || "").trim(),
+        knots: raw.knots
+          .slice(0, 4)
+          .filter((k) => String(k.question || "").trim().length > 0)
+          .map((k) => ({
+            question: String(k.question).trim(),
+            angle: String(k.angle || "angle").trim(),
+            threshold_grade: clampNumber(k.threshold_grade, 0.55, 0.85, 0.7),
+            budget: Math.round(clampNumber(k.budget, 2, 6, 4))
+          })),
+        close_instruction:
+          String(raw.close_instruction || "").trim() ||
+          "Integrate the ripened understandings into one seam-preserving articulation."
       }
     };
   }
@@ -115,11 +146,12 @@ export async function unfoldScene(input: {
       title: `Understanding: ${focus}`,
       purpose: `Settle what "${focus}" means, which rules govern it, and how it behaves at its boundaries.`,
       knots: [
-        { question: `What exactly is meant by "${focus}", and which problem does it exist to solve?`, angle: "purpose and meaning" },
-        { question: `Which normative rules or invariants govern it, and where are they stated?`, angle: "load-bearing rules" },
-        { question: `What happens when it fails, stalls, or is absent — what does the honest failure look like?`, angle: "failure behaviour" },
-        { question: `How does it connect to the rest of the machine — what feeds it and what consumes it?`, angle: "connections" }
-      ]
+        { question: `What exactly is meant by "${focus}", and which problem does it exist to solve?`, angle: "purpose and meaning", threshold_grade: 0.7, budget: 4 },
+        { question: `Which normative rules or invariants govern it, and where are they stated?`, angle: "load-bearing rules", threshold_grade: 0.7, budget: 4 },
+        { question: `What happens when it fails, stalls, or is absent — what does the honest failure look like?`, angle: "failure behaviour", threshold_grade: 0.7, budget: 4 },
+        { question: `How does it connect to the rest of the machine — what feeds it and what consumes it?`, angle: "connections", threshold_grade: 0.7, budget: 4 }
+      ],
+      close_instruction: "Integrate the ripened understandings into one seam-preserving articulation that answers the scene's purpose."
     }
   };
 }

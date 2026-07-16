@@ -3,21 +3,31 @@
 // spec/first-turn-log-protocol.md: target knot → answer; operator → configured
 // bind request; neither → plain signal, no machine work. The server, never the
 // browser, mints ids, uids and offsets.
+//
+// Scene authoring follows the declared-form discipline (Vol. 01 §2.5,
+// Vol. 06 §7): the internal agent (lib/guide.ts) supplies content only — a
+// ScenePlan — and expandScenePlan turns it into sys.knot.defined records with
+// explicit collect rules (seed, answer, evidence sockets and the return
+// socket declared at birth), one closing bind descriptor, head facts, and the
+// terminal delegated publication, in exactly that order: registration always
+// precedes the facts that reach it (Vol. 02 §5.1). Scene integration is not a
+// user command: settleScenes() completes each close bind's rendezvous as soon
+// as its barrier settles (Vol. 06 §4) — the human decision is acceptance.
 
 import { findEvidence } from "./corpus";
-import { foldIntegration, unfoldScene, windUnderstanding } from "./guide";
-import { evaluateCompletion, project } from "./projection";
+import { authorScene, foldIntegration, windUnderstanding, type ScenePlan } from "./guide";
+import { evaluateCompletion, knotSettled, project } from "./projection";
 import { commit, fact, readiness, updateMeta, type SessionRecord } from "./store";
 import type {
   CommandResult,
   DecisionBody,
   KnotView,
+  SceneView,
+  SessionProjection,
   TurnBody,
   WaveEmission,
   WaveTuple
 } from "./types";
-
-const READY_THRESHOLD = 0.7;
 
 function countFacts(record: SessionRecord, factType: string): number {
   let count = 0;
@@ -95,7 +105,7 @@ async function windKnot(
       fact(key, "inference.reasoning", { knotId: knot.knotId, uid, reasoning: wound.result.reasoning })
     );
   }
-  if (wound.result.grade >= READY_THRESHOLD) {
+  if (wound.result.grade >= knot.threshold) {
     emissions.push(
       readiness(key, knot.knotId, { state: wound.result.state, grade: wound.result.grade })
     );
@@ -104,7 +114,136 @@ async function windKnot(
   return committed;
 }
 
-// A scene-forming bind: selection → service intention → delegated publication.
+// ---------------------------------------------------------------------------
+// Scene authoring: plan → records → close → heads → delegated publication
+// ---------------------------------------------------------------------------
+
+function expandScenePlan(input: {
+  key: string;
+  bindId: string;
+  uid: string;
+  plan: ScenePlan;
+  source: string;
+  returnTo?: string;
+}): WaveEmission[] {
+  const emissions: WaveEmission[] = [];
+  const knotIds: string[] = [];
+
+  // 1. Knot records: the declared form. Each knot carries, from birth, its
+  //    seed rule, the learner-facing sockets (answer, evidence) and the
+  //    return socket a future child scene may write into (no retroactive
+  //    subscriptions exist — Vol. 02 §5.1).
+  input.plan.knots.forEach((planKnot, index) => {
+    const knotId = `${input.bindId}.k${index + 1}`;
+    knotIds.push(knotId);
+    emissions.push({
+      kind: "sys.knot.defined",
+      key: null,
+      payload: {
+        id: knotId,
+        strategy: "semantic_evaluator",
+        config: {
+          wind: {
+            collect: [
+              {
+                as: "seed",
+                match_type: "learning.knot.seeded",
+                reduce: "append",
+                field: "question",
+                where: [{ field: "knot", equals: knotId }]
+              },
+              {
+                as: "answer",
+                match_type: "learning.answer.submitted",
+                reduce: "append",
+                field: "answer",
+                where: [{ field: "knotId", equals: knotId }]
+              },
+              {
+                as: "evidence",
+                match_type: "learning.evidence.registered",
+                reduce: "append",
+                where: [{ field: "knotId", equals: knotId }]
+              },
+              {
+                as: "return",
+                match_type: "learning.integration.returned",
+                reduce: "append",
+                where: [{ field: "parentKnotId", equals: knotId }]
+              }
+            ],
+            integrate: "through_world",
+            lane: `${input.bindId}.q${index + 1}`,
+            budget: planKnot.budget
+          },
+          condition: {
+            evaluate_understanding: true,
+            questions: [planKnot.question],
+            threshold_grade: planKnot.threshold_grade
+          }
+        },
+        emittedBy: input.uid
+      }
+    });
+  });
+
+  // 2. The closing bind, once: demands on every sown knot; its publication
+  //    target is fixed here — the candidate type for a root scene, the
+  //    parent-addressed return type for a deepened scene. `return_to` is
+  //    template-fixed, never model-supplied.
+  const closeBindId = `${input.bindId}.close`;
+  emissions.push({
+    kind: "sys.descriptor.defined",
+    key: null,
+    payload: {
+      id: closeBindId,
+      operator: {
+        demands: knotIds.map((knotId, index) => ({ as: `k${index + 1}`, knot: knotId })),
+        service: {
+          instruction: input.plan.close_instruction,
+          emit: {
+            writes: input.returnTo ? "learning.integration.returned" : "learning.integration.candidate"
+          }
+        },
+        ...(input.returnTo ? { return_to: input.returnTo } : {})
+      },
+      emittedBy: input.uid
+    }
+  });
+
+  // 3. Head facts, last: they seed the sown knots and inject the angle of
+  //    perception. (Simulation liberty: the seed itself does not project a
+  //    winding intention; grades stay honest at 0 until learner material or
+  //    a returned integration arrives.)
+  input.plan.knots.forEach((planKnot, index) => {
+    emissions.push(
+      fact(input.key, "learning.knot.seeded", {
+        knot: knotIds[index],
+        question: planKnot.question,
+        angle: planKnot.angle,
+        emittedBy: input.uid
+      })
+    );
+  });
+
+  // 4. The terminal delegated publication for the sowing service uid.
+  emissions.push(
+    fact(input.key, "learning.scene.unfolded", {
+      bindId: input.bindId,
+      uid: input.uid,
+      result: {
+        title: input.plan.title,
+        purpose: input.plan.purpose,
+        knotIds,
+        closeBindId
+      },
+      source: input.source
+    })
+  );
+
+  return emissions;
+}
+
 async function formScene(
   record: SessionRecord,
   input: {
@@ -119,6 +258,7 @@ async function formScene(
   }
 ): Promise<WaveTuple[]> {
   const key = record.meta.id;
+  const projection = project(record.tuples);
   const bindId = `bind-${countFacts(record, "learning.bind.selected") + 1}`;
   const committed: WaveTuple[] = [];
   committed.push(
@@ -145,8 +285,8 @@ async function formScene(
         uid,
         instruction:
           input.operatorId === "deepen"
-            ? "Unfold the deepened knot into 3-4 question knots for a child scene."
-            : "Unfold the learner's root material into 3-4 question knots.",
+            ? "Author a bounded child scene for the deepened knot: 3-4 question knots and a closing instruction."
+            : "Author a bounded scene over the learner's root material: 3-4 question knots and a closing instruction.",
         scope: {
           subject: subjectLabel(record),
           root: input.focusQuestion ?? rootText(record, input.text),
@@ -156,34 +296,134 @@ async function formScene(
       })
     ]))
   );
-  const unfolded = await unfoldScene({
+  const sourceStatements = input.sourceRefs
+    .map((ref) => projection.values.find((v) => v.valueId === ref))
+    .filter((v): v is NonNullable<typeof v> => Boolean(v))
+    .map((v) => `${v.valueId}: ${v.statement.slice(0, 300)}`);
+  const authored = await authorScene({
     subjectLabel: subjectLabel(record),
     rootText: rootText(record, input.text),
     emphasis: input.text || undefined,
     focusQuestion: input.focusQuestion,
-    focusState: input.focusState
+    focusState: input.focusState,
+    sources: sourceStatements
   });
   committed.push(
-    ...(await commit(record, [
-      fact(key, "learning.scene.unfolded", {
+    ...(await commit(
+      record,
+      expandScenePlan({
+        key,
         bindId,
         uid,
-        result: {
-          title: unfolded.result.title,
-          purpose: unfolded.result.purpose,
-          knots: unfolded.result.knots.map((k, i) => ({
-            knotId: `${bindId}.k${i + 1}`,
-            question: k.question,
-            angle: k.angle,
-            lane: `${bindId}.q${i + 1}`
-          }))
-        },
-        source: unfolded.source
+        plan: authored.result,
+        source: authored.source,
+        returnTo: input.sourceKnotId
       })
-    ]))
+    ))
   );
   return committed;
 }
+
+// ---------------------------------------------------------------------------
+// Barrier settlement: every close bind whose demands have all settled
+// completes its rendezvous and publishes — cascading, since a child's return
+// may ripen its parent knot and settle the parent's own barrier.
+// ---------------------------------------------------------------------------
+
+function closeEntries(scene: SceneView, projection: SessionProjection) {
+  return scene.knots.map((knot) => {
+    if (knot.returned && knot.childBindId) {
+      const childScene = projection.scenes.find((s) => s.bindId === knot.childBindId);
+      return {
+        name: knot.question,
+        kind: "returned integration",
+        text: childScene?.candidate?.statement ?? knot.state ?? "",
+        grade: 1
+      };
+    }
+    if (knot.unknown) {
+      return {
+        name: knot.question,
+        kind: "explicitly unknown",
+        text: "Held open as unknown by the learner.",
+        grade: 0
+      };
+    }
+    return {
+      name: knot.question,
+      kind: knot.ready ? "ready knot" : "unripe knot",
+      text: knot.state || knot.answers.map((a) => a.text).join("\n") || "(no material)",
+      grade: knot.grade
+    };
+  });
+}
+
+async function settleScenes(record: SessionRecord): Promise<WaveTuple[]> {
+  const key = record.meta.id;
+  const committed: WaveTuple[] = [];
+  for (let round = 0; round < 4; round += 1) {
+    const projection = project(record.tuples);
+    let fired = false;
+    for (const scene of projection.scenes) {
+      if (scene.status !== "active" || !scene.closeBindId || scene.knots.length === 0) continue;
+      if (scene.candidate) continue; // one-shot rendezvous (Vol. 06 §4.2)
+      if (!scene.knots.every(knotSettled)) continue;
+
+      const uid = `${scene.closeBindId}#1`;
+      const entries = closeEntries(scene, projection);
+      const emitTarget = scene.returnTo
+        ? "learning.integration.returned"
+        : "learning.integration.candidate";
+      committed.push(
+        ...(await commit(record, [
+          fact(key, "service.request", {
+            bindId: scene.closeBindId,
+            uid,
+            instruction:
+              scene.closeInstruction ??
+              "Integrate the ripened understandings into one seam-preserving articulation.",
+            scope: { entries: entries.map((e) => ({ name: e.name, kind: e.kind })) },
+            emit: { writes: emitTarget }
+          })
+        ]))
+      );
+      const folded = await foldIntegration({
+        title: scene.title,
+        purpose: scene.purpose,
+        rootText: rootText(record, ""),
+        entries
+      });
+      committed.push(
+        ...(await commit(record, [
+          fact(key, emitTarget, {
+            bindId: scene.closeBindId,
+            uid,
+            ...(scene.returnTo ? { parentKnotId: scene.returnTo } : {}),
+            result: folded.result,
+            source: folded.source
+          })
+        ]))
+      );
+      // The returned integration winds the parent knot through the return
+      // socket the parent has carried since birth.
+      if (scene.returnTo) {
+        const parentKnot = knotOrNull(record, scene.returnTo);
+        if (parentKnot && !parentKnot.ready) {
+          committed.push(
+            ...(await windKnot(record, parentKnot, [`[return] ${folded.result.statement}`]))
+          );
+        }
+      }
+      fired = true;
+    }
+    if (!fired) break;
+  }
+  return committed;
+}
+
+// ---------------------------------------------------------------------------
+// Commands
+// ---------------------------------------------------------------------------
 
 export async function submitTurn(record: SessionRecord, body: TurnBody): Promise<CommandResult> {
   const key = record.meta.id;
@@ -229,6 +469,7 @@ export async function submitTurn(record: SessionRecord, body: TurnBody): Promise
     );
     const refreshed = knotOrNull(record, targetKnotId);
     if (refreshed) tuples.push(...(await windKnot(record, refreshed, [`[${vector}] ${body.text.trim()}`])));
+    tuples.push(...(await settleScenes(record)));
     return { tuples };
   }
 
@@ -269,6 +510,7 @@ export async function submitDecision(record: SessionRecord, body: DecisionBody):
       const deltas = excerpts.map((e) => `[evidence] ${e.volume}, "${e.section}": ${e.excerpt}`);
       const refreshed = knotOrNull(record, knot.knotId);
       if (refreshed) tuples.push(...(await windKnot(record, refreshed, deltas)));
+      tuples.push(...(await settleScenes(record)));
       return { tuples };
     }
 
@@ -289,106 +531,37 @@ export async function submitDecision(record: SessionRecord, body: DecisionBody):
       return { tuples };
     }
 
-    case "integrate": {
-      const projection = project(record.tuples);
-      const scene = projection.scenes.find((s) => s.bindId === body.bindId);
-      if (!scene) return { tuples: [], refused: { reasons: [`Unknown scene ${body.bindId}.`] } };
-      if (scene.knots.length === 0) return { tuples: [], refused: { reasons: ["The scene has no knots yet."] } };
-      const worked = scene.knots.some((k) => k.ready || k.unknown || k.returnedValueId || k.state);
-      if (!worked) {
-        return { tuples: [], refused: { reasons: ["Nothing has been wound yet — answer, evidence, or deepen at least one knot first."] } };
-      }
-      const uid = `${body.bindId}#${countFacts(record, "service.request") + 1}`;
-      const entries = scene.knots.map((k) => {
-        if (k.returnedValueId) {
-          const value = projection.values.find((v) => v.valueId === k.returnedValueId);
-          return { name: k.question, kind: "returned value", text: value?.statement ?? "", grade: 1 };
-        }
-        if (k.unknown) return { name: k.question, kind: "explicitly unknown", text: "Held open as unknown by the learner.", grade: 0 };
-        return {
-          name: k.question,
-          kind: k.ready ? "ready knot" : "unripe knot",
-          text: k.state || k.answers.map((a) => a.text).join("\n") || "(no material)",
-          grade: k.grade
-        };
-      });
-      const tuples: WaveTuple[] = [];
-      tuples.push(
-        ...(await commit(record, [
-          fact(key, "service.request", {
-            bindId: body.bindId,
-            uid,
-            instruction: "Integrate the ripened understandings into one seam-preserving articulation.",
-            scope: { entries: entries.map((e) => ({ name: e.name, kind: e.kind })) },
-            emit: { writes: "learning.integration.candidate" }
-          })
-        ]))
-      );
-      const folded = await foldIntegration({
-        title: scene.title,
-        purpose: scene.purpose,
-        rootText: rootText(record, ""),
-        entries
-      });
-      tuples.push(
-        ...(await commit(record, [
-          fact(key, "learning.integration.candidate", {
-            bindId: body.bindId,
-            uid,
-            result: folded.result,
-            source: folded.source
-          })
-        ]))
-      );
-      return { tuples };
-    }
-
     case "accept": {
       const projection = project(record.tuples);
       const scene = projection.scenes.find((s) => s.bindId === body.bindId);
-      if (!scene?.candidate) return { tuples: [], refused: { reasons: ["The scene has no integration candidate to accept."] } };
+      if (!scene?.candidate) return { tuples: [], refused: { reasons: ["The scene has no published integration to accept."] } };
       if (scene.candidate.offset !== body.candidateOffset) {
         return { tuples: [], refused: { reasons: ["The candidate changed since it was shown — review the current candidate."] } };
       }
       if (scene.status === "integrated") return { tuples: [], refused: { reasons: ["This scene is already integrated."] } };
       const valueId = `v${projection.values.length + 1}`;
-      const tuples: WaveTuple[] = [];
-      tuples.push(
-        ...(await commit(record, [
-          fact(key, "learning.integration.accepted", {
-            valueId,
-            bindId: body.bindId,
-            candidateOffset: body.candidateOffset,
-            title: scene.title,
-            actor: "learner"
-          })
-        ]))
-      );
-      if (scene.parentBindId && scene.sourceKnotId) {
-        tuples.push(
-          ...(await commit(record, [
-            fact(key, "learning.integration.returned", {
-              childBindId: body.bindId,
-              parentBindId: scene.parentBindId,
-              parentKnotId: scene.sourceKnotId,
-              valueId
-            })
-          ]))
-        );
-        const parentKnot = knotOrNull(record, scene.sourceKnotId);
-        if (parentKnot) {
-          tuples.push(...(await windKnot(record, parentKnot, [`[return] ${scene.candidate.statement}`])));
-        }
-      }
+      const tuples = await commit(record, [
+        fact(key, "learning.integration.accepted", {
+          valueId,
+          bindId: body.bindId,
+          candidateOffset: body.candidateOffset,
+          title: scene.title,
+          actor: "learner"
+        })
+      ]);
       return { tuples };
     }
 
     case "markUnknown": {
       const knot = knotOrNull(record, body.knotId);
       if (!knot) return { tuples: [], refused: { reasons: [`Unknown knot ${body.knotId}.`] } };
-      const tuples = await commit(record, [
-        fact(key, "learning.knot.marked", { knotId: body.knotId, mark: "unknown", actor: "learner" })
-      ]);
+      const tuples: WaveTuple[] = [];
+      tuples.push(
+        ...(await commit(record, [
+          fact(key, "learning.knot.marked", { knotId: body.knotId, mark: "unknown", actor: "learner" })
+        ]))
+      );
+      tuples.push(...(await settleScenes(record)));
       return { tuples };
     }
 

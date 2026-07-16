@@ -16,8 +16,15 @@ demands, integration, and retained multi-turn sessions.
   catalogue from that analysis.
 - [ADR-003: Spatial bind-and-knot workspace](./ADR-003-spatial-bind-knot-workspace.md)
   is the current interaction decision.
+- [ADR-004: Session runtime context](./ADR-004-session-runtime-context.md) fixes
+  the UI↔backend session API, the backend-owned storage planes (command journal,
+  workshop drafts, registry) versus the machine-owned pluggable wave store, the
+  machine port for the core swap, and this product's assembly profile.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
+- [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how
+  the human participates: the two storage planes, the human role and its limits,
+  the read→revise→append responsibility step, and the gesture geometry.
 - [Attention matrix](./attention-matrix.md) tests the design through Truth, Deep,
   Connect, Service, Knowledge, Evolution, and Responsibility.
 - [ADR-001](./ADR-001-guided-canvas.md) is retained as superseded history.

@@ -177,8 +177,16 @@ function excerptAround(text: string, queryTokens: string[], limit = 460): string
   return best;
 }
 
-export async function findEvidence(query: string, count = 3): Promise<EvidenceExcerpt[]> {
+// Deterministic retrieval; when `preferSlugs` is given (the session's
+// presented spec sources), sections of those documents are boosted so the
+// learner's own sources anchor the evidence before the wider corpus.
+export async function findEvidence(
+  query: string,
+  count = 3,
+  preferSlugs: readonly string[] = []
+): Promise<EvidenceExcerpt[]> {
   const c = await corpus();
+  const preferred = new Set(preferSlugs);
   const queryTokens = [...new Set(tokens(query))];
   if (queryTokens.length === 0) return [];
   const scored = c.sections
@@ -196,6 +204,7 @@ export async function findEvidence(query: string, count = 3): Promise<EvidenceEx
         }
         score += hits;
       }
+      if (preferred.has(section.slug)) score *= 2;
       return { section, score };
     })
     .filter((s) => s.score > 2)

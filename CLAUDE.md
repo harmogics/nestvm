@@ -83,9 +83,10 @@ derived from the specification set and `spec/` and are not to be weakened.
   winding/fold services; `lib/machine.ts` is the declared-form wrapper that
   expands agent plans into records. The external session API is the future
   swap surface for a real Nest VM.
-- Seed heads do not project winding intentions (grades stay 0 until learner
-  material or a return arrives); close binds carry no gates yet; unknown-marks
-  stand in for barrier re-scoping.
+- Scene forming ends with a grounding tact: every sown knot winds the
+  presented sources once (parallel windings, correlation-joined); further
+  winding follows learner material. Close binds carry no gates yet;
+  unknown-marks stand in for barrier re-scoping.
 
 ## Project frame: The Algorithmic Company
 
@@ -116,6 +117,11 @@ derived from the specification set and `spec/` and are not to be weakened.
    is walked end to end, the core is written per `specifications/` — driven by
    real scenarios, data flows, and the UI/UX requirements discovered in
    phase 1. Product needs drive runtime growth (Vol. 13 §1 rule).
+3. The binding contract for the swap is `spec/ADR-004-session-runtime-context.md`:
+   the session API and the machine port stay stable; backend-owned storage
+   (command journal, workshop drafts, registry — the only mutable plane, always
+   pre-commitment) is separate from the machine-owned pluggable WaveStore
+   (in-memory first, JSONL today); human decisions are always committed facts.
 - Existing code (`app/`, `components/`) is **reused**: adapted and evolved, or
   gradually replaced, respecting the layout already forming in the project.
 

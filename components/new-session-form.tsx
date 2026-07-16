@@ -17,8 +17,15 @@ export function NewSessionForm({
   const [mode, setMode] = useState<"volume" | "question">(initialIsVolume || !initialSubject ? "volume" : "question");
   const [volumeRef, setVolumeRef] = useState(initialIsVolume ? initialSubject! : volumes[0]?.slug ?? "");
   const [question, setQuestion] = useState("");
+  const [sources, setSources] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function toggleSource(slug: string) {
+    setSources((current) =>
+      current.includes(slug) ? current.filter((s) => s !== slug) : [...current, slug]
+    );
+  }
 
   async function start() {
     setBusy(true);
@@ -29,7 +36,7 @@ export function NewSessionForm({
       const response = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ petal: "understand-the-machine", subject })
+        body: JSON.stringify({ petal: "understand-the-machine", subject, sources })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Could not open the session.");
@@ -73,6 +80,29 @@ export function NewSessionForm({
           />
         </div>
       )}
+      <details className="sources-picker">
+        <summary>
+          Sources on the shelf
+          {mode === "volume" ? " · the subject volume is included automatically" : ""}
+          {sources.length > 0 ? ` · ${sources.length} selected` : ""}
+        </summary>
+        <div className="sources-list">
+          {volumes.map((v) => {
+            const isSubject = mode === "volume" && v.slug === volumeRef;
+            return (
+              <label key={v.slug} className={isSubject ? "muted" : ""}>
+                <input
+                  type="checkbox"
+                  checked={isSubject || sources.includes(v.slug)}
+                  disabled={isSubject}
+                  onChange={() => toggleSource(v.slug)}
+                />
+                {v.label}
+              </label>
+            );
+          })}
+        </div>
+      </details>
       <button
         className="cta terra"
         type="button"

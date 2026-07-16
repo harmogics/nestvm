@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { listSpecDocs } from "@/lib/corpus";
 import { createSession, commit, fact, listSessions, mintSessionId } from "@/lib/store";
-import type { SessionMeta, SessionSubject } from "@/lib/types";
+import type { ResourceRef, SessionMeta, SessionSubject, WaveEmission } from "@/lib/types";
 
 export async function GET() {
   const sessions = await listSessions();
@@ -9,17 +9,21 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  let body: { petal?: string; subject?: { kind?: string; ref?: string; text?: string } };
+  let body: {
+    petal?: string;
+    subject?: { kind?: string; ref?: string; text?: string };
+    sources?: string[]; // spec volume slugs declared on the session shelf
+  };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
+  const docs = await listSpecDocs();
   const petal = body.petal?.trim() || "understand-the-machine";
   let subject: SessionSubject;
   if (body.subject?.kind === "volume" && body.subject.ref) {
-    const docs = await listSpecDocs();
     const doc = docs.find((d) => d.slug === body.subject?.ref);
     if (!doc) return NextResponse.json({ error: `Unknown volume ref "${body.subject.ref}".` }, { status: 400 });
     subject = { kind: "volume", ref: doc.slug, title: `${doc.volumeLabel} — ${doc.title}` };
@@ -30,6 +34,19 @@ export async function POST(request: Request) {
       { error: "A subject is required: {kind:'volume', ref} or {kind:'question', text}." },
       { status: 400 }
     );
+  }
+
+  // The opening gesture declares the session's source shelf: the subject
+  // volume (when the subject is a volume) plus every valid selected volume.
+  const shelfSlugs: string[] = [];
+  if (subject.kind === "volume") shelfSlugs.push(subject.ref);
+  for (const slug of body.sources ?? []) {
+    if (typeof slug !== "string") continue;
+    if (shelfSlugs.includes(slug)) continue;
+    if (!docs.some((d) => d.slug === slug)) {
+      return NextResponse.json({ error: `Unknown source volume "${slug}".` }, { status: 400 });
+    }
+    shelfSlugs.push(slug);
   }
 
   const meta: SessionMeta = {
@@ -43,7 +60,7 @@ export async function POST(request: Request) {
     tuples: 0
   };
   const record = await createSession(meta);
-  await commit(record, [
+  const emissions: WaveEmission[] = [
     fact(meta.id, "learning.session.opened", {
       sessionId: meta.id,
       petal,
@@ -52,6 +69,17 @@ export async function POST(request: Request) {
       actor: "learner",
       class: "simulated"
     })
-  ]);
+  ];
+  for (const slug of shelfSlugs) {
+    const doc = docs.find((d) => d.slug === slug)!;
+    const resource: ResourceRef = {
+      store: "spec",
+      ref: slug,
+      title: `${doc.volumeLabel} — ${doc.title}`,
+      excerpt: `Status ${doc.status}; a volume of the Nest Runtime Specification Set.`
+    };
+    emissions.push(fact(meta.id, "learning.source.declared", { resource, actor: "learner" }));
+  }
+  await commit(record, emissions);
   return NextResponse.json({ sessionId: meta.id }, { status: 201 });
 }

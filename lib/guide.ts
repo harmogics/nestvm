@@ -1,10 +1,12 @@
 // The simulated semantic side of the machine: three bounded tasks discharged
-// to Together AI when a key is configured, with deterministic fallbacks so the
-// workbench runs credibly without one. Declared form, supplied content
-// (Vol. 01 §2.5): every task fixes its JSON result shape in advance; the
-// model fills content only. British English throughout.
+// through the pluggable inference port (lib/inference.ts), with deterministic
+// fallbacks so the workbench runs credibly without a provider. Declared form,
+// supplied content (Vol. 01 §2.5): every task fixes its JSON result shape in
+// advance; the model fills content only. British English throughout.
 
-type GuideSource = "together" | "simulation";
+import { inference } from "./inference";
+
+type GuideSource = string; // the inference port id, or "simulation"
 
 // The agent's authoring output: a bounded scene plan. The model supplies
 // content only; lib/machine.ts expands the plan through the declared template
@@ -31,38 +33,13 @@ export type FoldResult = {
 
 export type Guided<T> = { result: T; source: GuideSource };
 
-const TOGETHER_URL = "https://api.together.xyz/v1/chat/completions";
-
-async function callTogether(system: string, user: string): Promise<unknown | null> {
-  const key = process.env.TOGETHER_API_KEY;
-  if (!key) return null;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60_000);
+async function completeJson(system: string, user: string): Promise<unknown | null> {
+  const content = await inference().complete({ system, user });
+  if (!content) return null;
   try {
-    const response = await fetch(TOGETHER_URL, {
-      method: "POST",
-      signal: controller.signal,
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: process.env.TOGETHER_MODEL || "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-        temperature: 0.3,
-        max_tokens: 1400,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user }
-        ]
-      })
-    });
-    if (!response.ok) return null;
-    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) return null;
     return JSON.parse(content) as unknown;
   } catch {
     return null;
-  } finally {
-    clearTimeout(timer);
   }
 }
 
@@ -109,17 +86,17 @@ Constraints: "title" names the scene in the learner's own domain language (max 9
       : `The learner's root material: ${input.rootText}`,
     input.emphasis?.trim() ? `The learner's emphasis for this unfold: ${input.emphasis.trim()}` : "",
     input.sources && input.sources.length > 0
-      ? `Released values available as sources:\n${input.sources.map((s) => `- ${s}`).join("\n")}`
+      ? `Presented sources (documents and released values the learner focused this scene on):\n${input.sources.map((s) => `- ${s}`).join("\n")}`
       : "",
     `Author the scene plan.`
   ]
     .filter(Boolean)
     .join("\n");
 
-  const raw = (await callTogether(system, user)) as ScenePlan | null;
+  const raw = (await completeJson(system, user)) as ScenePlan | null;
   if (raw && Array.isArray(raw.knots) && raw.knots.length > 0 && typeof raw.title === "string") {
     return {
-      source: "together",
+      source: inference().id,
       result: {
         title: String(raw.title || "Unfolded inquiry").trim(),
         purpose: String(raw.purpose || "").trim(),
@@ -166,17 +143,17 @@ export async function windUnderstanding(input: {
   priorGrade: number;
   deltas: string[];
 }): Promise<Guided<WindResult>> {
-  const system = `You are the integration service of a study workbench (the winding protocol of the Nest VM, Vol. 07 §4.1). Rewrite STATE into one updated, self-contained integrated understanding that absorbs the DELTAS and addresses the QUESTIONS. Preserve seams: keep it visible which part came from the learner ([answer]/[challenge]), from the specification ([evidence]), or from a child scene ([return]). Assess sufficiency honestly with a grade in [0,1] — fluency does not raise the grade; grounding and directness do. Write British English. Return only JSON: {"state": string, "grade": number, "reasoning": string}. "reasoning" is 1-2 inspectable sentences on what changed and what is still missing; no hidden chain-of-thought.`;
+  const system = `You are the integration service of a study workbench (the winding protocol of the Nest VM, Vol. 07 §4.1). Rewrite STATE into one updated, self-contained integrated understanding that absorbs the DELTAS and addresses the QUESTIONS. Preserve seams: keep it visible which part came from the learner ([answer]/[challenge]), from the specification ([evidence]), from a presented document ([source]), or from a child scene ([return]). Assess sufficiency honestly with a grade in [0,1] — fluency does not raise the grade; grounding and directness do. If the understanding so far contains no learner articulation (no [answer] or [challenge] delta absorbed yet), grade conservatively — at most 0.6: the session's contract is a defended articulation, and reading alone defends nothing. Write British English. Return only JSON: {"state": string, "grade": number, "reasoning": string}. "reasoning" is 1-2 inspectable sentences on what changed and what is still missing; no hidden chain-of-thought.`;
   const user = [
     `QUESTIONS:\n${input.questions.map((q) => `- ${q}`).join("\n")}`,
     `STATE (previous integrated understanding):\n${input.state || "(empty)"}`,
     `DELTAS (new material, labelled by origin):\n${input.deltas.map((d) => `- ${d}`).join("\n")}`
   ].join("\n\n");
 
-  const raw = (await callTogether(system, user)) as WindResult | null;
+  const raw = (await completeJson(system, user)) as WindResult | null;
   if (raw && typeof raw.state === "string" && raw.state.trim()) {
     return {
-      source: "together",
+      source: inference().id,
       result: {
         state: raw.state.trim(),
         grade: clampGrade(raw.grade),
@@ -191,6 +168,7 @@ export async function windUnderstanding(input: {
   for (const delta of input.deltas) {
     if (delta.startsWith("[answer]")) increment += 0.34;
     else if (delta.startsWith("[evidence]")) increment += 0.15;
+    else if (delta.startsWith("[source]")) increment += 0.16;
     else if (delta.startsWith("[return]")) increment += 0.36;
     else if (delta.startsWith("[challenge]")) increment += 0.2;
     else increment += 0.1;
@@ -234,10 +212,10 @@ export async function foldIntegration(input: {
     )
   ].join("\n");
 
-  const raw = (await callTogether(system, user)) as FoldResult | null;
+  const raw = (await completeJson(system, user)) as FoldResult | null;
   if (raw && typeof raw.statement === "string" && raw.statement.trim()) {
     return {
-      source: "together",
+      source: inference().id,
       result: {
         statement: raw.statement.trim(),
         contributions: Array.isArray(raw.contributions)

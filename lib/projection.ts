@@ -5,6 +5,7 @@
 import type {
   DomainFactPayload,
   EvidenceExcerpt,
+  ResourceRef,
   IntegrationCandidate,
   KnotView,
   ResultDocument,
@@ -33,6 +34,7 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
     resultContract: "",
     status: "open",
     rootMaterials: [],
+    sources: [],
     scenes: [],
     values: [],
     openQuestions: [],
@@ -85,6 +87,7 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
         returned: false,
         tacts: [],
         evidence: [],
+        sources: [],
         answers: []
       };
       knots.set(knot.knotId, knot);
@@ -142,6 +145,7 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
           operatorId: (d.operatorId as SceneView["operatorId"]) ?? "unfold",
           selectedOffset: tuple.offset,
           status: "projecting",
+          sources: [],
           knots: []
         };
         scenes.set(bindId, scene);
@@ -190,6 +194,23 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
             vector: String(d.vector ?? "answer"),
             offset: tuple.offset
           });
+        }
+        break;
+      }
+      case "learning.source.declared": {
+        const resource = d.resource as ResourceRef | undefined;
+        if (resource) projection.sources.push(resource);
+        break;
+      }
+      case "learning.source.presented": {
+        const resource = d.resource as ResourceRef | undefined;
+        if (!resource) break;
+        if (d.knotId) {
+          const knot = knots.get(String(d.knotId));
+          if (knot) knot.sources.push(resource);
+        } else if (d.bindId) {
+          const scene = scenes.get(String(d.bindId));
+          if (scene) scene.sources.push(resource);
         }
         break;
       }

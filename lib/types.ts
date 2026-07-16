@@ -52,6 +52,17 @@ export type EvidenceExcerpt = {
   excerpt: string;
 };
 
+// A reference to an internal document carried by a tuple: the log stays
+// bounded (ref + digest + excerpt); content is resolved at attention time
+// through the pluggable ResourceResolver (ADR-004 Decision 5).
+export type ResourceRef = {
+  store: "spec" | "workshop" | "wave";
+  ref: string; // '05-activation-knots#3-…' | draftId | 'offset:42'
+  digest?: string;
+  title?: string;
+  excerpt?: string;
+};
+
 export type WindingTact = {
   uid: string;
   requestOffset: number;
@@ -81,6 +92,7 @@ export type KnotView = {
   returnOffset?: number;
   tacts: WindingTact[];
   evidence: EvidenceExcerpt[];
+  sources: ResourceRef[];
   answers: { text: string; vector: string; offset: number }[];
   childBindId?: string;
   returnedValueId?: string;
@@ -108,6 +120,7 @@ export type SceneView = {
   closeInstruction?: string;
   returnTo?: string;
   status: "projecting" | "active" | "candidate" | "integrated";
+  sources: ResourceRef[];
   knots: KnotView[];
   candidate?: IntegrationCandidate;
   integratedValueId?: string;
@@ -145,6 +158,7 @@ export type SessionProjection = {
   resultContract: string;
   status: "open" | "completed";
   rootMaterials: RootMaterial[];
+  sources: ResourceRef[];
   scenes: SceneView[];
   values: ValueView[];
   openQuestions: string[];
@@ -171,6 +185,7 @@ export type TurnBody = {
 // when its barrier settles (Vol. 06 §4); the human decision is acceptance.
 export type DecisionBody =
   | { kind: "evidence"; knotId: string; query?: string }
+  | { kind: "readSource"; knotId: string; store: string; ref: string }
   | { kind: "deepen"; knotId: string }
   | { kind: "accept"; bindId: string; candidateOffset: number }
   | { kind: "markUnknown"; knotId: string }

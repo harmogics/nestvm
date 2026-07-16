@@ -41,6 +41,95 @@ function truncate(text: string, limit: number): string {
   return text.length > limit ? text.slice(0, limit - 1).replace(/\s+\S*$/, "") + "…" : text;
 }
 
+// The trace as a stream of thought: who moved (the learner, the machine's
+// own structures, or the world behind the membrane) and what the move was.
+type TraceActor = "learner" | "machine" | "world";
+
+function describeTuple(tuple: WaveTuple): { actor: TraceActor; summary: string } {
+  const p = payloadOf(tuple) as Record<string, unknown>;
+  if (tuple.kind === "sys.knot.defined") {
+    const config = p.config as { condition?: { questions?: string[] } } | undefined;
+    return {
+      actor: "machine",
+      summary: `knot ${p.id} registered — "${truncate(String(config?.condition?.questions?.[0] ?? ""), 70)}"`
+    };
+  }
+  if (tuple.kind === "sys.descriptor.defined") {
+    const operator = p.operator as { demands?: unknown[]; return_to?: string } | undefined;
+    return {
+      actor: "machine",
+      summary: `close bind ${p.id} registered — ${operator?.demands?.length ?? 0} demands${
+        operator?.return_to ? `, returns to ${operator.return_to}` : ""
+      }`
+    };
+  }
+  if (tuple.kind === "sys.knot.ready") {
+    const understanding = p.understanding as { grade?: number } | undefined;
+    return {
+      actor: "machine",
+      summary: `readiness reified — ${p.knotId} (grade ${Number(understanding?.grade ?? 0).toFixed(2)})`
+    };
+  }
+  const d = factDataOf(tuple);
+  const type = tupleLabel(tuple);
+  const src = d.source ? ` (${d.source})` : "";
+  switch (type) {
+    case "learning.session.opened": {
+      const subject = d.subject as { title?: string; text?: string } | undefined;
+      return { actor: "learner", summary: `session opened — ${truncate(String(subject?.title ?? subject?.text ?? ""), 70)}` };
+    }
+    case "learning.source.declared":
+      return { actor: "learner", summary: `source declared on the shelf — ${truncate(String((d.resource as { title?: string })?.title ?? ""), 64)}` };
+    case "learning.source.presented":
+      return {
+        actor: "machine",
+        summary: `source presented to ${d.knotId ?? d.bindId} — ${truncate(String((d.resource as { title?: string })?.title ?? ""), 54)}`
+      };
+    case "learning.turn.submitted":
+      if (d.operator) return { actor: "learner", summary: `turn — operator ${(d.operator as { id?: string }).id} requested` };
+      if (d.targetKnotId) return { actor: "learner", summary: `turn — ${d.vector ?? "answer"} aimed at ${d.targetKnotId}` };
+      return { actor: "learner", summary: `plain signal — "${truncate(String(d.text ?? ""), 70)}"` };
+    case "learning.bind.selected":
+      return { actor: "machine", summary: `bind ${d.bindId} selected (operator ${d.operatorId})` };
+    case "service.request":
+      return { actor: "machine", summary: `${d.bindId} gathered its scope and projected intention ${d.uid}` };
+    case "service.failed":
+      return { actor: "world", summary: `service failed — ${truncate(String(d.reason ?? ""), 70)}` };
+    case "learning.knot.seeded":
+      return { actor: "machine", summary: `head fact seeded ${d.knot} — angle "${d.angle}"` };
+    case "learning.scene.unfolded": {
+      const result = d.result as { title?: string } | undefined;
+      return { actor: "world", summary: `scene published — "${truncate(String(result?.title ?? ""), 60)}"${src}` };
+    }
+    case "learning.answer.submitted":
+      return { actor: "learner", summary: `${d.vector ?? "answer"} → ${d.knotId}: "${truncate(String(d.answer ?? ""), 60)}"` };
+    case "learning.evidence.registered":
+      return { actor: "machine", summary: `evidence registered → ${d.knotId} (${(d.excerpts as unknown[])?.length ?? 0} excerpts)` };
+    case "inference.request":
+      return { actor: "machine", summary: `${d.knotId} projected winding intention ${d.uid} (${(d.deltas as unknown[])?.length ?? 0} deltas)` };
+    case "inference.response":
+      return { actor: "world", summary: `world integrated → ${d.knotId}, grade ${Number(d.grade ?? 0).toFixed(2)}${src}` };
+    case "inference.reasoning":
+      return { actor: "world", summary: `reasoning behind ${d.uid}` };
+    case "inference.failed":
+      return { actor: "world", summary: `winding failed — ${truncate(String(d.reason ?? ""), 70)}` };
+    case "learning.knot.marked":
+      return { actor: "learner", summary: `marked explicitly unknown — ${d.knotId}` };
+    case "learning.integration.candidate":
+      return { actor: "world", summary: `${d.bindId} published the integration candidate${src}` };
+    case "learning.integration.returned":
+      return { actor: "world", summary: `${d.bindId} published the return → ${d.parentKnotId}${src}` };
+    case "learning.integration.accepted":
+      return { actor: "learner", summary: `accepted — released as ${d.valueId}` };
+    case "learning.session.result.candidate":
+      return { actor: "machine", summary: "result candidate assembled — the completion gate passed" };
+    case "learning.session.completed":
+      return { actor: "learner", summary: "session completed — attested" };
+    default:
+      return { actor: "machine", summary: type };
+  }
+}
+
 export function Workbench({ sessionId }: { sessionId: string }) {
   const [meta, setMeta] = useState<SessionMeta | null>(null);
   const [tuples, setTuples] = useState<WaveTuple[] | null>(null);
@@ -51,7 +140,9 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   const [composer, setComposer] = useState<ComposerMode>({ mode: "plain" });
   const [input, setInput] = useState("");
   const [traceOpen, setTraceOpen] = useState(false);
+  const [traceFilter, setTraceFilter] = useState<TraceActor | "all">("all");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const [sourceMenuKnotId, setSourceMenuKnotId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -296,6 +387,24 @@ export function Workbench({ sessionId }: { sessionId: string }) {
 
       <div className="workspace">
         <aside className="rail left">
+          {projection.sources.length > 0 && (
+            <section>
+              <h4>Sources on the shelf</h4>
+              <div className="chip-column">
+                {projection.sources.map((source) => (
+                  <span className="src-chip" key={`${source.store}:${source.ref}`}>
+                    {source.store === "spec" ? (
+                      <a href={`/spec/${source.ref}`} target="_blank" rel="noreferrer">
+                        {truncate(source.title ?? source.ref, 54)}
+                      </a>
+                    ) : (
+                      truncate(source.title ?? source.ref, 54)
+                    )}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
           <section>
             <h4>Root material</h4>
             {projection.rootMaterials.length === 0 && (
@@ -351,6 +460,15 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                 </span>
                 <h2>{focusedScene.title}</h2>
                 {focusedScene.purpose && <p className="purpose">{focusedScene.purpose}</p>}
+                {focusedScene.sources.length > 0 && (
+                  <div className="chip-row">
+                    {focusedScene.sources.map((source) => (
+                      <span className="src-chip" key={`${source.store}:${source.ref}`}>
+                        {truncate(source.title ?? source.ref, 44)}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {focusedScene.status === "active" && focusedScene.knots.length > 0 && (
                   <p className="barrier-note">
                     close bind {focusedScene.closeBindId ?? "—"} · barrier{" "}
@@ -390,6 +508,15 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                       </span>
                     </div>
                     <p className="knot-question">{knot.question}</p>
+                    {knot.sources.length > 0 && (
+                      <div className="chip-row">
+                        {knot.sources.map((source, index) => (
+                          <span className="src-chip read" key={index}>
+                            read: {truncate(source.title ?? source.ref, 40)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {knot.state && <p className="knot-state">{knot.state}</p>}
                     {knot.evidence.length > 0 && (
                       <div className="knot-evidence">
@@ -433,9 +560,17 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                       </button>
                       <button
                         type="button"
-                        className="vec-btn"
+                        className={`vec-btn${sourceMenuKnotId === knot.knotId ? " on" : ""}`}
                         disabled={busy || completed}
-                        onClick={() => decide({ kind: "evidence", knotId: knot.knotId })}
+                        onClick={() => {
+                          if (projection.sources.length === 0) {
+                            decide({ kind: "evidence", knotId: knot.knotId });
+                          } else {
+                            setSourceMenuKnotId((current) =>
+                              current === knot.knotId ? null : knot.knotId
+                            );
+                          }
+                        }}
                       >
                         Evidence
                       </button>
@@ -468,6 +603,39 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                         </button>
                       )}
                     </div>
+                    {sourceMenuKnotId === knot.knotId && (
+                      <div className="src-menu">
+                        <span className="eyebrow">Ground this knot in evidence</span>
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => {
+                            setSourceMenuKnotId(null);
+                            decide({ kind: "evidence", knotId: knot.knotId });
+                          }}
+                        >
+                          Search the specification set for this question
+                        </button>
+                        {projection.sources.map((source) => (
+                          <button
+                            type="button"
+                            key={`${source.store}:${source.ref}`}
+                            disabled={busy}
+                            onClick={() => {
+                              setSourceMenuKnotId(null);
+                              decide({
+                                kind: "readSource",
+                                knotId: knot.knotId,
+                                store: source.store,
+                                ref: source.ref
+                              });
+                            }}
+                          >
+                            Read into the knot: {truncate(source.title ?? source.ref, 60)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </article>
                 ))}
               </div>
@@ -616,27 +784,37 @@ export function Workbench({ sessionId }: { sessionId: string }) {
 
       {traceOpen && (
         <section className="trace-drawer">
-          <h4>Trace — the session&rsquo;s wave log</h4>
-          <p className="trace-note">
-            Every element of the scene above is a derivation of these committed tuples (offset ·
-            kind/factType · correlation). This is the machine you are studying, reading its own
-            passage: winding intentions and integrations join by uid, readiness is reified as
-            sys.knot.ready, and nothing you see lives outside this log.
-          </p>
+          <div className="trace-head">
+            <div>
+              <h4>Trace — the session&rsquo;s wave log</h4>
+              <p className="trace-note">
+                The stream of thought of the machine you are studying, as it is committed: the
+                learner supplies facts and judgement, the machine&rsquo;s structures register,
+                wind and gather, and the world behind the membrane answers. Everything on the
+                screen above is a derivation of these tuples; click a row for its payload.
+              </p>
+            </div>
+            <div className="trace-filters">
+              {(["all", "learner", "machine", "world"] as const).map((filter) => (
+                <button
+                  type="button"
+                  key={filter}
+                  className={traceFilter === filter ? "on" : ""}
+                  onClick={() => setTraceFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
           {tuples.map((tuple) => {
+            const { actor, summary } = describeTuple(tuple);
+            if (traceFilter !== "all" && actor !== traceFilter) return null;
             const data = factDataOf(tuple);
-            const label = tupleLabel(tuple);
             const uid = typeof data.uid === "string" ? data.uid : null;
-            const owner =
-              typeof data.knotId === "string"
-                ? data.knotId
-                : typeof data.bindId === "string"
-                  ? data.bindId
-                  : null;
-            const grade = typeof data.grade === "number" ? data.grade : null;
             const isOpen = expanded.has(tuple.offset);
             return (
-              <div className="tuple-row" key={tuple.offset}>
+              <div className={`tuple-row actor-${actor}`} key={tuple.offset}>
                 <div
                   className="tuple-head"
                   onClick={() =>
@@ -649,10 +827,10 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                   }
                 >
                   <span className="off">{tuple.offset}</span>
-                  <span className={`kind${tuple.kind !== "domain.fact" ? " sys" : ""}`}>{label}</span>
-                  {owner && <span className="uid">{owner}</span>}
+                  <span className={`actor-chip ${actor}`}>{actor}</span>
+                  <span className="summary">{summary}</span>
                   {uid && <span className="uid">{uid}</span>}
-                  {grade !== null && <span className="gr">grade {grade.toFixed(2)}</span>}
+                  <span className="kind-tag">{tupleLabel(tuple)}</span>
                 </div>
                 {isOpen && <pre className="tuple-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>}
               </div>

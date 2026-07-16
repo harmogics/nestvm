@@ -17,17 +17,34 @@
 import { findEvidence } from "./corpus";
 import { authorScene, foldIntegration, windUnderstanding, type ScenePlan } from "./guide";
 import { evaluateCompletion, knotSettled, project } from "./projection";
+import { resolverFor } from "./resources";
 import { commit, fact, readiness, updateMeta, type SessionRecord } from "./store";
 import type {
   CommandResult,
   DecisionBody,
   KnotView,
+  ResourceRef,
   SceneView,
   SessionProjection,
   TurnBody,
   WaveEmission,
   WaveTuple
 } from "./types";
+
+// A winding delta: the committed intention carries a bounded string
+// (ref + excerpt form); when the delta references a resource, the full
+// content is resolved at discharge time, within a budget, and only the
+// resolved text reaches the inference task (ADR-004 Decision 5).
+type WindDelta = {
+  label: "answer" | "challenge" | "evidence" | "return" | "source";
+  text: string;
+  resource?: ResourceRef;
+};
+
+function boundText(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length > limit ? flat.slice(0, limit - 1).replace(/\s+\S*$/, "") + "…" : flat;
+}
 
 function countFacts(record: SessionRecord, factType: string): number {
   let count = 0;
@@ -67,10 +84,15 @@ function knotOrNull(record: SessionRecord, knotId: string): KnotView | null {
 async function windKnot(
   record: SessionRecord,
   knot: KnotView,
-  deltas: string[]
+  deltas: WindDelta[]
 ): Promise<WaveTuple[]> {
   const key = record.meta.id;
   const uid = `${knot.knotId}#${knot.tacts.length + 1}`;
+  // The committed intention stays bounded: ref + excerpt, never full bodies.
+  const factDeltas = deltas.map((delta) => {
+    const refSuffix = delta.resource ? ` (${delta.resource.store}:${delta.resource.ref})` : "";
+    return `[${delta.label}] ${boundText(delta.text, 300)}${refSuffix}`;
+  });
   const committed: WaveTuple[] = [];
   committed.push(
     ...(await commit(record, [
@@ -79,16 +101,27 @@ async function windKnot(
         uid,
         questions: [knot.question, `Angle: ${knot.angle}`],
         state: knot.state,
-        deltas,
+        deltas: factDeltas,
         lane: knot.lane
       })
     ]))
+  );
+  // Attention-time assembly: resolve referenced resources into content for
+  // the integration task only.
+  const resolver = resolverFor(record);
+  const resolvedDeltas = await Promise.all(
+    deltas.map(async (delta) => {
+      if (!delta.resource) return `[${delta.label}] ${delta.text}`;
+      const resolved = await resolver.resolve(delta.resource);
+      if (!resolved) return `[${delta.label}] ${delta.text}`;
+      return `[${delta.label}] ${resolved.title}: ${resolved.content}`;
+    })
   );
   const wound = await windUnderstanding({
     questions: [knot.question],
     state: knot.state,
     priorGrade: knot.grade,
-    deltas
+    deltas: resolvedDeltas
   });
   const emissions: WaveEmission[] = [
     fact(key, "inference.response", {
@@ -296,17 +329,37 @@ async function formScene(
       })
     ]))
   );
-  const sourceStatements = input.sourceRefs
+  // The scene's sources: the session shelf (declared at opening) plus the
+  // included released values, re-presented as wave references.
+  const valueResources: ResourceRef[] = input.sourceRefs
     .map((ref) => projection.values.find((v) => v.valueId === ref))
     .filter((v): v is NonNullable<typeof v> => Boolean(v))
-    .map((v) => `${v.valueId}: ${v.statement.slice(0, 300)}`);
+    .map((v) => ({
+      store: "wave" as const,
+      ref: `offset:${v.candidateOffset}`,
+      title: `${v.valueId} · ${v.title}`,
+      excerpt: boundText(v.statement, 240)
+    }));
+  const sceneResources: ResourceRef[] = [...projection.sources, ...valueResources];
+
+  // Attention-time assembly for the authoring task itself.
+  const resolver = resolverFor(record, 900);
+  const resolvedSources = (
+    await Promise.all(
+      sceneResources.map(async (resource) => {
+        const resolved = await resolver.resolve(resource);
+        return resolved ? `${resolved.title}: ${resolved.content}` : null;
+      })
+    )
+  ).filter((s): s is string => Boolean(s));
+
   const authored = await authorScene({
     subjectLabel: subjectLabel(record),
     rootText: rootText(record, input.text),
     emphasis: input.text || undefined,
     focusQuestion: input.focusQuestion,
     focusState: input.focusState,
-    sources: sourceStatements
+    sources: resolvedSources
   });
   committed.push(
     ...(await commit(
@@ -321,6 +374,35 @@ async function formScene(
       })
     ))
   );
+  // Presentation facts, after registration: the scene's context registry.
+  if (sceneResources.length > 0) {
+    committed.push(
+      ...(await commit(
+        record,
+        sceneResources.map((resource) =>
+          fact(key, "learning.source.presented", { bindId, resource })
+        )
+      ))
+    );
+
+    // Grounding tact: every sown knot winds the presented sources once, so
+    // the scene starts from the material the session is built on. Windings
+    // run in parallel; their batches interleave on the log and stay joined
+    // by correlation, never adjacency (Vol. 03 §3.3).
+    const sourceDeltas: WindDelta[] = sceneResources.map((resource) => ({
+      label: "source",
+      text: resource.excerpt || resource.title || resource.ref,
+      resource
+    }));
+    const scene = project(record.tuples).scenes.find((s) => s.bindId === bindId);
+    if (scene) {
+      const groundings = await Promise.all(
+        scene.knots.map((knot) => windKnot(record, knot, sourceDeltas))
+      );
+      for (const batch of groundings) committed.push(...batch);
+      committed.push(...(await settleScenes(record)));
+    }
+  }
   return committed;
 }
 
@@ -410,7 +492,7 @@ async function settleScenes(record: SessionRecord): Promise<WaveTuple[]> {
         const parentKnot = knotOrNull(record, scene.returnTo);
         if (parentKnot && !parentKnot.ready) {
           committed.push(
-            ...(await windKnot(record, parentKnot, [`[return] ${folded.result.statement}`]))
+            ...(await windKnot(record, parentKnot, [{ label: "return", text: folded.result.statement }]))
           );
         }
       }
@@ -468,7 +550,9 @@ export async function submitTurn(record: SessionRecord, body: TurnBody): Promise
       ]))
     );
     const refreshed = knotOrNull(record, targetKnotId);
-    if (refreshed) tuples.push(...(await windKnot(record, refreshed, [`[${vector}] ${body.text.trim()}`])));
+    if (refreshed) {
+      tuples.push(...(await windKnot(record, refreshed, [{ label: vector, text: body.text.trim() }])));
+    }
     tuples.push(...(await settleScenes(record)));
     return { tuples };
   }
@@ -497,7 +581,11 @@ export async function submitDecision(record: SessionRecord, body: DecisionBody):
       const knot = knotOrNull(record, body.knotId);
       if (!knot) return { tuples: [], refused: { reasons: [`Unknown knot ${body.knotId}.`] } };
       const query = body.query?.trim() || `${subjectLabel(record)} ${knot.question} ${knot.angle}`;
-      const excerpts = await findEvidence(query, 3);
+      const projection = project(record.tuples);
+      const preferSlugs = projection.sources
+        .filter((s) => s.store === "spec")
+        .map((s) => s.ref.split("#")[0]);
+      const excerpts = await findEvidence(query, 3, preferSlugs);
       if (excerpts.length === 0) {
         return { tuples: [], refused: { reasons: ["No sufficiently relevant sections found in the specification set for this question."] } };
       }
@@ -507,9 +595,45 @@ export async function submitDecision(record: SessionRecord, body: DecisionBody):
           fact(key, "learning.evidence.registered", { knotId: knot.knotId, query, excerpts })
         ]))
       );
-      const deltas = excerpts.map((e) => `[evidence] ${e.volume}, "${e.section}": ${e.excerpt}`);
+      const deltas: WindDelta[] = excerpts.map((e) => ({
+        label: "evidence" as const,
+        text: `${e.volume}, "${e.section}": ${e.excerpt}`,
+        resource: { store: "spec" as const, ref: `${e.slug}#${e.anchor}`, title: `${e.volume} · ${e.section}` }
+      }));
       const refreshed = knotOrNull(record, knot.knotId);
       if (refreshed) tuples.push(...(await windKnot(record, refreshed, deltas)));
+      tuples.push(...(await settleScenes(record)));
+      return { tuples };
+    }
+
+    case "readSource": {
+      const knot = knotOrNull(record, body.knotId);
+      if (!knot) return { tuples: [], refused: { reasons: [`Unknown knot ${body.knotId}.`] } };
+      const projection = project(record.tuples);
+      const resource = projection.sources.find(
+        (s) => s.store === body.store && s.ref === body.ref
+      );
+      if (!resource) {
+        return { tuples: [], refused: { reasons: ["The referenced source is not on this session's shelf."] } };
+      }
+      const tuples: WaveTuple[] = [];
+      tuples.push(
+        ...(await commit(record, [
+          fact(key, "learning.source.presented", { knotId: knot.knotId, resource })
+        ]))
+      );
+      const refreshed = knotOrNull(record, knot.knotId);
+      if (refreshed) {
+        tuples.push(
+          ...(await windKnot(record, refreshed, [
+            {
+              label: "source",
+              text: resource.excerpt || resource.title || resource.ref,
+              resource
+            }
+          ]))
+        );
+      }
       tuples.push(...(await settleScenes(record)));
       return { tuples };
     }

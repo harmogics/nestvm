@@ -33,7 +33,13 @@ A **turn** carries `{clientTurnId?, text, targetKnotId?, vector?, operator?,
 sourceRefs?, excludedSourceRefs?, focusRef?}` with the interpretation
 precedence of [first-turn-log-protocol.md](./first-turn-log-protocol.md):
 target → answer; operator → configured bind request; neither → plain signal.
-`targetKnotId` and `operator` are mutually exclusive.
+`targetKnotId` and `operator` are mutually exclusive. Operators:
+`unfold` (scene over root material) and `reframe` (a 1–2 knot lens scene over
+one produced tuple, `parameters.targetOffset`; its close publishes the
+reframed text as an ordinary integration candidate); `deepen` arrives as a
+decision. The central column is three projections of the same log: focus
+(one bind), canvas (produced texts, renderer-configurable via `lib/canvas.ts`),
+log (the trace).
 
 A **decision** carries `{clientCommandId?, kind, …}` with kinds:
 `evidence · deepen · accept · revise (planned) · markUnknown · finish ·

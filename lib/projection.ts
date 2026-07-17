@@ -136,6 +136,7 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
       }
       case "learning.bind.selected": {
         const bindId = String(d.bindId ?? "");
+        const parameters = (d.parameters ?? {}) as { targetOffset?: number };
         const scene: SceneView = {
           bindId,
           parentBindId: d.parentBindId ? String(d.parentBindId) : undefined,
@@ -145,6 +146,7 @@ export function project(tuples: readonly WaveTuple[]): SessionProjection {
           operatorId: (d.operatorId as SceneView["operatorId"]) ?? "unfold",
           selectedOffset: tuple.offset,
           status: "projecting",
+          reframeOffset: Number.isInteger(parameters.targetOffset) ? parameters.targetOffset : undefined,
           sources: [],
           knots: []
         };

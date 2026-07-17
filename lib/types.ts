@@ -37,7 +37,7 @@ export type SessionMeta = {
   tuples: number;
 };
 
-export type OperatorId = "unfold" | "deepen" | "integrate";
+export type OperatorId = "unfold" | "deepen" | "reframe";
 export type VectorId = "answer" | "challenge" | "evidence" | "unknown";
 
 // ---------------------------------------------------------------------------
@@ -120,6 +120,7 @@ export type SceneView = {
   closeInstruction?: string;
   returnTo?: string;
   status: "projecting" | "active" | "candidate" | "integrated";
+  reframeOffset?: number; // for reframe scenes: the produced tuple being read
   sources: ResourceRef[];
   knots: KnotView[];
   candidate?: IntegrationCandidate;

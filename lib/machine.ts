@@ -15,7 +15,7 @@
 // as its barrier settles (Vol. 06 §4) — the human decision is acceptance.
 
 import { findEvidence } from "./corpus";
-import { authorScene, foldIntegration, windUnderstanding, type ScenePlan } from "./guide";
+import { authorReframe, authorScene, foldIntegration, windUnderstanding, type ScenePlan } from "./guide";
 import { evaluateCompletion, knotSettled, project } from "./projection";
 import { resolverFor } from "./resources";
 import { commit, fact, readiness, updateMeta, type SessionRecord } from "./store";
@@ -406,6 +406,90 @@ async function formScene(
   return committed;
 }
 
+// A reframe scene: a bounded lens figure over one produced tuple. Its knots
+// are grounded on the source artefact through the wave resolver; its close
+// publishes the reframed text as an ordinary integration candidate.
+async function formReframeScene(
+  record: SessionRecord,
+  input: { turnId: string | null; lens: string; targetOffset: number }
+): Promise<CommandResult> {
+  const key = record.meta.id;
+  const resolver = resolverFor(record, 1600);
+  const targetRef: ResourceRef = { store: "wave", ref: `offset:${input.targetOffset}` };
+  const resolved = await resolver.resolve(targetRef);
+  if (!resolved) {
+    return {
+      tuples: [],
+      refused: { reasons: [`Offset ${input.targetOffset} does not resolve to a readable artefact.`] }
+    };
+  }
+  const resource: ResourceRef = {
+    ...targetRef,
+    title: resolved.title,
+    excerpt: boundText(resolved.content, 240)
+  };
+
+  const bindId = `bind-${countFacts(record, "learning.bind.selected") + 1}`;
+  const committed: WaveTuple[] = [];
+  committed.push(
+    ...(await commit(record, [
+      fact(key, "learning.bind.selected", {
+        bindId,
+        operatorId: "reframe",
+        operatorVersion: "1",
+        parameters: { targetOffset: input.targetOffset, lens: input.lens || null },
+        sourceSnapshot: [targetRef.ref],
+        focusRef: targetRef.ref,
+        turnId: input.turnId,
+        parentBindId: null,
+        sourceKnotId: null,
+        title: `Reframe: ${boundText(resolved.title, 60)}`
+      })
+    ]))
+  );
+  const uid = `${bindId}#1`;
+  committed.push(
+    ...(await commit(record, [
+      fact(key, "service.request", {
+        bindId,
+        uid,
+        instruction: "Author a bounded lens scene that reads one produced artefact and publishes a reframed text.",
+        scope: { subject: subjectLabel(record), target: targetRef.ref, lens: input.lens || null },
+        emit: { writes: "learning.scene.unfolded" }
+      })
+    ]))
+  );
+  const authored = await authorReframe({
+    subjectLabel: subjectLabel(record),
+    sourceTitle: resolved.title,
+    sourceExcerpt: boundText(resolved.content, 900),
+    lens: input.lens
+  });
+  committed.push(
+    ...(await commit(
+      record,
+      expandScenePlan({ key, bindId, uid, plan: authored.result, source: authored.source })
+    ))
+  );
+  committed.push(
+    ...(await commit(record, [fact(key, "learning.source.presented", { bindId, resource })]))
+  );
+  // Grounding: the lens knots read the source artefact itself.
+  const scene = project(record.tuples).scenes.find((s) => s.bindId === bindId);
+  if (scene) {
+    const groundings = await Promise.all(
+      scene.knots.map((knot) =>
+        windKnot(record, knot, [
+          { label: "source", text: resource.excerpt || resolved.title, resource }
+        ])
+      )
+    );
+    for (const batch of groundings) committed.push(...batch);
+    committed.push(...(await settleScenes(record)));
+  }
+  return { tuples: committed };
+}
+
 // ---------------------------------------------------------------------------
 // Barrier settlement: every close bind whose demands have all settled
 // completes its rendezvous and publishes — cascading, since a child's return
@@ -555,6 +639,20 @@ export async function submitTurn(record: SessionRecord, body: TurnBody): Promise
     }
     tuples.push(...(await settleScenes(record)));
     return { tuples };
+  }
+
+  if (operator?.id === "reframe") {
+    const targetOffset = Number((operator.parameters as { targetOffset?: unknown } | undefined)?.targetOffset);
+    if (!Number.isInteger(targetOffset) || targetOffset < 0) {
+      return { tuples, refused: { reasons: ["Reframe requires parameters.targetOffset — the produced tuple to read."] } };
+    }
+    const result = await formReframeScene(record, {
+      turnId,
+      lens: body.text.trim(),
+      targetOffset
+    });
+    tuples.push(...result.tuples);
+    return result.refused ? { tuples, refused: result.refused } : { tuples };
   }
 
   if (operator?.id === "unfold") {

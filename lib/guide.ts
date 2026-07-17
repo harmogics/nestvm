@@ -134,6 +134,71 @@ Constraints: "title" names the scene in the learner's own domain language (max 9
 }
 
 // ---------------------------------------------------------------------------
+// authorReframe — the reframe service: a bounded lens scene over one produced
+// artefact. Its knots read the source through the wave resolver; its close
+// publishes the reframed text itself as the statement.
+// ---------------------------------------------------------------------------
+
+export async function authorReframe(input: {
+  subjectLabel: string;
+  sourceTitle: string;
+  sourceExcerpt: string;
+  lens?: string;
+}): Promise<Guided<ScenePlan>> {
+  const lens = input.lens?.trim() || "Reframe faithfully and clearly for a reader new to the machine.";
+  const system = `You are the reframe service of a study workbench for the Nest virtual machine specification. Your task is one bounded act: author a small lens scene (1 or 2 question knots and one closing instruction) that will read ONE produced artefact and publish a reframed text. The knots' questions are the tests the reframed text must pass under the given lens (fidelity to the source's claims, fitness for the lens). Write British English. Return only JSON, exactly this shape:
+{"title": string, "purpose": string, "knots": [{"question": string, "angle": string, "threshold_grade": number, "budget": number}], "close_instruction": string}
+Constraints: 1-2 knots only; "threshold_grade" in [0.55, 0.85]; "budget" in [2, 4]; "close_instruction" MUST direct the closing service to write the reframed text itself as the statement — the statement IS the reframed text, seams preserved where the reframe departs from the source. Never request or reveal hidden chain-of-thought.`;
+  const user = [
+    `Subject under study: ${input.subjectLabel}`,
+    `The produced artefact to reframe: ${input.sourceTitle}`,
+    `Its content (excerpt): ${input.sourceExcerpt}`,
+    `The learner's lens: ${lens}`,
+    `Author the lens scene plan.`
+  ].join("\n");
+
+  const raw = (await completeJson(system, user)) as ScenePlan | null;
+  if (raw && Array.isArray(raw.knots) && raw.knots.length > 0 && typeof raw.title === "string") {
+    return {
+      source: inference().id,
+      result: {
+        title: String(raw.title || "Reframe").trim(),
+        purpose: String(raw.purpose || "").trim(),
+        knots: raw.knots
+          .slice(0, 2)
+          .filter((k) => String(k.question || "").trim().length > 0)
+          .map((k) => ({
+            question: String(k.question).trim(),
+            angle: String(k.angle || "lens").trim(),
+            threshold_grade: clampNumber(k.threshold_grade, 0.55, 0.85, 0.65),
+            budget: Math.round(clampNumber(k.budget, 2, 4, 3))
+          })),
+        close_instruction:
+          String(raw.close_instruction || "").trim() ||
+          `Write the reframed text as the statement, under the lens: ${lens}. Preserve the source's claims; mark departures.`
+      }
+    };
+  }
+
+  return {
+    source: "simulation",
+    result: {
+      title: `Reframe: ${focusPhrase(input.sourceTitle)}`,
+      purpose: `Produce a reframed text of "${focusPhrase(input.sourceTitle)}" under the lens: ${lens}`,
+      knots: [
+        {
+          question: `Does the reframed text preserve the source's claims while serving the lens: ${lens}?`,
+          angle: "fidelity under the lens",
+          threshold_grade: 0.65,
+          budget: 3
+        }
+      ],
+      close_instruction: `Write the reframed text itself as the statement, under the lens: ${lens}. Preserve the source's claims; mark departures.`
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
 // wind — integrate labelled deltas into a knot's understanding (Vol. 07 §4.1)
 // ---------------------------------------------------------------------------
 

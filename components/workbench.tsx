@@ -7,6 +7,7 @@
 // browser holds no semantic history of its own.
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { buildCanvas, defaultCanvasOptions, type CanvasOptions } from "@/lib/canvas";
 import { project } from "@/lib/projection";
 import type {
   CommandResult,
@@ -21,7 +22,8 @@ import type {
 type ComposerMode =
   | { mode: "plain" }
   | { mode: "answer" | "challenge"; knotId: string }
-  | { mode: "unfold" };
+  | { mode: "unfold" }
+  | { mode: "reframe"; targetOffset: number; targetTitle: string };
 
 type Catalogue = {
   volumes: { slug: string; label: string; sections: { anchor: string; heading: string }[] }[];
@@ -143,7 +145,8 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   const [focusSceneId, setFocusSceneId] = useState<string | null>(null);
   const [composer, setComposer] = useState<ComposerMode>({ mode: "plain" });
   const [input, setInput] = useState("");
-  const [traceOpen, setTraceOpen] = useState(false);
+  const [centreView, setCentreView] = useState<"focus" | "canvas" | "log">("focus");
+  const [canvasOptions, setCanvasOptions] = useState<CanvasOptions>(defaultCanvasOptions);
   const [traceFilter, setTraceFilter] = useState<TraceActor | "all">("all");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [sourceMenuKnotId, setSourceMenuKnotId] = useState<string | null>(null);
@@ -195,6 +198,10 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   }, [sessionId]);
 
   const projection = useMemo(() => project(tuples ?? []), [tuples]);
+  const canvasBlocks = useMemo(
+    () => buildCanvas(tuples ?? [], projection, canvasOptions),
+    [tuples, projection, canvasOptions]
+  );
   const completed = projection.status === "completed";
 
   useEffect(() => {
@@ -229,7 +236,10 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     const selected = [...result.tuples]
       .reverse()
       .find((t) => tupleLabel(t) === "learning.bind.selected");
-    if (selected) setFocusSceneId(String(factDataOf(selected).bindId ?? ""));
+    if (selected) {
+      setFocusSceneId(String(factDataOf(selected).bindId ?? ""));
+      setCentreView("focus");
+    }
     return result;
   }, []);
 
@@ -264,6 +274,11 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     if (composer.mode === "answer" || composer.mode === "challenge") {
       if (!text) return;
       body = { text, targetKnotId: composer.knotId, vector: composer.mode };
+    } else if (composer.mode === "reframe") {
+      body = {
+        text,
+        operator: { id: "reframe", parameters: { targetOffset: composer.targetOffset } }
+      };
     } else if (composer.mode === "unfold") {
       body = {
         text,
@@ -303,6 +318,18 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     return null;
   }
 
+  function producedTuples(scene: SceneView): WaveTuple[] {
+    const uid = scene.requestUid;
+    return (tuples ?? []).filter((tuple) => {
+      const payload = payloadOf(tuple);
+      const data = factDataOf(tuple);
+      if (uid && payload.emittedBy === uid) return true; // sown records
+      if (uid && data.emittedBy === uid) return true; // heads, publication
+      const owner = typeof data.bindId === "string" ? data.bindId : null;
+      return owner === scene.bindId || (scene.closeBindId != null && owner === scene.closeBindId);
+    });
+  }
+
   if (loadError) {
     return (
       <main style={{ padding: "60px 4%" }}>
@@ -329,6 +356,8 @@ export function Workbench({ sessionId }: { sessionId: string }) {
       <>Plain signal → root material</>
     ) : composer.mode === "unfold" ? (
       <>Operator: unfold → new scene</>
+    ) : composer.mode === "reframe" ? (
+      <>Reframe → {truncate(composer.targetTitle, 34)}</>
     ) : (
       <>
         {composer.mode === "answer" ? "Answer" : "Challenge"} →{" "}
@@ -363,9 +392,18 @@ export function Workbench({ sessionId }: { sessionId: string }) {
             Request completion
           </button>
         )}
-        <button type="button" onClick={() => setTraceOpen((open) => !open)}>
-          {traceOpen ? "Hide trace" : "Trace"}
-        </button>
+        <span className="view-switch">
+          {(["focus", "canvas", "log"] as const).map((view) => (
+            <button
+              type="button"
+              key={view}
+              className={centreView === view ? "on" : ""}
+              onClick={() => setCentreView(view)}
+            >
+              {view}
+            </button>
+          ))}
+        </span>
         <a href="/studio" style={{ font: "inherit", color: "var(--muted)" }}>
           Exit
         </a>
@@ -466,7 +504,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
         </aside>
 
         <section className="scene">
-          {focusedScene ? (
+          {centreView === "focus" && (focusedScene ? (
             <>
               <div className="scene-crumbs">
                 <button type="button" onClick={() => setFocusSceneId(rootScene?.bindId ?? null)}>
@@ -509,11 +547,44 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                 )}
               </div>
 
+              <details className="produced">
+                <summary>
+                  Produced by this bind — {producedTuples(focusedScene).length} tuples on the log
+                </summary>
+                {producedTuples(focusedScene).map((tuple) => {
+                  const { summary } = describeTuple(tuple);
+                  const isOpen = expanded.has(tuple.offset);
+                  return (
+                    <div className="produced-row" key={tuple.offset}>
+                      <div
+                        className="produced-head"
+                        onClick={() =>
+                          setExpanded((current) => {
+                            const nextSet = new Set(current);
+                            if (nextSet.has(tuple.offset)) nextSet.delete(tuple.offset);
+                            else nextSet.add(tuple.offset);
+                            return nextSet;
+                          })
+                        }
+                      >
+                        <span className="off">@{tuple.offset}</span>
+                        <span className="summary">{summary}</span>
+                        <span className="kind-tag">{tupleLabel(tuple)}</span>
+                      </div>
+                      {isOpen && (
+                        <pre className="produced-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>
+                      )}
+                    </div>
+                  );
+                })}
+              </details>
+
               <div className="knot-list">
                 {focusedScene.knots.map((knot) => (
                   <article
                     className={`knot${knot.ready ? " ready" : ""}${knot.unknown ? " unknown" : ""}${
-                      composer.mode !== "plain" && composer.mode !== "unfold" && composer.knotId === knot.knotId
+                      (composer.mode === "answer" || composer.mode === "challenge") &&
+                      composer.knotId === knot.knotId
                         ? " focused"
                         : ""
                     }`}
@@ -775,6 +846,154 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                 </p>
               </div>
             </>
+          ))}
+
+          {centreView === "canvas" && (
+            <div className="canvas-view">
+              <div className="canvas-head">
+                <span className="eyebrow">The log as a text canvas — every block is a tuple</span>
+                <div className="canvas-toggles">
+                  {(
+                    [
+                      ["turns", "learner turns"],
+                      ["answers", "answers"],
+                      ["evidence", "evidence"]
+                    ] as const
+                  ).map(([optionKey, label]) => (
+                    <label key={optionKey}>
+                      <input
+                        type="checkbox"
+                        checked={canvasOptions[optionKey]}
+                        onChange={() =>
+                          setCanvasOptions((current) => ({
+                            ...current,
+                            [optionKey]: !current[optionKey]
+                          }))
+                        }
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {canvasBlocks.length === 0 && (
+                <p className="purpose" style={{ marginTop: 18 }}>
+                  Nothing to show yet — integrations published by binds will read here as text.
+                </p>
+              )}
+              {canvasBlocks.map((block) => (
+                <article className={`canvas-block ${block.kind} actor-${block.actor}`} key={block.offset}>
+                  <div className="canvas-block-meta">
+                    <span className="off">@{block.offset}</span>
+                    <span>{block.meta}</span>
+                    {block.valueId && <span className="value-chip">released as {block.valueId}</span>}
+                    {block.isCandidate && <span className="cand-chip">candidate — awaiting review</span>}
+                  </div>
+                  {block.title && <h3>{block.title}</h3>}
+                  <p className="canvas-body">{block.body}</p>
+                  <div className="canvas-actions">
+                    {block.bindId && (
+                      <button
+                        type="button"
+                        className="vec-btn"
+                        onClick={() => {
+                          setFocusSceneId(block.bindId!);
+                          setCentreView("focus");
+                        }}
+                      >
+                        Open its bind
+                      </button>
+                    )}
+                    {block.isCandidate && block.bindId && (
+                      <button
+                        type="button"
+                        className="vec-btn"
+                        disabled={busy || completed}
+                        onClick={() =>
+                          decide({ kind: "accept", bindId: block.bindId!, candidateOffset: block.offset })
+                        }
+                      >
+                        Accept — release left
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="vec-btn"
+                      disabled={completed}
+                      onClick={() => {
+                        setComposer({
+                          mode: "reframe",
+                          targetOffset: block.offset,
+                          targetTitle: block.title ?? `@${block.offset}`
+                        });
+                        inputRef.current?.focus();
+                      }}
+                    >
+                      Reframe
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {centreView === "log" && (
+            <div className="trace-drawer central">
+              <div className="trace-head">
+                <div>
+                  <h4>The session&rsquo;s wave log</h4>
+                  <p className="trace-note">
+                    The stream of thought of the machine you are studying, as it is committed: the
+                    learner supplies facts and judgement, the machine&rsquo;s structures register,
+                    wind and gather, and the world behind the membrane answers. Click a row for its
+                    payload.
+                  </p>
+                </div>
+                <div className="trace-filters">
+                  {(["all", "learner", "machine", "world"] as const).map((filter) => (
+                    <button
+                      type="button"
+                      key={filter}
+                      className={traceFilter === filter ? "on" : ""}
+                      onClick={() => setTraceFilter(filter)}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {tuples.map((tuple) => {
+                const { actor, summary } = describeTuple(tuple);
+                if (traceFilter !== "all" && actor !== traceFilter) return null;
+                const data = factDataOf(tuple);
+                const uid = typeof data.uid === "string" ? data.uid : null;
+                const isOpen = expanded.has(tuple.offset);
+                return (
+                  <div className={`tuple-row actor-${actor}`} key={tuple.offset}>
+                    <div
+                      className="tuple-head"
+                      onClick={() =>
+                        setExpanded((current) => {
+                          const nextSet = new Set(current);
+                          if (nextSet.has(tuple.offset)) nextSet.delete(tuple.offset);
+                          else nextSet.add(tuple.offset);
+                          return nextSet;
+                        })
+                      }
+                    >
+                      <span className="off">{tuple.offset}</span>
+                      <span className={`actor-chip ${actor}`}>{actor}</span>
+                      <span className="summary">{summary}</span>
+                      {uid && <span className="uid">{uid}</span>}
+                      <span className="kind-tag">{tupleLabel(tuple)}</span>
+                    </div>
+                    {isOpen && (
+                      <pre className="tuple-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </section>
 
@@ -831,7 +1050,9 @@ export function Workbench({ sessionId }: { sessionId: string }) {
               ? "The session is completed — its log remains readable."
               : composer.mode === "unfold"
                 ? "Optional emphasis for the unfold — or send as is."
-                : "Write here. Nothing activates until you choose an operator."
+                : composer.mode === "reframe"
+                  ? "The lens for the reframe (e.g. \"plain English, one paragraph\") — or send as is."
+                  : "Write here. Nothing activates until you choose an operator."
           }
           disabled={completed || busy}
           aria-label="Composer"
@@ -855,65 +1076,6 @@ export function Workbench({ sessionId }: { sessionId: string }) {
         how this turn is committed
       </p>
 
-      {traceOpen && (
-        <section className="trace-drawer">
-          <div className="trace-head">
-            <div>
-              <h4>Trace — the session&rsquo;s wave log</h4>
-              <p className="trace-note">
-                The stream of thought of the machine you are studying, as it is committed: the
-                learner supplies facts and judgement, the machine&rsquo;s structures register,
-                wind and gather, and the world behind the membrane answers. Everything on the
-                screen above is a derivation of these tuples; click a row for its payload.
-              </p>
-            </div>
-            <div className="trace-filters">
-              {(["all", "learner", "machine", "world"] as const).map((filter) => (
-                <button
-                  type="button"
-                  key={filter}
-                  className={traceFilter === filter ? "on" : ""}
-                  onClick={() => setTraceFilter(filter)}
-                >
-                  {filter}
-                </button>
-              ))}
-              <button type="button" className="trace-close" onClick={() => setTraceOpen(false)}>
-                ✕ close
-              </button>
-            </div>
-          </div>
-          {tuples.map((tuple) => {
-            const { actor, summary } = describeTuple(tuple);
-            if (traceFilter !== "all" && actor !== traceFilter) return null;
-            const data = factDataOf(tuple);
-            const uid = typeof data.uid === "string" ? data.uid : null;
-            const isOpen = expanded.has(tuple.offset);
-            return (
-              <div className={`tuple-row actor-${actor}`} key={tuple.offset}>
-                <div
-                  className="tuple-head"
-                  onClick={() =>
-                    setExpanded((current) => {
-                      const nextSet = new Set(current);
-                      if (nextSet.has(tuple.offset)) nextSet.delete(tuple.offset);
-                      else nextSet.add(tuple.offset);
-                      return nextSet;
-                    })
-                  }
-                >
-                  <span className="off">{tuple.offset}</span>
-                  <span className={`actor-chip ${actor}`}>{actor}</span>
-                  <span className="summary">{summary}</span>
-                  {uid && <span className="uid">{uid}</span>}
-                  <span className="kind-tag">{tupleLabel(tuple)}</span>
-                </div>
-                {isOpen && <pre className="tuple-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>}
-              </div>
-            );
-          })}
-        </section>
-      )}
     </main>
   );
 }

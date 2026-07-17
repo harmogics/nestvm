@@ -61,6 +61,9 @@ function resolveWave(record: SessionRecord, ref: string, limit: number): Resolve
     if (payload.factType === "learning.turn.submitted") {
       return { title: `turn @${tuple.offset}`, content: bound(String(d.text ?? ""), limit) };
     }
+    if (payload.factType === "learning.answer.submitted") {
+      return { title: `answer @${tuple.offset}`, content: bound(String(d.answer ?? ""), limit) };
+    }
   }
   return {
     title: `${tuple.kind} @${tuple.offset}`,

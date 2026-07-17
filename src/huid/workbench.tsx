@@ -7,6 +7,7 @@
 // browser holds no semantic history of its own.
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SessionArchiveChip } from "@/huid/modules/session-archive/strip";
 import { buildCanvas, defaultCanvasOptions, type CanvasOptions } from "@/nest/readings/canvas";
 import { project } from "@/nest/readings/projection";
 import type { KnotView, SceneView } from "@/nest/readings/views";
@@ -398,6 +399,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
             </button>
           ))}
         </span>
+        <SessionArchiveChip sessionId={sessionId} />
         <a href="/studio" style={{ font: "inherit", color: "var(--muted)" }}>
           Exit
         </a>

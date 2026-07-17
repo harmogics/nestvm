@@ -1,3 +1,4 @@
+import { ImportSession } from "./import-session";
 import { NewSessionForm } from "./new-session-form";
 import { listSpecDocs } from "@/corpus/corpus";
 import { listSessions } from "@/nest/wave/store";
@@ -52,6 +53,7 @@ export default async function StudioIndexPage(context: {
               </small>
             </a>
           ))}
+          <ImportSession />
         </div>
       </div>
     </main>

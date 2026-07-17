@@ -133,4 +133,65 @@ export function readiness(key: string, knotId: string, understanding: unknown): 
   return { kind: "sys.knot.ready", key, payload: { knotId, understanding } };
 }
 
+// Serialise a committed log in the reference field order of Vol. 03 §6
+// (kind, key, payload, offset) — one tuple per line, the archive format.
+export function serialiseLog(tuples: readonly WaveTuple[]): string {
+  return (
+    tuples
+      .map((t) => JSON.stringify({ kind: t.kind, key: t.key, payload: t.payload, offset: t.offset }))
+      .join("\n") + "\n"
+  );
+}
+
+// Parse and validate a persisted log: JSON per line, envelope fields present,
+// offsets dense from 0 (Vol. 03 §6.2 — a reader may verify and must not
+// renumber). Returns the tuples or one honest refusal reason.
+export function parseLog(text: string): { tuples: WaveTuple[] } | { error: string } {
+  const lines = text.split("\n").filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return { error: "The file carries no tuples." };
+  const tuples: WaveTuple[] = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(lines[i]);
+    } catch {
+      return { error: `Line ${i + 1} is not valid JSON.` };
+    }
+    const t = parsed as Partial<WaveTuple>;
+    if (typeof t.kind !== "string" || t.payload === undefined || (t.key !== null && typeof t.key !== "string")) {
+      return { error: `Line ${i + 1} is not a wave tuple (kind, key, payload, offset).` };
+    }
+    if (t.offset !== i) {
+      return { error: `Offsets are not dense from 0: line ${i + 1} carries offset ${String(t.offset)}.` };
+    }
+    tuples.push({ kind: t.kind, key: t.key ?? null, payload: t.payload, offset: i });
+  }
+  return { tuples };
+}
+
+// Register an imported session: the log enters verbatim — never re-keyed,
+// never renumbered, never re-discharged (Vol. 08 §9). A collision refuses
+// honestly: correction is a new act, never an overwrite.
+export async function createSessionFromLog(
+  meta: SessionMeta,
+  tuples: readonly WaveTuple[]
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!safeId(meta.id)) return { ok: false, error: `"${meta.id}" is not a safe session id.` };
+  await ensureRoot();
+  if (store().has(meta.id)) {
+    return { ok: false, error: `Session ${meta.id} already exists on this workbench.` };
+  }
+  try {
+    await fs.access(metaPath(meta.id));
+    return { ok: false, error: `Session ${meta.id} already exists on this workbench.` };
+  } catch {
+    // absent — free to register
+  }
+  const record: SessionRecord = { meta, tuples: [...tuples] };
+  await fs.writeFile(logPath(meta.id), serialiseLog(tuples), "utf8");
+  await fs.writeFile(metaPath(meta.id), JSON.stringify(meta, null, 2), "utf8");
+  store().set(meta.id, record);
+  return { ok: true };
+}
+
 export type { SessionRecord };

@@ -11,3 +11,10 @@ Fixtures are recorded from real sessions, never handcrafted tuple by tuple
 (minimal negative anchors excepted). To add one: run a session to the state
 worth pinning, copy its `var/sessions/<id>.jsonl` + `<id>.meta.json` here,
 and name it for the state it captures.
+
+## Licensing status
+
+These recorded sessions are not covered by the repository's CC BY or AGPL
+blanket licences. They are test inputs, not a public experience dataset. An
+individual recording requires explicit provenance and licensing review before
+it may be presented as reusable material.

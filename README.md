@@ -81,3 +81,11 @@ commit nothing further. The envelope is the wave tuple of Vol. 03 §1:
 
 NestVM is a sibling of **The Algorithmic Company** — seeds of one field:
 comparable look and feel, its own accent.
+
+## Licence
+
+This is a multi-licensed repository: the specification and architecture
+documents are available under `CC-BY-4.0`; the current workbench software is
+available under `AGPL-3.0-only`. Recorded sessions and adjacent research or
+visual materials are excluded unless individually licensed. See
+[LICENSE.md](./LICENSE.md) for the exact path-based scope.

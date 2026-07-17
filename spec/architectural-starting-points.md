@@ -191,6 +191,8 @@ rather than silently resolved.
 | Grounding tact + conservative source-only grading | figure fidelity vs the defended-articulation contract | `CLAUDE.md` liberties |
 | Evidence = one gesture: automatic search or explicit catalogue pick | manifest: human attunes sources | this file §1.6 |
 | Three central projections; trace humanised by actor; reframe as the second operator | log as canvas; Vessel fold | ADR-004 D1 |
+| Panels are derived readings + fact factories, never controllers; replay-based testing; scene strata | station rules Vol. 01 §4; replay is reading Vol. 03 §6.4 | ADR-005 |
+| HUID layer: UI grows as modules on a fixed motherboard (host, feed, docks) | plugin growth without mechanism growth (Vol. 11 §1 mirrored) | `huid/`, ADR-006 |
 
 ## 3. Open tensions carried forward
 

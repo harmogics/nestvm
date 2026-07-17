@@ -26,6 +26,22 @@ demands, integration, and retained multi-turn sessions.
   the UI↔backend session API, the backend-owned storage planes (command journal,
   workshop drafts, registry) versus the machine-owned pluggable wave store, the
   machine port for the core swap, and this product's assembly profile.
+- [ADR-005: UI surfaces as derived readings](./ADR-005-ui-derivation-and-replay.md)
+  normalises three questions against the specification set: panels are derived
+  readings and fact factories rather than membrane controllers (navigation is a
+  parameter, not a fact); testing rests on replay-as-reading fixtures,
+  continuation fixtures, and port doubles under a fixed assembly profile; and
+  the scene figure has three strata — admission, sowing, harvest — with one
+  lid per bind.
+- [UI panel rails](./ui-panel-rails.md) is the companion pattern catalogue to
+  ADR-005: the panel contract (reading / parameters / gestures / placement),
+  the manifest template, derivation and gesture rules, the current surfaces
+  mapped, and the extension recipes.
+- [ADR-006: Establish the HUID layer](./ADR-006-huid-layer.md) records the
+  decision to specify the UI motherboard as the top-level `huid/` layer: an
+  invariant host (one feed, one parameter space, two verbs, five docks) into
+  which panels plug as four-part modules — so UI growth adds plugins, never
+  mechanisms — with a fixture-pinned migration of the current workbench.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

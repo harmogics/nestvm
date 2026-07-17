@@ -146,6 +146,10 @@ derived from the specification set and `spec/` and are not to be weakened.
 - `specifications/` — the Nest Runtime Specification Set (Nest VM): the
   normative machine contract. Treat it as the draft under study; the learning
   workbench wraps around it.
+- `huid/` — the Human Interaction Device layer: the specification of the UI
+  motherboard (host, feed, docks) and the four-part module contract by which
+  panels plug in without host change (ADR-006). Extends the machine set from
+  the product side; never modifies it.
 - `spec/` — product/architecture layer for the inductive learning interface
   (ADR-003 is the current interaction decision). Its ideas are being
   re-evaluated against `specifications/`.

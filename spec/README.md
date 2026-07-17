@@ -42,6 +42,11 @@ demands, integration, and retained multi-turn sessions.
   invariant host (one feed, one parameter space, two verbs, five docks) into
   which panels plug as four-part modules — so UI growth adds plugins, never
   mechanisms — with a fixture-pinned migration of the current workbench.
+- [ADR-007: Implementation layout](./ADR-007-implementation-layout.md)
+  realises the nest figure in the source tree: the radial `src/` layout
+  (wave → readings/membrane → machine · corpus · product · huid · app), the
+  inward-only import rule, region lids, and the type split by level —
+  executed as pure relocation pinned by recorded fixtures.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

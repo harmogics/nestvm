@@ -1,0 +1,14 @@
+{
+  "id": "s-mrnvt9rf-s9an",
+  "createdAt": "2026-07-16T19:08:09.003Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "00-introduction",
+    "title": "Vol. 00 — Nest Runtime Specification Set — Introduction and Reading Map"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 28
+}

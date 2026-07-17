@@ -1,0 +1,13 @@
+{
+  "id": "s-mrnskli4-7h4v",
+  "createdAt": "2026-07-16T17:37:25.468Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "question",
+    "text": "What is love ?"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 14
+}

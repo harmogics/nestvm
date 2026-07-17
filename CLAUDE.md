@@ -122,8 +122,8 @@ derived from the specification set and `spec/` and are not to be weakened.
    (command journal, workshop drafts, registry — the only mutable plane, always
    pre-commitment) is separate from the machine-owned pluggable WaveStore
    (in-memory first, JSONL today); human decisions are always committed facts.
-- Existing code (`app/`, `components/`) is **reused**: adapted and evolved, or
-  gradually replaced, respecting the layout already forming in the project.
+- Existing code (`src/`) is **reused**: adapted and evolved, or gradually
+  replaced, respecting the radial layout fixed by ADR-007.
 
 ## Language policy
 
@@ -157,8 +157,13 @@ derived from the specification set and `spec/` and are not to be weakened.
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with
   Vol. 14 §4 and `spec/attention-matrix.md`.
-- `app/`, `components/` — runnable Next.js prototype (ADR-002, prototype-only;
-  conceptually superseded by ADR-003).
+- `src/` — the implementation nest (ADR-007): radial regions with
+  inward-only imports — `src/nest/{wave,readings,membrane,machine}` the
+  machine side, `src/corpus` the studied set as a store, `src/product` the
+  session contract, `src/huid` the surface (device code), `src/app` the thin
+  Next.js shell. Each region carries a lid (README) with its rules; the
+  routing table lives in `src/README.md`.
+- `fixtures/sessions/` — recorded session goldens (the ADR-005 replay pin).
 - `concepts_ui/` — UI concept screenshots to reuse and develop.
 
 ## Working mode

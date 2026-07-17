@@ -1,0 +1,14 @@
+{
+  "id": "s-mrnu2ol4-7y15",
+  "createdAt": "2026-07-16T18:19:28.888Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "07-membrane-and-controllers",
+    "title": "Vol. 07 — The Membrane and Output Controllers"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 35
+}

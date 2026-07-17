@@ -1,0 +1,14 @@
+{
+  "id": "s-mroigkny-5a5t",
+  "createdAt": "2026-07-17T05:42:07.774Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "01-overview",
+    "title": "Vol. 01 — Overview: the Nest Runtime at a Glance"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 48
+}

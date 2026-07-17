@@ -1,0 +1,14 @@
+{
+  "id": "s-mrntpwjp-pako",
+  "createdAt": "2026-07-16T18:09:32.677Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "05-activation-knots",
+    "title": "Vol. 05 — Activation Knots: the Accumulating Units"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 31
+}

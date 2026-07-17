@@ -1,0 +1,14 @@
+{
+  "id": "s-mrnfmx9v-zra2",
+  "createdAt": "2026-07-16T11:35:19.028Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "06-bind-descriptors",
+    "title": "Vol. 06 — Bind Descriptors: Gather, Judge, Publish"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 14
+}

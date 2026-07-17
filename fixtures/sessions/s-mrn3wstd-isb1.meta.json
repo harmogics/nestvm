@@ -1,0 +1,13 @@
+{
+  "id": "s-mrn3wstd-isb1",
+  "createdAt": "2026-07-16T06:07:04.417Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "question",
+    "text": "Why is readiness reified as a committed tuple instead of a synchronous call?"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "completed",
+  "class": "simulated",
+  "tuples": 56
+}

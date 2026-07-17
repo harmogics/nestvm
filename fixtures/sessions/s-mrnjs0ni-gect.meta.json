@@ -1,0 +1,14 @@
+{
+  "id": "s-mrnjs0ni-gect",
+  "createdAt": "2026-07-16T13:31:15.150Z",
+  "petal": "understand-the-machine",
+  "subject": {
+    "kind": "volume",
+    "ref": "03-wave-log",
+    "title": "Vol. 03 — The Wave Log: Envelope, Ordering, Persistence"
+  },
+  "resultContract": "defended-articulation@1",
+  "status": "open",
+  "class": "simulated",
+  "tuples": 27
+}

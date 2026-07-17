@@ -8,6 +8,12 @@ demands, integration, and retained multi-turn sessions.
 
 ## Current documents
 
+- [Architectural starting points and the decision method](./architectural-starting-points.md)
+  preserves the accumulated architectural understanding (the load-bearing
+  starting points any future step builds from) and the method by which the
+  architectural decisions were made, with the decision chronicle and the open
+  tensions carried forward.
+
 - [Cross-source concept analysis](./cross-source-concept-analysis.md) identifies
   ten critical distinctions between Nest and the supplied semantic-topology,
   activation, and distinction-thread materials.

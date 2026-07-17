@@ -12,6 +12,8 @@ International licence (`CC-BY-4.0`):
 - `huid/**`
 - `spec/**`
 - `README.md`
+- `PHILOSOPHY.md`
+- `ECOSYSTEM.md`
 - `CLAUDE.md`
 
 The complete licence text is in

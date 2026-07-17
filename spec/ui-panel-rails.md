@@ -141,6 +141,9 @@ a bespoke query.
 5. **Authoring weight is visible.** Gestures that sow topology (unfold,
    deepen, reframe) are categorically heavier than fact ingress and carry
    distinguished presentation (thinking rail 6).
+6. **Calm is binding.** Load budget, disclosure over dialogs, inline
+   refusals, no unsolicited interruptions — the load contract of
+   [HUID 04](../huid/04-attention-and-calm.md), adopted by ADR-008.
 
 ## 6. The current surfaces, mapped
 

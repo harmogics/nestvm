@@ -1,7 +1,8 @@
 # HUID 03 — Conformance, Worked Examples, Migration
 
 Status: SEED · Snapshot date: 2026-07-17 ·
-Previous: [02-module-contract.md](./02-module-contract.md)
+Previous: [02-module-contract.md](./02-module-contract.md) ·
+Next: [04-attention-and-calm.md](./04-attention-and-calm.md)
 
 This closing volume gives the checklists a module and the host must pass,
 the diff test that proves the motherboard invariant, the fixture-based
@@ -24,7 +25,10 @@ A conforming module demonstrates:
    byte-identical (§3);
 7. at least one reading fixture with a golden model, covering at least one
    honest-state case (§4);
-8. no network, no storage, no imports of other modules' internals.
+8. no network, no storage, no imports of other modules' internals;
+9. the calm obligations of [HUID 04 §7](./04-attention-and-calm.md): load
+   budget, disclosure over dialogs, no unsolicited interruptions, visual
+   weight by kind of act, raw records one disclosure away.
 
 ## 2. Host obligations
 
@@ -131,6 +135,19 @@ membrane (an analysis figure publishing a declared fact family, e.g.
 The example is retained here precisely because it shows where the boundary
 runs: the panel idea splits cleanly into a fold (device) and a figure
 (machine), joined by the log.
+
+### 5.4 Session archive — the registry boundary
+
+The first module seated in the field (ADR-008). Its lesson is a boundary:
+saving and loading a session split along the feed. The **in-session face**
+(export — the log materialised as a `.jsonl` download) is a true strip
+module: a read-model reference, no commits, no fold. The **registry face**
+(import — a recording replayed into a new live session, ADR-005 §2.2) acts
+*before a session's feed exists*, so it is app-shell chrome beside the
+new-session form, not a module. Session-registry operations (open, list,
+import) are app chrome by nature; in-session capability is a module. Both
+faces are dialog-free (HUID 04): export is the download itself; import is
+one native file input with inline honest refusals.
 
 ## 6. Migration of the current workbench
 

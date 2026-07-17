@@ -47,6 +47,13 @@ demands, integration, and retained multi-turn sessions.
   (wave → readings/membrane → machine · corpus · product · huid · app), the
   inward-only import rule, region lids, and the type split by level —
   executed as pure relocation pinned by recorded fixtures.
+- [ADR-008: The session archive and the UI request path](./ADR-008-session-archive-and-ui-request-path.md)
+  fixes the standing intake path for UI requests (classify → manifest →
+  dock + calm → implement → verify → record), lands the first module
+  (session archive: export as a materialised reading, import as
+  continuation; registry operations are app chrome), adopts the calm
+  contract of HUID 04 as binding, and fixes the trace's trajectory to
+  matched templates with JSON one disclosure away.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

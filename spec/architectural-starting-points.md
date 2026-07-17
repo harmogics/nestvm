@@ -194,6 +194,7 @@ rather than silently resolved.
 | Panels are derived readings + fact factories, never controllers; replay-based testing; scene strata | station rules Vol. 01 §4; replay is reading Vol. 03 §6.4 | ADR-005 |
 | HUID layer: UI grows as modules on a fixed motherboard (host, feed, docks) | plugin growth without mechanism growth (Vol. 11 §1 mirrored) | `huid/`, ADR-006 |
 | Radial `src/` layout: wave → readings/membrane → machine · corpus · product · huid · app; inward-only imports; region lids | the nest figure made legible to models; every fragment has one region | ADR-007 |
+| UI request path + calm contract; session archive as the proving module; registry operations are app chrome | consistent intake for UI growth; attention psychology grounding | ADR-008, HUID 04 |
 
 ## 3. Open tensions carried forward
 

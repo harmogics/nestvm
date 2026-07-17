@@ -105,6 +105,10 @@ distinguished weight (product thinking rail 6). There is no third channel.
 - **[HUID 03](./03-conformance-and-migration.md)** — conformance checklists,
   the motherboard diff test, fixture-based verification, worked example
   modules, and the migration of the current workbench.
+- **[HUID 04](./04-attention-and-calm.md)** — the load contract: inductive
+  disclosure, the element budget, no overlapping layers, interruption
+  discipline — binding for every module, grounded in the psychology of
+  attention.
 
 ## 6. Status language
 

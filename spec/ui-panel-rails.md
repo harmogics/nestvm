@@ -121,6 +121,12 @@ a bespoke query.
    actor classification is registering a renderer in a registry
    (`enabled` + `build`, first claim wins in declared order), not extending
    a switch statement inside a component.
+8. **Formation is core-side; presentation is the panel's whole job.** The
+   model arrives formed — a shared derivation or a projector snapshot
+   (ADR-009); `select` applies parameters, the view renders fields. A
+   panel that forms information — invents a count, merges facts, computes
+   a status the model does not carry — has crossed the boundary
+   (HUID 00 §5).
 
 ## 5. Gesture rules
 

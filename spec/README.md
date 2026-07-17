@@ -54,6 +54,13 @@ demands, integration, and retained multi-turn sessions.
   continuation; registry operations are app chrome), adopts the calm
   contract of HUID 04 as binding, and fixes the trace's trajectory to
   matched templates with JSON one disclosure away.
+- [ADR-009: Panel projectors](./ADR-009-panel-projectors.md) fixes the
+  transport direction: panels receive backend-computed snapshots
+  (`{model, asOfOffset}`) from observer-class projectors — the module's
+  server half, fed by the store's commit hook, filtered by the manifest,
+  rebuildable from the log — never the append-log stream itself; output
+  controllers stay reserved for the machine addressing the operator
+  (obligation sockets). Includes the right-panel adaptation plan.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

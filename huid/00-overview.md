@@ -93,7 +93,56 @@ Every act at the surface is exactly one of:
 Authoring gestures (unfold, deepen, reframe) travel as semantic acts with
 distinguished weight (product thinking rail 6). There is no third channel.
 
-## 5. Documents of this layer
+## 5. The formation boundary
+
+The layer's load-bearing separation of responsibility: **information is
+formed on the core side of the wire; a surface only presents it.**
+
+- **Formation** — deriving meaning from committed tuples: the shared
+  derivations, module folds, panel projectors (ADR-009). Formation is
+  pluggable core mechanics — declared by manifests, stationed as readings,
+  rebuildable from the log, independent of any surface.
+- **Presentation** — `select` + view: applying navigation parameters and
+  rendering model fields. A surface adds no fields, computes no semantics,
+  and holds no truth.
+
+The boundary is physical — a wire with a declared contract on each side:
+
+```text
+SERVER: machine → store (commit hook) → readings → projectors → routes
+        └─ forms {model, asOfOffset} per panel ─┐
+                                            THE WIRE
+        ┌─ declared command bodies ─────────────┘
+CLIENT: host (params · port · docks) → module select(model, params) → view
+```
+
+What crosses the wire is enumerable: snapshots and acks down, declared
+command bodies up — never navigation parameters, never fold state, never
+the raw tuple stream to panels. The component-by-component map with
+regions and responsibilities is HUID 01 §1 ("Sides and the wire").
+
+Two invariants follow, extending the one-assembly rule (Vol. 08 §1: every
+shell of one product drives the same assembly — behaviour identical by
+construction):
+
+1. **The core never depends on which surface is attached.** Swapping or
+   multiplying UIs — the workbench, a CLI, another product's shell, a
+   future specialised device — touches nothing in the machine, the corpus,
+   the product contracts, or the projectors.
+2. **What the human sees does not depend on the surface.** Models, counts,
+   grades, honest states are formed once, identically for every surface,
+   by the same declared flows: a surface chooses *how* to show, never
+   *what is true*. The reference implementation states the same from its
+   side: the client is "not part of compatibility; the derivation purity
+   behind every rendered element is" (refimpl 08 §4).
+
+The practical test: replace the entire UI — the diff stays inside
+`src/huid` views and `src/app` pages, and every model field available to
+one surface is available to any other through the same declared flows and
+panel APIs. A UI that must be consulted to know what the human was shown
+has taken responsibility it does not own.
+
+## 6. Documents of this layer
 
 - **HUID 00** (this document) — position, commitments, figure.
 - **[HUID 01](./01-motherboard.md)** — the motherboard: host obligations,
@@ -110,7 +159,7 @@ distinguished weight (product thinking rail 6). There is no third channel.
   discipline — binding for every module, grounded in the psychology of
   attention.
 
-## 6. Status language
+## 7. Status language
 
 This layer uses the specification set's status vocabulary (CURRENT /
 DECLARED / PROPOSED / SEED). The layer as a whole is SEED: its rules bind

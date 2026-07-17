@@ -24,6 +24,58 @@ the docks. It knows nothing about any particular module beyond its manifest.
 Everything in the left column is written once and does not change when
 modules come and go. Everything in the right column is per module.
 
+### Sides and the wire
+
+The boundary has **two axes**, and both must be read together: the *role*
+axis (host / module, the table above) and the *side* axis (server /
+client) — which components physically sit where, and what crosses the
+wire. Since ADR-009 the side axis is architectural, not a deployment
+detail: **the server side forms information; the client side presents
+it** (HUID 00 §5).
+
+```text
+SERVER — information is formed          CLIENT — information is presented
+─────────────────────────────────       ─────────────────────────────────
+machine · src/nest/{machine,membrane}   host, client half · src/huid
+  commits tuples; knows no panels         snapshot replicas per panel
+store + commit hook · src/nest/wave       parameter space (focus, options)
+  append-only log, JSONL, notifies        command-port client
+  listeners (the mirror's one sink)       docks, registries, chrome
+readings library · src/nest/readings    modules · src/huid/modules
+  the pure folds projectors evaluate      select(model, params) — pure
+projectors, host's server half            view(model, port) — render only
+  · src/huid/projectors                   gestures → declared bodies
+  claims = manifest.reads;              nothing else: no fetch, no
+  fold → snapshot + asOfOffset            semantic state, no second truth
+routes · src/app/api
+  panels (GET/SSE) · commands · Class L
+```
+
+**The wire — everything that crosses it, exhaustively:**
+
+| Direction | Crosses |
+| --- | --- |
+| down (server → client) | panel snapshots `{model, asOfOffset}` · command results (acks with the committed batch) · Class L materialisations (archive download, payload by offset) |
+| up (client → server) | declared `TurnBody` / `DecisionBody` through the command port · panel snapshot requests (`after` offset) |
+| **never** | navigation parameters (client-only) · fold state (server-only) · machine registers (no one's, Vol. 02 §4.7) · the raw tuple stream to panels (ADR-009 Decision 3) |
+
+Component by component:
+
+| Component | Side | Region | Does | Never does |
+| --- | --- | --- | --- | --- |
+| machine | server | `src/nest/machine`, `membrane` | commits tuples; discharges intentions | knows panels exist |
+| store + commit hook | server | `src/nest/wave` | append-only log; JSONL; notifies listeners | edits; interprets |
+| readings library | server (and any Class L tool) | `src/nest/readings` | pure folds: projection, canvas, trace, strata | store access; fetch |
+| panel projector (host, server half) | server | `src/huid/projectors` | claims + fold → snapshot + `asOfOffset`; rebuilds by replay | discharge; judgement; second truth |
+| routes | server | `src/app/api` | serve snapshots; accept commands; Class L endpoints | machine semantics |
+| host (client half) | client | `src/huid` | snapshot transport; params; port; docks; chrome | forming information |
+| module (`select` + view) | client | `src/huid/modules` | apply params; render model fields; shape gestures | fetch; compute semantics |
+
+Interim honesty: until the ADR-009 steps land, panels without a projector
+form their models in the **client** host over the tuple replica — the same
+pure folds on the provisional side. The map above states the target
+contract; the interim is recorded in ADR-009 and HUID 03 §6.
+
 ## 2. The feed
 
 The feed is the device-side continuation of the machine's own feed — "tuples
@@ -42,6 +94,8 @@ in offset order" (Vol. 08 §8) — delivered to module folds:
    module's reads are its collection rules, and the host is the dispatcher —
    the mirror of topology dispatch (Vol. 02 §5) and knot collection
    (Vol. 05 §3). A module physically cannot read what it did not declare.
+   Where a fold evaluates server-side, the same filter feeds its projector
+   (§8) and the enforcement moves behind the wire entirely.
 4. **Folds always run; views render on demand.** An inactive centre view's
    fold still steps (state stays warm; switching is instant); only rendering
    is deferred.
@@ -121,7 +175,22 @@ Adding a centre view adds its switch button by registration alone; adding a
 rail module adds its section in declared order. The host's dock frames do
 not change.
 
-## 7. What never crosses the board
+## 7. The projector plane — where folds evaluate
+
+A module's fold MAY evaluate server-side as a **panel projector**
+(ADR-009): an observer-class reading service fed by the store's commit
+hook (the mirror's one sink), filtered by the module's `reads`,
+accumulating the parameter-independent snapshot and serving it with a
+mandatory `asOfOffset` (GET first, SSE later). The module contract is
+unchanged — `select` and the view stay client-side over `(model, params)`,
+and the module still never fetches: the host transports snapshots. A
+projector is rebuildable from the log at any time and holds no second
+truth; it is not a Vol. 07 output controller — controllers discharge
+exactly once and address the world, and their UI face is the reserved
+obligation socket (ADR-005 §1.4). The component-by-component sides and the
+wire contract are the map in §1.
+
+## 8. What never crosses the board
 
 Restated from the module side in HUID 02 §5; stated here as host law:
 

@@ -76,6 +76,12 @@ derived from the specification set and `spec/` and are not to be weakened.
    ordering allow; keep the surface quiet but make the ripple inspectable.
 10. **When in doubt, ask:** which tuples exist, which are being created, and
     which projection shows them (Vol. 08 §8 derivation discipline).
+11. **The formation boundary.** Information is formed on the core side of
+    the wire — readings, projectors, manifest-declared and rebuildable
+    (ADR-009, HUID 00 §5) — and surfaces only present it. UIs may be many
+    and different; the core never depends on which surface is attached,
+    and what the human sees is formed identically for every surface.
+    Swapping the whole UI leaves the nest untouched.
 
 ## Simulation liberties (current, documented)
 

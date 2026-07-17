@@ -109,7 +109,19 @@ reachability (every demand's feeding chain exists), termination (budgets,
 bounded fan-out, honest stalls) — inherited from Vol. 01 §7 and applied as
 the checklist for every new operator, fact family, or UI affordance.
 
-### 1.11 Terminology is load-bearing
+### 1.11 The formation boundary
+
+Information is formed on the core side of the wire — shared derivations,
+module folds, panel projectors: pluggable, manifest-declared, rebuildable
+readings (ADR-009) — and surfaces only present it (`select` + view). This
+extends the one-assembly rule (Vol. 08 §1) one level up: not only is
+machine behaviour identical under every shell, the *formed information* is
+too. UIs may be many and different; the core never depends on which
+surface is attached, and what the human sees — models, counts, grades,
+honest states — does not vary by surface. The UI stays thin: responsible
+for the presentation of information, never for its formation (HUID 00 §5).
+
+### 1.12 Terminology is load-bearing
 
 Vol. 15 is the vocabulary authority; Nest primitives are never renamed to
 match adjacent materials (Semantic Vessel, maturity cube) — they are
@@ -195,6 +207,8 @@ rather than silently resolved.
 | HUID layer: UI grows as modules on a fixed motherboard (host, feed, docks) | plugin growth without mechanism growth (Vol. 11 §1 mirrored) | `huid/`, ADR-006 |
 | Radial `src/` layout: wave → readings/membrane → machine · corpus · product · huid · app; inward-only imports; region lids | the nest figure made legible to models; every fragment has one region | ADR-007 |
 | UI request path + calm contract; session archive as the proving module; registry operations are app chrome | consistent intake for UI growth; attention psychology grounding | ADR-008, HUID 04 |
+| Panel projectors: backend snapshots per panel (`model` + `asOfOffset`), observer-class, manifest-filtered; the log stream never ships to panels | zones of responsibility; refimpl 08 mirror/digest precedent; rebuildability vs the membrane cursor | ADR-009, HUID 01 §7 |
+| Formation boundary stated: information formed core-side, surfaces present only; what the human sees is surface-independent | thin-UI mandate; one-assembly rule extended to formed information | HUID 00 §5, rail 11, this file §1.11 |
 
 ## 3. Open tensions carried forward
 

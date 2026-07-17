@@ -610,13 +610,33 @@ export async function submitDecision(record: SessionRecord, body: DecisionBody):
       const knot = knotOrNull(record, body.knotId);
       if (!knot) return { tuples: [], refused: { reasons: [`Unknown knot ${body.knotId}.`] } };
       const projection = project(record.tuples);
-      const resource = projection.sources.find(
+      let resource = projection.sources.find(
         (s) => s.store === body.store && s.ref === body.ref
       );
-      if (!resource) {
-        return { tuples: [], refused: { reasons: ["The referenced source is not on this session's shelf."] } };
-      }
       const tuples: WaveTuple[] = [];
+      if (!resource) {
+        // A catalogue selection beyond the shelf: validate that it resolves,
+        // then declare it on the shelf first — the shelf grows only through
+        // explicit, committed human acts.
+        if (body.store !== "spec") {
+          return { tuples: [], refused: { reasons: ["Only specification catalogue refs can be declared mid-session."] } };
+        }
+        const resolved = await resolverFor(record).resolve({ store: "spec", ref: body.ref });
+        if (!resolved) {
+          return { tuples: [], refused: { reasons: [`Unknown catalogue ref "${body.ref}".`] } };
+        }
+        resource = {
+          store: "spec",
+          ref: body.ref,
+          title: resolved.title,
+          excerpt: boundText(resolved.content, 240)
+        };
+        tuples.push(
+          ...(await commit(record, [
+            fact(key, "learning.source.declared", { resource, actor: "learner" })
+          ]))
+        );
+      }
       tuples.push(
         ...(await commit(record, [
           fact(key, "learning.source.presented", { knotId: knot.knotId, resource })

@@ -589,6 +589,23 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
 }
 .src-menu button:hover { border-color: var(--blue); color: var(--blue); }
+.cat-browse {
+  border-top: 1px dashed var(--line-strong);
+  padding-top: 10px;
+  margin-top: 4px;
+  display: grid;
+  gap: 7px;
+}
+.cat-browse select {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  background: #fffdf4;
+  padding: 8px 10px;
+  font: 400 12px var(--prose);
+  outline: none;
+}
+.cat-browse select:focus { border-color: var(--blue); }
+.cat-browse .op-btn { justify-self: start; }
 .sources-picker { margin: 4px 0 16px; }
 .sources-picker summary {
   cursor: pointer;
@@ -751,13 +768,32 @@ a:hover { text-decoration: underline; }
 /* -------------------------------------------------------------------- trace */
 
 .trace-drawer {
-  border-top: 1px solid var(--line-strong);
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 1580px;
+  z-index: 70;
+  border-top: 3px solid var(--terra);
   background: #23282e;
   color: #cfd4c2;
   padding: 20px 4% 30px;
-  max-height: 46vh;
+  max-height: 58vh;
   overflow: auto;
+  box-shadow: 0 -20px 60px #0006;
 }
+.trace-close {
+  border: 1px solid #5a4436 !important;
+  color: #e0a37e !important;
+  background: transparent;
+  padding: 6px 12px;
+  font: 600 9px var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.trace-close:hover { background: #3a2f28; }
 .trace-drawer h4 { font: 600 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #8fa0b5; margin: 0 0 6px; }
 .trace-drawer .trace-note { font: 400 11px/1.6 var(--sans); color: #97a08e; margin: 0 0 14px; max-width: 720px; }
 .trace-head { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; justify-content: space-between; }

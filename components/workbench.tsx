@@ -23,6 +23,10 @@ type ComposerMode =
   | { mode: "answer" | "challenge"; knotId: string }
   | { mode: "unfold" };
 
+type Catalogue = {
+  volumes: { slug: string; label: string; sections: { anchor: string; heading: string }[] }[];
+};
+
 function payloadOf(tuple: WaveTuple): Record<string, unknown> {
   return (tuple.payload ?? {}) as Record<string, unknown>;
 }
@@ -143,7 +147,32 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   const [traceFilter, setTraceFilter] = useState<TraceActor | "all">("all");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [sourceMenuKnotId, setSourceMenuKnotId] = useState<string | null>(null);
+  const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
+  const [catVolume, setCatVolume] = useState("");
+  const [catSection, setCatSection] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // The catalogue of static study material, fetched once when a knot's
+  // evidence menu first opens.
+  useEffect(() => {
+    if (!sourceMenuKnotId || catalogue) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await fetch("/api/catalogue");
+        const data = (await response.json()) as Catalogue;
+        if (!cancelled) {
+          setCatalogue(data);
+          if (data.volumes.length > 0) setCatVolume(data.volumes[0].slug);
+        }
+      } catch {
+        // the menu stays useful without the catalogue
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [sourceMenuKnotId, catalogue]);
 
   useEffect(() => {
     let cancelled = false;
@@ -634,6 +663,50 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                             Read into the knot: {truncate(source.title ?? source.ref, 60)}
                           </button>
                         ))}
+                        {catalogue && (
+                          <div className="cat-browse">
+                            <span className="eyebrow">Or pick a chapter from the catalogue</span>
+                            <select
+                              value={catVolume}
+                              onChange={(event) => {
+                                setCatVolume(event.target.value);
+                                setCatSection("");
+                              }}
+                            >
+                              {catalogue.volumes.map((volume) => (
+                                <option key={volume.slug} value={volume.slug}>
+                                  {volume.label}
+                                </option>
+                              ))}
+                            </select>
+                            <select value={catSection} onChange={(event) => setCatSection(event.target.value)}>
+                              <option value="">Whole volume</option>
+                              {catalogue.volumes
+                                .find((volume) => volume.slug === catVolume)
+                                ?.sections.map((section) => (
+                                  <option key={section.anchor} value={section.anchor}>
+                                    {section.heading}
+                                  </option>
+                                ))}
+                            </select>
+                            <button
+                              type="button"
+                              className="op-btn"
+                              disabled={busy || !catVolume}
+                              onClick={() => {
+                                setSourceMenuKnotId(null);
+                                decide({
+                                  kind: "readSource",
+                                  knotId: knot.knotId,
+                                  store: "spec",
+                                  ref: catSection ? `${catVolume}#${catSection}` : catVolume
+                                });
+                              }}
+                            >
+                              Read the chapter into the knot
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </article>
@@ -805,6 +878,9 @@ export function Workbench({ sessionId }: { sessionId: string }) {
                   {filter}
                 </button>
               ))}
+              <button type="button" className="trace-close" onClick={() => setTraceOpen(false)}>
+                ✕ close
+              </button>
             </div>
           </div>
           {tuples.map((tuple) => {

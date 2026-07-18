@@ -37,24 +37,52 @@ restated); known deviations are ledgered and retired opportunistically
    absent capability *states* its absence — affordances are never
    silently hidden (seed §9 discipline).
 4. **Monotonic snapshots.** A snapshot with `asOfOffset` ≤ the held one
-   is dropped. *Ledgered gap (§5.1): designed in design_proposal §5, not
+   is dropped. *Ledgered gap (§6.1): designed in design_proposal §5, not
    yet guarded in the host.*
 
-## 3. Code
+## 3. The construction paradigm — functional, atomic, stratified
+
+Not taste but entailment: purity is what the standing law runs on —
+rebuildable readings (Art. 2), replayable folds, location-free
+derivations (Class L), parity oracles — and in a workshop developed by
+several models it makes the unit of review equal the unit of meaning,
+with diffs that localise.
+
+1. **Functions over classes; plain data over instances.** Classes only
+   where a port demands an adapter shape (the membrane); no inheritance —
+   composition is calls.
+2. **Atoms compose upward within a file** — the anatomy files converge
+   to: the role header, then seams/state (if any), then private atoms,
+   then composed operations, then the narrow exported surface. A file
+   reads as its own figure: gathered atoms → composition → published
+   exports (a degenerate instance, meta-bind-01 §3).
+3. **Narrow exports are a file's publication face.** Export only what
+   the outer ring consumes; a widening export list is reviewed like a
+   widening claim.
+4. **Effects live at named seams only.** Backend: `fs` in the store,
+   network in membrane adapters, process caches in commented
+   `globalThis` registries — each explicitly a cache of replay. Device:
+   state and effects in the host only; modules are pure `select` plus
+   components (`props → view`).
+5. **Two sides, one discipline, different strata.** Backend strata:
+   atoms → operations → exported commands and ports. Device strata: pure
+   selects/formers → components → host glue. The difference is where
+   state may live — never how code is written; forking the paradigm per
+   side would fork the shared language of the models developing it.
+
+## 4. Code
 
 1. **`import type` across boundaries** wherever only types are needed —
    bundle hygiene beneath the `server-only` guard, not instead of it.
 2. **`readonly` on manifest arrays and the tuple envelope**; committed
    payloads treated immutable (Vol. 03 §1.2).
-3. **Device code is functions and plain objects**; classes only in
-   machine-side adapters (the inference port).
-4. **Files kebab-case; identifiers and comments British English**;
+3. **Files kebab-case; identifiers and comments British English**;
    registered ids dotted or kebab per their register.
-5. **Comments state constraints, not narration** — the file-header
+4. **Comments state constraints, not narration** — the file-header
    style: role plus governing sections; nothing a reader sees in the
    next line anyway.
 
-## 4. Adopted by reference (named, not restated)
+## 5. Adopted by reference (named, not restated)
 
 - **HTTP status semantics with `{error}` bodies** — the machine
   refimpl 08 §2 house style (honest 400/404/409/413).
@@ -64,7 +92,7 @@ restated); known deviations are ledgered and retired opportunistically
 - **JSON-representable payloads** (Vol. 03 §1.3) — extended to
   snapshot models verbatim.
 
-## 5. Deviation ledger (opportunistic retirement)
+## 6. Deviation ledger (opportunistic retirement)
 
 1. The monotonic snapshot guard (§2.4) — lands with host transport
    generalisation (preparation P1).

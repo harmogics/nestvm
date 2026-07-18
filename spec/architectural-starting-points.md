@@ -218,6 +218,7 @@ rather than silently resolved.
 | The protocol closed into a cycle: seed → proposal (working canvas) → code → landing records → seed updated, proposal retired to history; governance inverts at close | development made isomorphic to a study session; no-second-truth given its lifecycle | PROTOCOL_DEV (the cycle), spec/history/ |
 | The visual layer normalised: tokens · composition · act-weighted rendering as styling's fractal passport; one field with sibling accents canonised; raw-value debts ledgered, retired opportunistically | the self-embedded pattern documented, not invented; seeds carry token references, never CSS | `themes/`, nestvm-ink |
 | The implicit code contracts explicated: wire-shape rules (absence over null, present flags, anchoring by shape), flow rules (ack-then-refresh, quiet degradation), adopted references named; deviations ledgered | conventions caught from practice, not invented; two real gaps surfaced by the audit | src/CONVENTIONS.md |
+| The construction paradigm named: functional-atomic-stratified as entailed by the law (purity powers Art. 2, folds, oracles); file anatomy = the figure in the small; one discipline, two strata (state at named seams vs host-only) | the shared language of self-development by several models, made explicit | src/CONVENTIONS.md §3 |
 
 ## 3. Open tensions carried forward
 

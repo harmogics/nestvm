@@ -230,6 +230,11 @@ this order:
   raw values only in token definitions; seeds reference tokens, never
   values. Register: nestvm-ink (+ the raw-value debt ledger, retired
   opportunistically).
+- `SDLC.md` — the third altitude beside law (CONSTITUTION) and procedure
+  (PROTOCOL_DEV): the understanding — development as a study session
+  whose machine is us; the lifecycle diagram; the ecosystem horizon
+  (capabilities ripening into seeds); honest incompleteness as method.
+  Bind-shaped: gathered scope, one integration, open questions preserved.
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

@@ -219,6 +219,7 @@ rather than silently resolved.
 | The visual layer normalised: tokens · composition · act-weighted rendering as styling's fractal passport; one field with sibling accents canonised; raw-value debts ledgered, retired opportunistically | the self-embedded pattern documented, not invented; seeds carry token references, never CSS | `themes/`, nestvm-ink |
 | The implicit code contracts explicated: wire-shape rules (absence over null, present flags, anchoring by shape), flow rules (ack-then-refresh, quiet degradation), adopted references named; deviations ledgered | conventions caught from practice, not invented; two real gaps surfaced by the audit | src/CONVENTIONS.md |
 | The construction paradigm named: functional-atomic-stratified as entailed by the law (purity powers Art. 2, folds, oracles); file anatomy = the figure in the small; one discipline, two strata (state at named seams vs host-only) | the shared language of self-development by several models, made explicit | src/CONVENTIONS.md §3 |
+| The phase closed by its own bind: SDLC.md as the third altitude (understanding, beside law and procedure) — development and the system named one figure at two radii; contributions mapped, open questions preserved | the reflexive bootstrap closed in both directions; acceptance the human's | `SDLC.md` |
 
 ## 3. Open tensions carried forward
 

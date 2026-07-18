@@ -111,8 +111,43 @@ export async function commit(
     await fs.appendFile(logPath(record.meta.id), lines, "utf8");
     record.meta.tuples = record.tuples.length;
     await fs.writeFile(metaPath(record.meta.id), JSON.stringify(record.meta, null, 2), "utf8");
+    notifyCommit(record.meta.id, committed);
   }
   return committed;
+}
+
+// ---------------------------------------------------------------------------
+// The commit hook — the mirror's second half (Vol. 08 §1.2: one sink feeds
+// the persisted store and the live listeners). Listeners are reading-side
+// infrastructure (panel projectors, later the SSE feed): they receive the
+// committed batch read-only, return nothing, and a throwing listener never
+// fails a commit (observers must not alter machine behaviour, Vol. 02
+// §3.4). Registration of imported history (createSessionFromLog) does not
+// notify — projectors rebuild lazily by replay.
+// ---------------------------------------------------------------------------
+
+export type CommitListener = (sessionId: string, tuples: readonly WaveTuple[]) => void;
+
+const globalListeners = globalThis as unknown as { __nestCommitListeners?: Set<CommitListener> };
+
+function commitListeners(): Set<CommitListener> {
+  if (!globalListeners.__nestCommitListeners) globalListeners.__nestCommitListeners = new Set();
+  return globalListeners.__nestCommitListeners;
+}
+
+export function onCommit(listener: CommitListener): () => void {
+  commitListeners().add(listener);
+  return () => commitListeners().delete(listener);
+}
+
+function notifyCommit(sessionId: string, tuples: readonly WaveTuple[]): void {
+  for (const listener of commitListeners()) {
+    try {
+      listener(sessionId, tuples);
+    } catch {
+      // an observer defect never fails the commit
+    }
+  }
 }
 
 export async function updateMeta(record: SessionRecord, patch: Partial<SessionMeta>): Promise<void> {

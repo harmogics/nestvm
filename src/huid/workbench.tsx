@@ -7,6 +7,8 @@
 // browser holds no semantic history of its own.
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { DepthPanelModel } from "@/huid/modules/depth-rail/model";
+import { DepthRail, selectDepthRail } from "@/huid/modules/depth-rail/view";
 import { SessionArchiveChip } from "@/huid/modules/session-archive/strip";
 import { buildCanvas, defaultCanvasOptions, type CanvasOptions } from "@/nest/readings/canvas";
 import { project } from "@/nest/readings/projection";
@@ -134,6 +136,7 @@ function describeTuple(tuple: WaveTuple): { actor: TraceActor; summary: string }
 export function Workbench({ sessionId }: { sessionId: string }) {
   const [meta, setMeta] = useState<SessionMeta | null>(null);
   const [tuples, setTuples] = useState<WaveTuple[] | null>(null);
+  const [depthPanel, setDepthPanel] = useState<DepthPanelModel | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -172,6 +175,20 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     };
   }, [sourceMenuKnotId, catalogue]);
 
+  // The host's snapshot transport (ADR-009): panels receive backend-formed
+  // models, never the tuple stream. Refreshed on load and after every
+  // command result; SSE replaces the refetch when the events channel lands.
+  const refreshPanels = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}/panels/right.depth`);
+      if (!response.ok) return; // the panel keeps its last snapshot
+      const data = (await response.json()) as { model: DepthPanelModel };
+      setDepthPanel(data.model);
+    } catch {
+      // transport hiccup — the last snapshot stands until the next refresh
+    }
+  }, [sessionId]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -182,6 +199,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
         if (!cancelled) {
           setMeta(data.meta);
           setTuples(data.tuples);
+          void refreshPanels();
         }
       } catch (e) {
         if (!cancelled) setLoadError(e instanceof Error ? e.message : "Could not load the session.");
@@ -190,7 +208,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, refreshPanels]);
 
   const projection = useMemo(() => project(tuples ?? []), [tuples]);
   const canvasBlocks = useMemo(
@@ -206,9 +224,6 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   const rootScene = projection.scenes.find((s) => !s.parentBindId) ?? null;
   const focusedScene =
     projection.scenes.find((s) => s.bindId === focusSceneId) ?? rootScene ?? null;
-  const childScenes = focusedScene
-    ? projection.scenes.filter((s) => s.parentBindId === focusedScene.bindId)
-    : [];
 
   const ancestry: SceneView[] = useMemo(() => {
     const chain: SceneView[] = [];
@@ -225,6 +240,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   const applyResult = useCallback((result: CommandResult) => {
     if (result.tuples.length > 0) {
       setTuples((current) => [...(current ?? []), ...result.tuples]);
+      void refreshPanels();
     }
     if (result.refused) setNotice(result.refused.reasons);
     else setNotice(null);
@@ -236,7 +252,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
       setCentreView("focus");
     }
     return result;
-  }, []);
+  }, [refreshPanels]);
 
   async function post(path: string, body: TurnBody | DecisionBody): Promise<CommandResult | null> {
     setBusy(true);
@@ -993,46 +1009,12 @@ export function Workbench({ sessionId }: { sessionId: string }) {
           )}
         </section>
 
-        <aside className="rail right">
-          <section>
-            <h4>Depth — child scenes</h4>
-            {childScenes.length === 0 && (
-              <p className="root-item">Deepen a knot to open a child scene here.</p>
-            )}
-            {childScenes.map((scene) => (
-              <button
-                type="button"
-                className={`child-link${scene.bindId === focusSceneId ? " active" : ""}`}
-                key={scene.bindId}
-                onClick={() => setFocusSceneId(scene.bindId)}
-              >
-                <b>{truncate(scene.title, 52)}</b>
-                <small>
-                  {scene.bindId} · {scene.status}
-                </small>
-              </button>
-            ))}
-          </section>
-          {projection.scenes.length > 1 && (
-            <section>
-              <h4>All scenes</h4>
-              {projection.scenes.map((scene) => (
-                <button
-                  type="button"
-                  className={`child-link${scene.bindId === (focusedScene?.bindId ?? "") ? " active" : ""}`}
-                  key={scene.bindId}
-                  onClick={() => setFocusSceneId(scene.bindId)}
-                >
-                  <b>{truncate(scene.title, 52)}</b>
-                  <small>
-                    {scene.bindId} · {scene.status}
-                    {scene.parentBindId ? ` · child of ${scene.parentBindId}` : " · root"}
-                  </small>
-                </button>
-              ))}
-            </section>
-          )}
-        </aside>
+        <DepthRail
+          model={selectDepthRail(depthPanel ?? { scenes: [] }, {
+            focusBindId: focusedScene?.bindId ?? null
+          })}
+          port={{ navigate: (patch) => setFocusSceneId(patch["focus.bindId"]) }}
+        />
       </div>
 
       <form className="composer-bar" onSubmit={submitTurn}>

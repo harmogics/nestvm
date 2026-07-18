@@ -219,7 +219,11 @@ The phases produce the proposal; they do not produce code. On the go:
    capability's description in `capabilities/`, bump its version and
    advance its status (the cycle, step 5);
 5. **retire the proposal** — freeze the working canvas into
-   `spec/history/` with its closing note (the cycle, step 6).
+   `spec/history/` with its closing note (the cycle, step 6);
+6. **leave the imprint** — the model records the arc's joint attribution
+   in `attributions/` (who, in which roles, on what, and how — honesty
+   included); the closing duty beside the records, because a model's
+   part traces nowhere else (attributions/README).
 
 | Phase | Output artefact | Primary instruments |
 | --- | --- | --- |

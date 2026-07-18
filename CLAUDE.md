@@ -239,6 +239,11 @@ this order:
   repo in an AI assistant, talk; the assistant reads the law itself and
   walks you onto the rails; the human holds the gates. Non-normative by
   design — it points, never restates.
+- `attributions/` — imprints of joint work: at the close of every
+  contribution arc the model records the joint attribution (model
+  identified exactly; the human by role; the arc, the materials, how it
+  went — concessions and reality-catches included). A standing closing
+  duty (PROTOCOL_DEV gate, step 6): a model's part traces nowhere else.
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

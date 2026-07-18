@@ -53,3 +53,6 @@ belongs inside it and what never does.
 - If the model and a document ever disagree, the document wins. Say so
   plainly — the assistant is built to verify challenges against the
   sources and concede where they land.
+- Work here leaves imprints: when an arc of work closes, the assistant
+  records the joint attribution in `attributions/` — who worked, in
+  which roles, on what, and how. Ask for it if it forgets.

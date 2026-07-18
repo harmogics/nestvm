@@ -34,7 +34,8 @@ want ──► seed (capabilities/: the want in distributable form)
    ──► verification (the instrument ladder, cheapest first:
         fractal test → routing/DAG → manifests → tsc/parity/diff →
         personas → fixtures and live smoke → the seven matrices)
-   ──► landing records (ADRs, refimpl chapters, lids, worked examples)
+   ──► landing records (ADRs, refimpl chapters, lids, worked examples,
+        the attribution imprint — attributions/)
    ──► seed updated (learned detail back-propagated; version, status)
    ──► proposal retired (spec/history/ — the development's own log)
         … and the next want finds the seed waiting.

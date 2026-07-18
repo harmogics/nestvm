@@ -221,6 +221,7 @@ rather than silently resolved.
 | The construction paradigm named: functional-atomic-stratified as entailed by the law (purity powers Art. 2, folds, oracles); file anatomy = the figure in the small; one discipline, two strata (state at named seams vs host-only) | the shared language of self-development by several models, made explicit | src/CONVENTIONS.md §3 |
 | The phase closed by its own bind: SDLC.md as the third altitude (understanding, beside law and procedure) — development and the system named one figure at two radii; contributions mapped, open questions preserved | the reflexive bootstrap closed in both directions; acceptance the human's | `SDLC.md` |
 | The front door opened: DEV_MANUAL in plain British English — fork, run, converse; the assistant reads the law and proposes the optimal path; instruments over confidence | onboarding = the collaboration's own working mode, documented honestly | `DEV_MANUAL.md` |
+| Joint attribution instituted: imprints per contribution arc (model identified exactly, human by role, honesty included); the closing duty at the gate | Art. 14 applied to the development itself — a model's part traces nowhere else | `attributions/`, imprint-001 |
 
 ## 3. Open tensions carried forward
 

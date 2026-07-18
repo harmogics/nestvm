@@ -209,6 +209,7 @@ rather than silently resolved.
 | UI request path + calm contract; session archive as the proving module; registry operations are app chrome | consistent intake for UI growth; attention psychology grounding | ADR-008, HUID 04 |
 | Panel projectors: backend snapshots per panel (`model` + `asOfOffset`), observer-class, manifest-filtered; the log stream never ships to panels | zones of responsibility; refimpl 08 mirror/digest precedent; rebuildability vs the membrane cursor | ADR-009, HUID 01 §7 |
 | Formation boundary stated: information formed core-side, surfaces present only; what the human sees is surface-independent | thin-UI mandate; one-assembly rule extended to formed information | HUID 00 §5, rail 11, this file §1.11 |
+| Snapshot contracts: projector identity = data product; N panels per projector; types-only join; server-only build guard | bundle mechanics over discipline; table+graph over one formation | ADR-010 |
 
 ## 3. Open tensions carried forward
 

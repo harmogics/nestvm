@@ -188,7 +188,8 @@ projector is rebuildable from the log at any time and holds no second
 truth; it is not a Vol. 07 output controller — controllers discharge
 exactly once and address the world, and their UI face is the reserved
 obligation socket (ADR-005 §1.4). The component-by-component sides and the
-wire contract are the map in §1.
+wire contract are the map in §1; the module-side shape of the two halves —
+directory layout, single-source claims, registration — is HUID 02 §8.
 
 ## 8. What never crosses the board
 

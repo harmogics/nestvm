@@ -1,8 +1,18 @@
 # ADR-009: Panel projectors — backend-computed snapshots per panel
 
-**Status:** Accepted direction, 2026-07-17; implementation planned (right
-panel first). Builds on ADR-005 (materialised derivations), ADR-008 (the UI
-request path), HUID 01–04. Amends HUID 01 with §8 in the same work item.
+**Status:** Accepted, 2026-07-17; right-panel implementation executed the
+same day (Decision 3 steps 1–6: commit hook, projector plane, depth
+projector, panel route, host transport, parity — 18 stored sessions, zero
+divergences against an independent oracle). Builds on ADR-005
+(materialised derivations), ADR-008 (the UI request path), HUID 01–04.
+Amends HUID 01 in the same work item. Implementation note: the executed
+claims list refined the step-3 sketch — `sys.knot.defined` is claimed (the
+knot→scene provenance join for stall flags) and `learning.knot.marked` is
+not (the card model does not consume it); manifests claim exactly what the
+fold consumes. A follow-up refinement made this structural: the projector
+derives its claims filter from the module manifest (`matchesReads`,
+single source), and the projector fold moved into the module's own
+directory — one module, two halves, one registry line (HUID 02 §8).
 
 ## Context
 

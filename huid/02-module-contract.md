@@ -142,3 +142,43 @@ machine infers, the log carries, panels read.** This keeps every inference
 on the membrane where it is budgeted, correlated, and replayable
 (Vol. 07 §4) — a panel that called a model would be an unbudgeted,
 uncorrelated, unreplayable side channel.
+
+## 8. The two halves of a module
+
+Since ADR-009 a module is one directory with two halves, joined by two
+shared artefacts:
+
+```text
+src/huid/modules/<id>/
+  manifest.ts    the contract — the single source of the claims
+  model.ts       the wire model between the halves
+  projector.ts   server half: pure fold from the claims to the model
+  view.tsx       client half: select(model, params) + View(model, port)
+  README.md      the lid
+```
+
+1. **The manifest is executable, not descriptive.** `reads` is not "what
+   the client listens to" — the client half never sees a tuple. It is the
+   module's declared information diet, and the server half derives its
+   claims filter from it mechanically (`matchesReads` in
+   `src/huid/manifest.ts`): what is declared is exactly what the fold is
+   fed, so declaration and enforcement cannot drift. Its other two roles
+   stand: the claim-review surface (Vol. 11 §6.4 mirrored) and the
+   dependency map for protocol evolution.
+2. **The projector file is pure.** It states *what* the panel's formation
+   is — claims → fold → snapshot — and nothing else. The server-only *how*
+   — commit-hook subscription, caches, lazy catch-up, routes — is the
+   projector plane (`src/huid/projectors/`, HUID 01 §7) and never lives
+   inside a module.
+3. **Registration is one line; the wave registers nothing.** The plane's
+   registry maps `manifest.id → projector`; `wireProjectors()` subscribes
+   the plane to the store's observer hook (`onCommit`) once per process,
+   called by the app shell because assembly is the app's job (Vol. 08 §1).
+   The wave stays panel-ignorant — it only offers the hook; this is the
+   formation boundary holding at the seam (HUID 00 §5).
+4. **The client half consumes the wire model only**, delivered by the
+   host's transport — `select` applies parameters, the view renders
+   fields; no fetch, no tuples, no second formation path.
+
+Adding a panel is therefore one module directory plus one registry entry —
+the motherboard diff test (HUID 03 §3) holds across both halves.

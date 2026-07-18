@@ -61,6 +61,11 @@ demands, integration, and retained multi-turn sessions.
   rebuildable from the log — never the append-log stream itself; output
   controllers stay reserved for the machine addressing the operator
   (obligation sockets). Includes the right-panel adaptation plan.
+- [ADR-010: Snapshot contracts](./ADR-010-snapshot-contracts.md) separates
+  projectors and UI modules fully: first-class wire contracts (types only,
+  named as data products), a server-only mechanical bundle guard, the
+  manifest split (projector `reads` vs module `consumes`), and the
+  per-contract snapshot API — one projector, many panels.
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

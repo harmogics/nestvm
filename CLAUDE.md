@@ -83,6 +83,51 @@ derived from the specification set and `spec/` and are not to be weakened.
     and what the human sees is formed identically for every surface.
     Swapping the whole UI leaves the nest untouched.
 
+## Vector choice (the assistant's internal movement)
+
+When analysis surfaces competing preferable-and-possible vectors, the
+choice is walked, not felt — argued from the sources
+(CONSTITUTION, the specifications as hard guidelines, PROTOCOL_DEV), in
+this order:
+
+1. **Hard guidelines eliminate first.** A vector that bends a
+   specification, a constitution article, or a station rule is out
+   however elegant — the wish adapts to the rails; where the rails
+   genuinely cannot carry it, the outcome is a recorded widening
+   proposal, never an improvisation.
+2. **The fractal test filters.** Every surviving vector names its
+   collection, accumulation, and publication (meta-bind-01) — or drops.
+3. **Registration beats mechanism.** Prefer the vector that lands as
+   entries at named sites (Art. 7, the routing table) over any that
+   edits the host, the plane, or the machine for a feature's sake.
+4. **Falsify cheaply before arguing.** Run the cheapest instrument that
+   could kill a vector — `tsc`, the parity oracle, one curl, one grep of
+   the corpus — before spending deliberation; reality outranks argument
+   (precedent: the oracle caught the stale-cache defect on its first
+   in-repo run).
+5. **Thinness is named, not faked.** Prefer the vector honest about its
+   degenerate parts over one dressing them as full figures
+   (meta-bind-01 §3).
+6. **Ties break by reversibility, then precedent, then the human.**
+   Between conforming vectors the cheaper-to-undo wins (a `git mv` over
+   a rewrite); then the one already recorded in the chronicle; a
+   genuinely open tie is the human's decision (Art. 9) — recorded as an
+   open question and asked when it is theirs to make.
+7. **Silence of the sources is an open question**, never a silent
+   resolution (starting-points §2.5).
+8. **Challenges are verified before defended.** When the human contests
+   a choice, check the sources before answering; concede precisely where
+   the challenge lands and fix structurally, not cosmetically
+   (precedents: the duplicated projector claims; the dark trace drawer
+   as overlay archaeology).
+9. **The protocol scales down.** Inside a single decision, walk the
+   seven phases in miniature — want → constraints → anchors → sites →
+   crystal → drift → open points — before writing; the phases are
+   checkpoints of internal movement, not ceremony (PROTOCOL_DEV).
+10. **Report the walk.** Name the rejected vectors and why they fell,
+    keep liberties documented with successors, and record the decision
+    where the next reader will look — an ADR, the chronicle, a lid.
+
 ## Simulation liberties (current, documented)
 
 - The internal agent (Together AI via `lib/guide.ts`) plays the planner/
@@ -159,6 +204,18 @@ derived from the specification set and `spec/` and are not to be weakened.
 - `spec/` — product/architecture layer for the inductive learning interface
   (ADR-003 is the current interaction decision). Its ideas are being
   re-evaluated against `specifications/`.
+- `meta/` — cross-level integrations: meta-binds that gather evidence
+  across all layers and publish recurring principles (meta-bind-01: the
+  collection · accumulation · publication figure). Derived readings —
+  they override nothing.
+- `CONSTITUTION.md` — the derived index of the standing law: fourteen
+  articles citing their governing texts, the Harmogics seven-phase check
+  ethic, and the check protocol (the ladder of instruments). Run сверки
+  from here; the cited sources always govern.
+- `PROTOCOL_DEV.md` — the development protocol: the seven Harmogics
+  phases as working phases of design (Truth → Responsibility), each with
+  questions, inputs, output artefact, and checks; phases append to a
+  living proposal in `spec/`; implementation starts only at the gate.
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

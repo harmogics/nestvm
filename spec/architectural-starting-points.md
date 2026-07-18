@@ -210,6 +210,9 @@ rather than silently resolved.
 | Panel projectors: backend snapshots per panel (`model` + `asOfOffset`), observer-class, manifest-filtered; the log stream never ships to panels | zones of responsibility; refimpl 08 mirror/digest precedent; rebuildability vs the membrane cursor | ADR-009, HUID 01 §7 |
 | Formation boundary stated: information formed core-side, surfaces present only; what the human sees is surface-independent | thin-UI mandate; one-assembly rule extended to formed information | HUID 00 §5, rail 11, this file §1.11 |
 | Snapshot contracts: projector identity = data product; N panels per projector; types-only join; server-only build guard | bundle mechanics over discipline; table+graph over one formation | ADR-010 |
+| The meta layer opened: collection · accumulation · publication as the recurring figure, observed across twelve levels; the fractal test as drift detector | self-similarity named as a construction rule, guarded against ontology-inflation | `meta/`, meta-bind-01 |
+| The constitution consolidated as a derived index: fourteen articles citing their sources, the Harmogics seven phases as the check ethic, the instrument ladder | one place to run сверки without minting a second authority | `CONSTITUTION.md` |
+| The development protocol phase-structured: seven Harmogics phases from goal to the implementation gate, artefact per phase, the alignment loop made explicit | consistent design flow for any author, human or model | `PROTOCOL_DEV.md` |
 
 ## 3. Open tensions carried forward
 

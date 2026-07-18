@@ -213,6 +213,9 @@ rather than silently resolved.
 | The meta layer opened: collection · accumulation · publication as the recurring figure, observed across twelve levels; the fractal test as drift detector | self-similarity named as a construction rule, guarded against ontology-inflation | `meta/`, meta-bind-01 |
 | The constitution consolidated as a derived index: fourteen articles citing their sources, the Harmogics seven phases as the check ethic, the instrument ladder | one place to run сверки without minting a second authority | `CONSTITUTION.md` |
 | The development protocol phase-structured: seven Harmogics phases from goal to the implementation gate, artefact per phase, the alignment loop made explicit | consistent design flow for any author, human or model | `PROTOCOL_DEV.md` |
+| Guild seeds envisioned: cross-level modules distributed as semantic descriptions and grown by the target (admit → sow → ground → seat); the factory and declarative folds named as the runway | modules as published experience, not code; ECOSYSTEM flows + PHILOSOPHY §5 anticipated it | spec/guild-seeds.md |
+| The capability layer opened: one seed format with a kind taxonomy (kinds = the registration-table rows; atomic capability = degenerate guild); the centre projected as the first seed | distribution units named before mechanisation; the proposal made portable | `capabilities/`, seed_centre-dock |
+| The protocol closed into a cycle: seed → proposal (working canvas) → code → landing records → seed updated, proposal retired to history; governance inverts at close | development made isomorphic to a study session; no-second-truth given its lifecycle | PROTOCOL_DEV (the cycle), spec/history/ |
 
 ## 3. Open tensions carried forward
 

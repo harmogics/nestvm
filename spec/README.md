@@ -66,6 +66,17 @@ demands, integration, and retained multi-turn sessions.
   named as data products), a server-only mechanical bundle guard, the
   manifest split (projector `reads` vs module `consumes`), and the
   per-contract snapshot API — one projector, many panels.
+- [Guild seeds](./guild-seeds.md) is the working vision (SEED) of
+  system-scale modules distributed as published semantic descriptions —
+  cross-level slices grown by the target system (admit → sow → ground →
+  seat) with the source guild's ideology travelling as content, never as
+  code; anchored in the ecosystem's package flows and PHILOSOPHY §5.
+- [Design proposal: the centre dock on snapshot contracts](./design_proposal.md)
+  is the living analysis of applying the projector/contract principles to
+  the central panel: the centre as a dock with three view-modules, three
+  data-product projectors (scene-detail, produced-texts, trace), the view
+  formalised as a lens (backend filter × UI form over one truth), and the
+  update transport (refetch now, contract-multiplexed SSE next).
 - [First-turn and append-log protocol](./first-turn-log-protocol.md) describes the
   lifecycle before and through the first visible bind.
 - [Manifest of conscious movement](./manifest-of-conscious-movement.md) states how

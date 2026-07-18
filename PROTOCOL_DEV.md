@@ -21,6 +21,44 @@ text, not meetings. Decisions taken along the way become ADRs; a
 cross-level principle, a meta-bind. Every cell answers or records its
 gap (Vol. 14 §4.8) — pretending is the only non-conforming option.
 
+## The cycle — seed → proposal → code → description → seed
+
+Capability-scale work runs the protocol as a **closed cycle**; smaller
+work (a fix, a bounded refactor) walks the phases in miniature within a
+turn (Vector choice §9) without minting seeds.
+
+1. **seed** — the capability described, or received, in `capabilities/`:
+   the want in distributable form, however early (`0.x.y-seed`).
+2. **proposal** — the result of *reading and discussing the seed*: the
+   seven phases applied to it, accumulating in a living document in
+   `spec/` — **the working canvas of the cycle**, maintained jointly by
+   the human and the system for its whole duration.
+3. **gate → code** — implementation in the named regions, per the
+   change map.
+4. **architectural description** — the landing records: ADRs for
+   decisions, refimpl chapters for shapes worth teaching, lids, worked
+   examples.
+5. **seed updated** — the learned concreteness back-propagates into the
+   original description: real reads and shapes as implemented,
+   deviations named, fixtures cited; version bumped, status advanced
+   (SEED → manifested-in-source → TRIAL → PROMOTED).
+6. **the proposal retires** — frozen verbatim into `spec/history/` with
+   a closing note, as the recorded run of this protocol; the seed
+   becomes the durable description until a next cycle opens a fresh
+   proposal.
+
+**Governance across the cycle** — the no-second-truth rule with its
+lifecycle: while the cycle is open, the living proposal governs and the
+seed follows it; at close the roles invert — the updated seed governs,
+and the frozen proposal is history (read, never edited).
+
+**The reflexive form.** The cycle is the product's own figure applied to
+its development: the seed is the subject on the shelf; the proposal is
+the scene — the central canvas of the work, its knots the open
+questions; implementation is the grounding tact through reality; the
+updated seed is the released value; `spec/history/` is the log.
+Development here is a study session whose machine is us.
+
 ---
 
 ## Phase 1 — Truth: goals grounded in inspectables
@@ -173,7 +211,12 @@ The phases produce the proposal; they do not produce code. On the go:
    behaviour, parity oracles for formation moves;
 3. record the landing: ADR for decisions, refimpl chapters for shapes
    worth teaching, worked examples for discovered boundaries, a dated
-   note in the proposal closing what it opened.
+   note in the proposal closing what it opened;
+4. **update the seed** — back-propagate the learned detail into the
+   capability's description in `capabilities/`, bump its version and
+   advance its status (the cycle, step 5);
+5. **retire the proposal** — freeze the working canvas into
+   `spec/history/` with its closing note (the cycle, step 6).
 
 | Phase | Output artefact | Primary instruments |
 | --- | --- | --- |

@@ -214,8 +214,16 @@ this order:
   from here; the cited sources always govern.
 - `PROTOCOL_DEV.md` — the development protocol: the seven Harmogics
   phases as working phases of design (Truth → Responsibility), each with
-  questions, inputs, output artefact, and checks; phases append to a
-  living proposal in `spec/`; implementation starts only at the gate.
+  questions, inputs, output artefact, and checks. Capability-scale work
+  runs the closed cycle: seed → proposal (the cycle's working canvas,
+  jointly maintained) → gate → code → landing records → seed updated
+  with the learned detail → proposal retired to `spec/history/`. While a
+  cycle is open the proposal governs; after close, the seed.
+- `capabilities/` — the seed register: distributable declarations of
+  growable capabilities (FORMAT.md — one format, a kind taxonomy, guild
+  as the maximal composite; atomic capabilities as degenerate guilds).
+  First seed: `guild.centre-dock`, the centre projected from
+  design_proposal. Code never travels in a seed.
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

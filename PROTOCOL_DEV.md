@@ -125,13 +125,16 @@ keeping the planes thin — and never as mechanism growth?
 
 **Draw from.** The routing table (`src/README.md`); the
 growth-is-registration table (design_proposal §8); the module and
-projector contracts (HUID 02).
+projector contracts (HUID 02); the theme grammar (`themes/`) for
+presentation fragments.
 
 **Produce.** The change map: fragment → registration site, with manifest
-sketches for new modules/projectors.
+sketches for new modules/projectors; presentation fragments name their
+class scope, consumed tokens, and act weights.
 
 **Check.** The diff test predicted in writing (what the blast radius
-will be); Art. 5–7 of the constitution; the import DAG untouched.
+will be); Art. 5–7 of the constitution; the import DAG untouched; no
+raw visual values outside token definitions (themes rule 1).
 
 *Worked:* design_proposal §3 (three contracts by data product) and §7
 (factory landing: one former server-side + one widget client-side + one

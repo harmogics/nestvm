@@ -124,7 +124,10 @@ fields, not styling.
 carousel registry (P3); the `tuples-by-offset` Class L endpoint (P4);
 the widget seam with the raw-JSON floor (P5); fold expression: today as
 source code in the plane — the declarative fold-strategy successor is
-recorded (guild-seeds §6.2).
+recorded (guild-seeds §6.2); the theme token vocabulary
+([themes](../themes/README.md)) — this guild's widgets consume tokens
+and act-weight classes only, and its lenses inherit the field; the sole
+accent semantics it relies on is the terra rule (acceptance moments).
 **Grants:** none — this guild needs **no** `controller-need`: it crosses
 no membrane. A presentation guild is grant-free by design.
 

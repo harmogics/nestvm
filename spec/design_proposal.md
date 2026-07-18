@@ -155,11 +155,13 @@ current sizes; recorded so the taxonomy of §3.4 earns its keep.
 
 ## 6. Proposed migration order for the centre
 
-1. **trace** — the simplest contract, and it carries two due reforms at
-   once: the row-former registry (ADR-008 D3 templates) and the visual
+1. **trace** — the simplest contract, and it carries three due reforms
+   at once: the row-former registry (ADR-008 D3 templates), the visual
    re-integration of the log into the paper canvas (the dark drawer is an
    archaeological artefact — its skin travelled from a superseded overlay
-   pattern; raw payload keeps the dark code-block idiom).
+   pattern; raw payload keeps the dark code-block idiom), and the first
+   token migration of the debt ledger (actor colours lifted into theme
+   tokens — themes/nestvm-ink §4.1).
 2. **produced-texts** — the canvas formers move server-side; toggles
    become select params.
 3. **scene-detail** — last, because focus interlocks with the composer:

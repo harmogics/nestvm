@@ -224,6 +224,12 @@ this order:
   as the maximal composite; atomic capabilities as degenerate guilds).
   First seed: `guild.centre-dock`, the centre projected from
   design_proposal. Code never travels in a seed.
+- `themes/` — the visual layer on rails: tokens as the declared
+  vocabulary (collection), module/widget composition (accumulation),
+  act-weighted rendering (publication); one field, sibling accents;
+  raw values only in token definitions; seeds reference tokens, never
+  values. Register: nestvm-ink (+ the raw-value debt ledger, retired
+  opportunistically).
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

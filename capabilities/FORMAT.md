@@ -45,7 +45,10 @@ fewer sections; nothing else changes.
    (contracts, fold strategies, docks, params) and which
    `controller-need`s require control-plane grants. Distinguished
    strictly: dependencies are checked at admission; grants are *asked*,
-   never assumed.
+   never assumed. **Visual dependencies are token references** (the
+   [themes](../themes/README.md) vocabulary) plus optional theme
+   *suggestions* — a seed carrying raw CSS values fails review: the
+   guild's identity travels as semantics; the target keeps its own ink.
 6. **Fixtures and trial** — recorded evidence, golden expectations, the
    parity method by which manifestation is verified in the target.
 7. **Applicability and failure examples** — where it fits, where it is

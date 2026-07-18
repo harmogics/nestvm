@@ -216,6 +216,7 @@ rather than silently resolved.
 | Guild seeds envisioned: cross-level modules distributed as semantic descriptions and grown by the target (admit → sow → ground → seat); the factory and declarative folds named as the runway | modules as published experience, not code; ECOSYSTEM flows + PHILOSOPHY §5 anticipated it | spec/guild-seeds.md |
 | The capability layer opened: one seed format with a kind taxonomy (kinds = the registration-table rows; atomic capability = degenerate guild); the centre projected as the first seed | distribution units named before mechanisation; the proposal made portable | `capabilities/`, seed_centre-dock |
 | The protocol closed into a cycle: seed → proposal (working canvas) → code → landing records → seed updated, proposal retired to history; governance inverts at close | development made isomorphic to a study session; no-second-truth given its lifecycle | PROTOCOL_DEV (the cycle), spec/history/ |
+| The visual layer normalised: tokens · composition · act-weighted rendering as styling's fractal passport; one field with sibling accents canonised; raw-value debts ledgered, retired opportunistically | the self-embedded pattern documented, not invented; seeds carry token references, never CSS | `themes/`, nestvm-ink |
 
 ## 3. Open tensions carried forward
 

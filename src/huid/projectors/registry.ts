@@ -1,21 +1,23 @@
-// The projector registry — adding a panel's server half is one entry here
-// (the motherboard diff discipline, HUID 03 §3). `wireProjectors()`
-// subscribes the plane to the store's commit hook once per process: warm
-// caches advance eagerly on commit; cold ones catch up lazily inside
-// projectorSnapshot(). Wiring is the app shell's act (assembly is the
-// app's job) — the panel route calls it at module load.
+import "server-only";
+
+// The projector registry — adding a contract's formation is one entry
+// here (the motherboard diff discipline, HUID 03 §3). Keyed by contract
+// id, never by panel: one projector may feed any number of consuming
+// panels (ADR-010). `wireProjectors()` subscribes the plane to the
+// store's observer hook once per process — the app shell's act, because
+// assembly is the app's job. The wave itself stays panel-ignorant.
 
 import { onCommit } from "@/nest/wave/store";
-import { depthProjector } from "@/huid/modules/depth-rail/projector";
-import { advanceOnCommit, type PanelProjector } from "./runtime";
+import { sceneRegistryProjector } from "./scene-registry";
+import { advanceOnCommit, type SnapshotProjector } from "./runtime";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const projectors = new Map<string, PanelProjector<any, any>>([
-  [depthProjector.manifestId, depthProjector]
+const projectors = new Map<string, SnapshotProjector<any, any>>([
+  [sceneRegistryProjector.manifest.contract, sceneRegistryProjector]
 ]);
 
-export function projectorFor(panelId: string): PanelProjector | undefined {
-  return projectors.get(panelId) as PanelProjector | undefined;
+export function projectorFor(contractId: string): SnapshotProjector | undefined {
+  return projectors.get(contractId) as SnapshotProjector | undefined;
 }
 
 const globalWiring = globalThis as unknown as { __huidProjectorsWired?: boolean };

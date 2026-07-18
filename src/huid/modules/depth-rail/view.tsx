@@ -1,20 +1,21 @@
-// The depth rail module (right dock) — client half. The model arrives
-// formed from the panel's projector (ADR-009); `select` is the pure
-// parameter application (HUID 02 §1) and the view renders model fields
-// only. Every control is a navigation move on `focus.bindId` — the rail
-// never commits and never fetches: the host transports snapshots.
+// The depth rail module (right dock) — presentation side. The model
+// arrives formed as the scene-registry contract snapshot (ADR-010);
+// `select` is the pure parameter application (HUID 02 §1) and the view
+// renders model fields only. Every control is a navigation move on
+// `focus.bindId` — the rail never commits and never fetches: the host
+// transports snapshots per contract.
 
+import type { SceneCard, SceneRegistrySnapshot } from "../../contracts/scene-registry";
 import { truncate } from "../../text";
-import type { DepthPanelModel, DepthSceneCard } from "./model";
 
 export type DepthRailModel = {
   focusedBindId: string | null;
-  childScenes: DepthSceneCard[];
-  allScenes: DepthSceneCard[]; // empty until more than one scene exists
+  childScenes: SceneCard[];
+  allScenes: SceneCard[]; // empty until more than one scene exists
 };
 
 export function selectDepthRail(
-  model: DepthPanelModel,
+  model: SceneRegistrySnapshot,
   params: { focusBindId: string | null }
 ): DepthRailModel {
   return {

@@ -11,8 +11,7 @@ export const sessionArchiveManifest: ModuleManifest = {
   id: "strip.session-archive",
   title: "Archive",
   dock: "strip",
-  reads: { factTypes: [], joins: [] },
-  derives: [],
+  consumes: [],
   params: [],
   commits: [],
   navigates: ["download /api/sessions/:id/archive — the log in wire format; no log effect"]

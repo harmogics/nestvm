@@ -7,7 +7,7 @@
 // browser holds no semantic history of its own.
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { DepthPanelModel } from "@/huid/modules/depth-rail/model";
+import { SCENE_REGISTRY, type SceneRegistrySnapshot } from "@/huid/contracts/scene-registry";
 import { DepthRail, selectDepthRail } from "@/huid/modules/depth-rail/view";
 import { SessionArchiveChip } from "@/huid/modules/session-archive/strip";
 import { buildCanvas, defaultCanvasOptions, type CanvasOptions } from "@/nest/readings/canvas";
@@ -136,7 +136,7 @@ function describeTuple(tuple: WaveTuple): { actor: TraceActor; summary: string }
 export function Workbench({ sessionId }: { sessionId: string }) {
   const [meta, setMeta] = useState<SessionMeta | null>(null);
   const [tuples, setTuples] = useState<WaveTuple[] | null>(null);
-  const [depthPanel, setDepthPanel] = useState<DepthPanelModel | null>(null);
+  const [depthPanel, setDepthPanel] = useState<SceneRegistrySnapshot | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -175,14 +175,15 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     };
   }, [sourceMenuKnotId, catalogue]);
 
-  // The host's snapshot transport (ADR-009): panels receive backend-formed
-  // models, never the tuple stream. Refreshed on load and after every
-  // command result; SSE replaces the refetch when the events channel lands.
+  // The host's snapshot transport (ADR-009/ADR-010): one fetch per
+  // contract, feeding every consuming panel — never the tuple stream.
+  // Refreshed on load and after every command result; SSE replaces the
+  // refetch when the events channel lands.
   const refreshPanels = useCallback(async () => {
     try {
-      const response = await fetch(`/api/sessions/${sessionId}/panels/right.depth`);
+      const response = await fetch(`/api/sessions/${sessionId}/snapshots/${SCENE_REGISTRY}`);
       if (!response.ok) return; // the panel keeps its last snapshot
-      const data = (await response.json()) as { model: DepthPanelModel };
+      const data = (await response.json()) as { model: SceneRegistrySnapshot };
       setDepthPanel(data.model);
     } catch {
       // transport hiccup — the last snapshot stands until the next refresh

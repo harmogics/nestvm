@@ -1,21 +1,41 @@
-// The server half of the depth-rail module (HUID 02 §8, ADR-009): a pure
-// fold from the manifest's claims to the wire model. This file states only
-// WHAT the panel's formation is; the server-only HOW — commit-hook
-// subscription, caches, catch-up, routes — lives in the projector plane
-// (src/huid/projectors/) and never inside a module. Claims are derived
-// from the manifest (single source): what is declared is exactly what the
-// fold is fed. Ownership resolves by provenance joins (`emittedBy`,
-// close-bind registration), never adjacency (Vol. 03 §3.3).
+import "server-only";
+
+// The scene-registry projector — forms the scene-registry contract from
+// the wave log (ADR-010): every bind's card with parent/child links and
+// attention flags. Claims are the manifest below, applied mechanically by
+// the runtime; ownership resolves by provenance joins (`emittedBy`,
+// close-bind registration), never adjacency (Vol. 03 §3.3). Pure over the
+// log: replay reproduces the snapshot byte-identically.
 
 import type { DomainFactPayload } from "@/nest/wave/envelope";
-import { matchesReads } from "../../manifest";
-import type { PanelProjector } from "../../projectors/runtime";
-import { depthRailManifest } from "./manifest";
-import type { DepthPanelModel, DepthSceneCard } from "./model";
+import {
+  SCENE_REGISTRY,
+  type SceneCard,
+  type SceneRegistrySnapshot
+} from "@/huid/contracts/scene-registry";
+import type { ProjectorManifest } from "./manifest";
+import type { SnapshotProjector } from "./runtime";
 
-type DepthFoldState = {
-  cards: DepthSceneCard[];
-  byBind: Map<string, DepthSceneCard>;
+const manifest: ProjectorManifest = {
+  contract: SCENE_REGISTRY,
+  reads: {
+    kinds: ["sys.knot.defined", "sys.descriptor.defined"],
+    factTypes: [
+      "learning.bind.selected",
+      "learning.scene.unfolded",
+      "learning.integration.candidate",
+      "learning.integration.returned",
+      "learning.integration.accepted",
+      "inference.failed",
+      "service.failed"
+    ],
+    joins: ["bindId", "parentBindId", "emittedBy", "knotId", "uid"]
+  }
+};
+
+type SceneRegistryFoldState = {
+  cards: SceneCard[];
+  byBind: Map<string, SceneCard>;
   bindOfClose: Map<string, string>; // close-bind id → scene bind id
   bindOfKnot: Map<string, string>; // knot id → scene bind id (via emittedBy)
 };
@@ -24,10 +44,8 @@ function bindOfUid(uid: string): string {
   return uid.split("#")[0];
 }
 
-export const depthProjector: PanelProjector<DepthFoldState, DepthPanelModel> = {
-  manifestId: depthRailManifest.id,
-
-  claims: (tuple) => matchesReads(depthRailManifest.reads, tuple),
+export const sceneRegistryProjector: SnapshotProjector<SceneRegistryFoldState, SceneRegistrySnapshot> = {
+  manifest,
 
   init: () => ({ cards: [], byBind: new Map(), bindOfClose: new Map(), bindOfKnot: new Map() }),
 
@@ -46,7 +64,7 @@ export const depthProjector: PanelProjector<DepthFoldState, DepthPanelModel> = {
     const d = payload.data ?? {};
     switch (payload.factType) {
       case "learning.bind.selected": {
-        const card: DepthSceneCard = {
+        const card: SceneCard = {
           bindId: String(d.bindId ?? ""),
           parentBindId: d.parentBindId ? String(d.parentBindId) : undefined,
           sourceKnotId: d.sourceKnotId ? String(d.sourceKnotId) : undefined,

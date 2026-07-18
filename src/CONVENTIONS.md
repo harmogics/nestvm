@@ -82,6 +82,35 @@ with diffs that localise.
    style: role plus governing sections; nothing a reader sees in the
    next line anyway.
 
+### React and Next.js — the carrier framework
+
+Standard practice is adopted by reference (function components, the
+hooks rules, App Router semantics, server components by default). Only
+what our law bends is stated:
+
+1. **The client boundary is drawn by the host, never by modules.**
+   `"use client"` sits on the host and on standalone app chrome (the
+   forms); module views carry no directive — they are side-neutral pure
+   components, seated by whoever owns the boundary.
+2. **No hooks in modules.** `useState`/`useEffect` live in the host
+   only; a module is a pure `select` plus a stateless view — the HUID
+   law expressed in React terms, against the habitual sprinkle of local
+   state.
+3. **Props are the contract: `{model, port}`.** No prop spreading, and
+   **no React Context for semantic data** — context would be an
+   undeclared bus around the manifests; explicit props keep the flow
+   reviewable. (Context may one day carry host plumbing such as a theme
+   handle — never truth.)
+4. **No semantic computation in JSX** — mapping model fields only
+   (HUID 02 §3.4); `select` computes.
+5. **Async effects carry the cancelled-flag cleanup** (the host's load
+   effect pattern); no effect exists outside the host.
+6. **No UI-kit and no CSS-in-JS dependencies.** Widgets are plain
+   components over theme tokens — which is precisely what keeps a
+   guild's widget hints portable: a seed may assume tokens, never a
+   component library (themes rule 5; the vanilla discipline of the
+   machine refimpl 08 §4 echoed).
+
 ## 5. Adopted by reference (named, not restated)
 
 - **HTTP status semantics with `{error}` bodies** — the machine

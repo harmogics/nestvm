@@ -12,6 +12,7 @@ const ROOT = path.join(process.cwd(), "var", "sessions");
 type SessionRecord = {
   meta: SessionMeta;
   tuples: WaveTuple[];
+  logBytes: number; // size of the JSONL mirror this cache reflects
 };
 
 type Store = Map<string, SessionRecord>;
@@ -47,7 +48,7 @@ export function mintSessionId(): string {
 
 export async function createSession(meta: SessionMeta): Promise<SessionRecord> {
   await ensureRoot();
-  const record: SessionRecord = { meta, tuples: [] };
+  const record: SessionRecord = { meta, tuples: [], logBytes: 0 };
   store().set(meta.id, record);
   await fs.writeFile(metaPath(meta.id), JSON.stringify(meta, null, 2), "utf8");
   await fs.writeFile(logPath(meta.id), "", "utf8");
@@ -57,7 +58,18 @@ export async function createSession(meta: SessionMeta): Promise<SessionRecord> {
 export async function loadSession(id: string): Promise<SessionRecord | null> {
   if (!safeId(id)) return null;
   const cached = store().get(id);
-  if (cached) return cached;
+  if (cached) {
+    // The in-memory record is a cache of the JSONL mirror, never a second
+    // truth: revalidate against the file so a batch appended by another
+    // process (a second workbench on the same store) becomes visible.
+    // Reloading is reading (Vol. 03 §6.4) — nothing is re-discharged.
+    try {
+      const stat = await fs.stat(logPath(id));
+      if (stat.size === cached.logBytes) return cached;
+    } catch {
+      return cached; // file momentarily unreadable — the cache stands
+    }
+  }
   try {
     const [metaRaw, logRaw] = await Promise.all([
       fs.readFile(metaPath(id), "utf8"),
@@ -69,7 +81,7 @@ export async function loadSession(id: string): Promise<SessionRecord | null> {
       .filter((line) => line.trim().length > 0)
       .map((line) => JSON.parse(line) as WaveTuple);
     meta.tuples = tuples.length;
-    const record: SessionRecord = { meta, tuples };
+    const record: SessionRecord = { meta, tuples, logBytes: Buffer.byteLength(logRaw, "utf8") };
     store().set(id, record);
     return record;
   } catch {
@@ -109,6 +121,7 @@ export async function commit(
   if (committed.length > 0) {
     const lines = committed.map((t) => JSON.stringify(t)).join("\n") + "\n";
     await fs.appendFile(logPath(record.meta.id), lines, "utf8");
+    record.logBytes += Buffer.byteLength(lines, "utf8");
     record.meta.tuples = record.tuples.length;
     await fs.writeFile(metaPath(record.meta.id), JSON.stringify(record.meta, null, 2), "utf8");
     notifyCommit(record.meta.id, committed);
@@ -222,8 +235,13 @@ export async function createSessionFromLog(
   } catch {
     // absent — free to register
   }
-  const record: SessionRecord = { meta, tuples: [...tuples] };
-  await fs.writeFile(logPath(meta.id), serialiseLog(tuples), "utf8");
+  const serialised = serialiseLog(tuples);
+  const record: SessionRecord = {
+    meta,
+    tuples: [...tuples],
+    logBytes: Buffer.byteLength(serialised, "utf8")
+  };
+  await fs.writeFile(logPath(meta.id), serialised, "utf8");
   await fs.writeFile(metaPath(meta.id), JSON.stringify(meta, null, 2), "utf8");
   store().set(meta.id, record);
   return { ok: true };

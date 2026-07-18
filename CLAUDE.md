@@ -235,6 +235,10 @@ this order:
   whose machine is us; the lifecycle diagram; the ecosystem horizon
   (capabilities ripening into seeds); honest incompleteness as method.
   Bind-shaped: gathered scope, one integration, open questions preserved.
+- `DEV_MANUAL.md` — the front door, in plain words: fork, run, open the
+  repo in an AI assistant, talk; the assistant reads the law itself and
+  walks you onto the rails; the human holds the gates. Non-normative by
+  design — it points, never restates.
 - `related/` — adjacent conceptual corpus: Semantic Vessel drafts (CoAgnes)
   and the AI maturity cube widget. Shares the seven-dimension vocabulary
   (Truth, Deep, Connect, Service, Knowledge, Evolution, Responsibility) with

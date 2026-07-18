@@ -4,40 +4,51 @@ Status: SEED · Snapshot date: 2026-07-17 ·
 Previous: [01-motherboard.md](./01-motherboard.md) ·
 Next: [03-conformance-and-migration.md](./03-conformance-and-migration.md)
 
-A module is the unit of UI capability: one card seated in one dock. It has
-exactly four parts — **manifest, fold, select, view** — and speaks to the
-board through exactly two verbs — **commit** and **navigate**. TypeScript is
-the reference encoding (as in Vol. 02); the shapes, not the language, are
-normative.
+A module is the unit of UI capability: one card seated in one dock. Its
+contract spans the two sides of the formation boundary (HUID 00 §5) —
+**formation** (a projector, server-only) and **presentation** (select +
+view, client) — joined only by a **snapshot contract** (types, erased at
+build; ADR-010). The presentation side speaks to the board through exactly
+two verbs — **commit** and **navigate**. TypeScript is the reference
+encoding (as in Vol. 02); the shapes, not the language, are normative.
 
 ## 1. The shape
 
 ```ts
-type HuidModule<S, M> = {
+// presentation side — src/huid/modules/<panel>/ (client)
+type HuidModule<M, V> = {
   manifest: ModuleManifest;
-  fold: {
-    init(): S;                                   // the empty accumulated state
-    step(state: S, tuple: WaveTuple): S;         // pure; called in offset order
-  };
-  select(state: S, shared: SharedDerivations, params: Params): M;  // pure
-  View(props: { model: M; port: ModulePort }): ViewOutput;
+  select(model: M, params: Params): V;             // pure parameter application
+  View(props: { model: V; port: ModulePort }): ViewOutput;
 };
 
 type ModuleManifest = {
-  id: string;                           // 'centre.maturity-map'
+  id: string;                           // 'right.depth'
   title: string;                        // dock label / carousel caption
   dock: "strip" | "left" | "centre" | "right" | "composer";
   order?: number;                       // position within stacked docks
+  consumes: readonly string[];          // snapshot contract ids the panel is fed
+  params?: readonly string[];           // parameter keys read
+  commits?: readonly string[];          // decision kinds / operator ids shaped
+  navigates?: readonly string[];        // parameter keys written
+  // reserved key: claims — obligation sockets (ADR-005 §1.4), not yet open
+};
+
+// formation side — src/huid/projectors/<contract>.ts (server-only)
+type SnapshotProjector<S, M> = {
+  manifest: ProjectorManifest;
+  init(): S;                                       // the empty accumulated state
+  step(state: S, tuple: WaveTuple): S;             // pure; called in offset order
+  snapshot(state: S): M;                           // the wire model
+};
+
+type ProjectorManifest = {
+  contract: string;                     // the snapshot contract id
   reads: {
     kinds?: readonly string[];          // envelope kinds beyond domain.fact
     factTypes: readonly string[] | "*"; // '*' is the observer-class claim
     joins: readonly string[];           // correlation fields the fold uses
   };
-  derives?: readonly ("projection" | "canvas" | "trace" | "strata")[];
-  params?: readonly string[];           // parameter keys read
-  commits?: readonly string[];          // decision kinds / operator ids shaped
-  navigates?: readonly string[];        // parameter keys written
-  // reserved key: claims — obligation sockets (ADR-005 §1.4), not yet open
 };
 
 type ModulePort = {
@@ -46,15 +57,17 @@ type ModulePort = {
 };
 ```
 
-The split between `fold` and `select` is load-bearing: the fold accumulates
-the **parameter-independent** state of the module over the log; `select`
-applies navigation cheaply. Fold state is cacheable and testable without any
-view; parameter changes never re-fold.
+The split between fold and `select` is load-bearing and is now the wire
+itself: the fold accumulates the **parameter-independent** snapshot
+server-side; `select` applies navigation client-side over the delivered
+model. Fold state is a rebuildable cache, testable without any view;
+parameter changes never re-fold and never cross the wire.
 
 ## 2. Fold rules
 
 1. **Pure, single-pass, offset order.** `step` MUST be a pure function; the
-   host guarantees order and exactly-once delivery (HUID 01 §2).
+   projector runtime guarantees order and exactly-once delivery per cache
+   entry (HUID 01 §2, §7).
 2. **Provenance joins only.** Ownership and causality come from `uid`,
    `emittedBy`, `bindId`, `knotId`, `key`, `valueId` — never from adjacency
    (Vol. 03 §3.3–4). A missing join field is a protocol gap to raise, not a
@@ -115,9 +128,11 @@ Mirroring the station matrix (Vol. 01 §4) at the device:
 
 ## 6. Enforcement
 
-1. **Reads are physical.** The host's filtered feed makes an undeclared read
-   impossible rather than reviewable — the module simply never sees the
-   tuple (HUID 01 §2.3).
+1. **Reads are physical.** The plane's runtime feeds a fold only tuples
+   matching its projector manifest's `reads` (`matchesReads`) — an
+   undeclared read is impossible rather than reviewable; and the
+   `server-only` marker makes any client-graph import of the plane a
+   build-time error (ADR-010 Decision 2).
 2. **Params are audited.** Undeclared parameter reads/writes warn in
    development and fail module conformance (HUID 03 §1).
 3. **Manifests are the review surface** for everything the feed cannot
@@ -143,42 +158,49 @@ on the membrane where it is budgeted, correlated, and replayable
 (Vol. 07 §4) — a panel that called a model would be an unbudgeted,
 uncorrelated, unreplayable side channel.
 
-## 8. The two halves of a module
+## 8. The two sides and the contract join
 
-Since ADR-009 a module is one directory with two halves, joined by two
-shared artefacts:
+Since ADR-010 the sides are physically separated and joined only by the
+snapshot contract (superseding the one-directory sketch this section
+carried earlier — the 1:1 assumption broke once one projector could feed
+several panels):
 
 ```text
-src/huid/modules/<id>/
-  manifest.ts    the contract — the single source of the claims
-  model.ts       the wire model between the halves
-  projector.ts   server half: pure fold from the claims to the model
-  view.tsx       client half: select(model, params) + View(model, port)
-  README.md      the lid
+src/huid/contracts/<contract>.ts    types + id constant — the only
+                                    compile-time join; erased at build
+src/huid/projectors/                server-only formation plane:
+  manifest.ts   reads declaration + matchesReads (single source)
+  runtime.ts    cache-of-fold(replay), asOfOffset, catch-up, advance
+  registry.ts   contract → projector; wireProjectors() to the store hook
+  <contract>.ts one projector: ProjectorManifest + fold → snapshot
+src/huid/modules/<panel>/           purely client presentation:
+  manifest.ts   consumes, dock, params, commits, navigates
+  view.tsx      select(model, params) + View(model, port)
+  README.md     the lid
 ```
 
-1. **The manifest is executable, not descriptive.** `reads` is not "what
-   the client listens to" — the client half never sees a tuple. It is the
-   module's declared information diet, and the server half derives its
-   claims filter from it mechanically (`matchesReads` in
-   `src/huid/manifest.ts`): what is declared is exactly what the fold is
-   fed, so declaration and enforcement cannot drift. Its other two roles
-   stand: the claim-review surface (Vol. 11 §6.4 mirrored) and the
-   dependency map for protocol evolution.
-2. **The projector file is pure.** It states *what* the panel's formation
-   is — claims → fold → snapshot — and nothing else. The server-only *how*
-   — commit-hook subscription, caches, lazy catch-up, routes — is the
-   projector plane (`src/huid/projectors/`, HUID 01 §7) and never lives
-   inside a module.
-3. **Registration is one line; the wave registers nothing.** The plane's
-   registry maps `manifest.id → projector`; `wireProjectors()` subscribes
-   the plane to the store's observer hook (`onCommit`) once per process,
+1. **Contracts are first-class data products.** Named for the data
+   (`scene-registry`), never for a dock; shapes evolve additively; a
+   breaking change is a new contract id. One contract may feed any number
+   of panels — a tabular rail and a graphical map alike — and the host
+   fetches once per contract for all of them.
+2. **The projector manifest is executable and single-source.** Claims
+   derive from `reads` mechanically (`matchesReads`); declaration and
+   enforcement cannot drift. Presentation manifests declare `consumes`,
+   never reads — what a panel is fed, not what the log contains.
+3. **Separation is mechanical, not conventional.** The plane carries the
+   `server-only` marker: a client-graph import is a build-time error; the
+   store's `node:fs` is the second tripwire. A module never imports the
+   plane — contract types come from `contracts/`.
+4. **Registration is one line; the wave registers nothing.** The plane's
+   registry maps contract → projector; `wireProjectors()` subscribes the
+   plane to the store's observer hook (`onCommit`) once per process,
    called by the app shell because assembly is the app's job (Vol. 08 §1).
-   The wave stays panel-ignorant — it only offers the hook; this is the
-   formation boundary holding at the seam (HUID 00 §5).
-4. **The client half consumes the wire model only**, delivered by the
-   host's transport — `select` applies parameters, the view renders
-   fields; no fetch, no tuples, no second formation path.
+   The wave stays panel-ignorant — the formation boundary holding at the
+   seam (HUID 00 §5).
 
-Adding a panel is therefore one module directory plus one registry entry —
-the motherboard diff test (HUID 03 §3) holds across both halves.
+Adding a panel over an existing contract is one module directory; adding a
+new data product is one contract file, one projector file, and one
+registry line — the motherboard diff test (HUID 03 §3) holds across both
+sides. The worked walk-through is the refimpl book
+([huid/refimpl](./refimpl/00-map.md)).

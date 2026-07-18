@@ -158,6 +158,10 @@ has taken responsibility it does not own.
   disclosure, the element budget, no overlapping layers, interruption
   discipline — binding for every module, grounded in the psychology of
   attention.
+- **[refimpl/](./refimpl/00-map.md)** — the reference implementation book:
+  the layer as built in `src/`, unit by unit, with the right panel
+  (scene-registry contract, projector, depth-rail module) as the worked
+  example throughout.
 
 ## 7. Status language
 

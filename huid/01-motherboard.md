@@ -55,7 +55,7 @@ routes · src/app/api
 
 | Direction | Crosses |
 | --- | --- |
-| down (server → client) | panel snapshots `{model, asOfOffset}` · command results (acks with the committed batch) · Class L materialisations (archive download, payload by offset) |
+| down (server → client) | contract snapshots `{model, asOfOffset}` (one per contract, shared by its consuming panels) · command results (acks with the committed batch) · Class L materialisations (archive download, payload by offset) |
 | up (client → server) | declared `TurnBody` / `DecisionBody` through the command port · panel snapshot requests (`after` offset) |
 | **never** | navigation parameters (client-only) · fold state (server-only) · machine registers (no one's, Vol. 02 §4.7) · the raw tuple stream to panels (ADR-009 Decision 3) |
 
@@ -66,7 +66,8 @@ Component by component:
 | machine | server | `src/nest/machine`, `membrane` | commits tuples; discharges intentions | knows panels exist |
 | store + commit hook | server | `src/nest/wave` | append-only log; JSONL; notifies listeners | edits; interprets |
 | readings library | server (and any Class L tool) | `src/nest/readings` | pure folds: projection, canvas, trace, strata | store access; fetch |
-| panel projector (host, server half) | server | `src/huid/projectors` | claims + fold → snapshot + `asOfOffset`; rebuilds by replay | discharge; judgement; second truth |
+| snapshot contract | shared (types only, erased at build) | `src/huid/contracts` | the compile-time join: wire shapes + contract id | runtime code |
+| projector (formation plane) | server, `server-only`-guarded | `src/huid/projectors` | claims from its manifest's `reads` + fold → snapshot + `asOfOffset`; rebuilds by replay; one contract, many panels | discharge; judgement; second truth |
 | routes | server | `src/app/api` | serve snapshots; accept commands; Class L endpoints | machine semantics |
 | host (client half) | client | `src/huid` | snapshot transport; params; port; docks; chrome | forming information |
 | module (`select` + view) | client | `src/huid/modules` | apply params; render model fields; shape gestures | fetch; compute semantics |
@@ -93,9 +94,10 @@ in offset order" (Vol. 08 §8) — delivered to module folds:
    The manifest is thereby not documentation but a **dispatch table**: a
    module's reads are its collection rules, and the host is the dispatcher —
    the mirror of topology dispatch (Vol. 02 §5) and knot collection
-   (Vol. 05 §3). A module physically cannot read what it did not declare.
-   Where a fold evaluates server-side, the same filter feeds its projector
-   (§8) and the enforcement moves behind the wire entirely.
+   (Vol. 05 §3). A fold physically cannot read what it did not declare.
+   Since ADR-010 folds evaluate server-side as a rule, filtered by their
+   projector manifest's `reads` (§7) — the enforcement sits entirely
+   behind the wire.
 4. **Folds always run; views render on demand.** An inactive centre view's
    fold still steps (state stays warm; switching is instant); only rendering
    is deferred.
@@ -177,19 +179,23 @@ not change.
 
 ## 7. The projector plane — where folds evaluate
 
-A module's fold MAY evaluate server-side as a **panel projector**
-(ADR-009): an observer-class reading service fed by the store's commit
-hook (the mirror's one sink), filtered by the module's `reads`,
-accumulating the parameter-independent snapshot and serving it with a
-mandatory `asOfOffset` (GET first, SSE later). The module contract is
-unchanged — `select` and the view stay client-side over `(model, params)`,
-and the module still never fetches: the host transports snapshots. A
-projector is rebuildable from the log at any time and holds no second
-truth; it is not a Vol. 07 output controller — controllers discharge
-exactly once and address the world, and their UI face is the reserved
-obligation socket (ADR-005 §1.4). The component-by-component sides and the
-wire contract are the map in §1; the module-side shape of the two halves —
-directory layout, single-source claims, registration — is HUID 02 §8.
+Folds evaluate server-side as **projectors** (ADR-009/ADR-010):
+observer-class reading services fed by the store's commit hook (the
+mirror's one sink), each filtered by its own **ProjectorManifest** `reads`
+(single-source claims via `matchesReads`), accumulating the
+parameter-independent snapshot of one **contract** and serving it with a
+mandatory `asOfOffset` (GET first, SSE later). A projector is keyed by its
+contract, never by a panel: one formation may feed any number of consuming
+views. The plane is `server-only`-guarded — a client-graph import fails
+the build. The presentation contract is unchanged — `select` and the view
+stay client-side over `(model, params)`, and a module still never fetches:
+the host transports snapshots per contract. A projector is rebuildable
+from the log at any time and holds no second truth; it is not a Vol. 07
+output controller — controllers discharge exactly once and address the
+world, and their UI face is the reserved obligation socket (ADR-005 §1.4).
+The component-by-component sides and the wire contract are the map in §1;
+the contract-join shape is HUID 02 §8; the worked walk-through is the
+refimpl book ([refimpl/00-map.md](./refimpl/00-map.md)).
 
 ## 8. What never crosses the board
 

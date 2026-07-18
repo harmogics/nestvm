@@ -1,9 +1,13 @@
 # ADR-010: Snapshot contracts — full separation of projectors and UI modules
 
-**Status:** Accepted direction, 2026-07-17 (proposed by the user);
-implementation pending the go. Refines ADR-009 and supersedes the
-one-directory sketch of HUID 02 §8 (amended in the implementing work
-item).
+**Status:** Accepted 2026-07-17 (proposed by the user); executed
+2026-07-18 on the right panel — contract `scene-registry`, its projector,
+the `depth-rail` module, the `/snapshots/:contractId` route, the
+`server-only` guard; parity re-verified (18 sessions, 0 divergences) and
+the old `/panels` path retired. HUID 01/02 amended in the same work item;
+the reference walk-through is the new refimpl book
+([huid/refimpl](../huid/refimpl/00-map.md)). Refines ADR-009 and
+supersedes the one-directory sketch HUID 02 §8 carried earlier.
 
 ## Context
 

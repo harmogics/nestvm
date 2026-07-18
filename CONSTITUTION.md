@@ -113,7 +113,7 @@ is duplicated or lost (2, 13); Evolution whether growth has a rail
 assigned (3, 9, 11). One name, deliberately: the field supplies the
 ethic; this repository does not define the field (ECOSYSTEM boundary 6).
 
-## III. The check protocol — how сверки run
+## III. The check protocol 
 
 Instruments in ascending cost; apply the cheapest that answers, and for
 substantial changes climb the ladder. The rule throughout is Vol. 14

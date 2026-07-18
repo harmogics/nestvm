@@ -42,3 +42,6 @@ Routing table — where a new fragment of source code lands:
     a resolver store                 → membrane/resources adapter
     a petal / result contract        → product
     a storage change                 → wave (WaveStore adapter)
+
+House contracts — wire shapes, flow, code style, adopted references and
+the deviation ledger — are [CONVENTIONS.md](./CONVENTIONS.md).

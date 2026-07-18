@@ -40,7 +40,11 @@ fewer sections; nothing else changes.
    fill this section is off the rails and not publishable.
 4. **Declared parts** — the growable content per kind: schemas, reads,
    contract shapes, manifests, form keys, templates, semantic filling
-   (questions, angles, thresholds, rubrics, close instructions).
+   (questions, angles, thresholds, rubrics, close instructions). Wire
+   shapes follow the house wire conventions
+   ([src/CONVENTIONS.md](../src/CONVENTIONS.md) §1: absence over null,
+   present flags, anchoring by shape, bounded at formation, the
+   factType idiom for form keys).
 5. **Dependencies and grants** — what the target must already hold
    (contracts, fold strategies, docks, params) and which
    `controller-need`s require control-plane grants. Distinguished

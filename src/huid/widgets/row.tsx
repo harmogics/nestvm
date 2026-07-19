@@ -4,7 +4,7 @@
 // never replacing it: the raw-JSON disclosure composes beneath
 // (ADR-008 D3; HUID 04 §3.3). Lenses route to it per their own
 // resolution-table lines; kneaded cards compose it inside disclosures
-// (design_proposal §7, trap 4).
+// (proposal-centre-dock §7, trap 4).
 
 import type { TraceRow } from "../contracts/trace";
 import { RawJsonWidget } from "./raw-json";

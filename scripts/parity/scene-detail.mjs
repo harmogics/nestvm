@@ -1,4 +1,4 @@
-// Parity oracle for the scene-detail projector (design_proposal §6
+// Parity oracle for the scene-detail projector (proposal-centre-dock §6
 // step 3): derive scene expectations independently from the raw JSONL —
 // ownership via the `.close` naming convention and the `<bindId>.k*` knot
 // naming (the deliberately different path, unlike the projector's

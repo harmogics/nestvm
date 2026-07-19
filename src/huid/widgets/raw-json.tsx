@@ -1,4 +1,4 @@
-// The lazy raw-JSON widget — the factory's total fallback (design_proposal
+// The lazy raw-JSON widget — the factory's total fallback (proposal-centre-dock
 // §7): every formed item can disclose the committed record it fronts. The
 // tuple is fetched by offset through the host-injected reader on first
 // disclosure — the snapshot wire stays bounded, raw truth stays one

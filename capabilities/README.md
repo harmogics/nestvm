@@ -14,7 +14,7 @@ then the durable description.
 
 | id | kind | version | status | source / analysis |
 | --- | --- | --- | --- | --- |
-| `guild.centre-dock` | guild | 0.2.0 | manifested-in-source | [seed_centre-dock.md](./seed_centre-dock.md) · [spec/design_proposal.md](../spec/design_proposal.md) |
+| `guild.centre-dock` | guild | 0.2.0 | manifested-in-source | [seed_centre-dock.md](./seed_centre-dock.md) · [spec/proposal-centre-dock.md](../spec/history/proposal-centre-dock.md) |
 
 Candidate extractions, recorded not started: `contract:scene-registry`
 (manifested in source — would be the first atomic seed and the format's

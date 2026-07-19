@@ -1,4 +1,4 @@
-// The widget seam (design_proposal §7, preparation P5) — the presentation
+// The widget seam (proposal-centre-dock §7, preparation P5) — the presentation
 // face of the tuple factory. Form keys are stamped server-side by the
 // projectors' formers; widgets resolve client-side through the table
 // below, keyed (lens, form) — never form alone (§7 trap 1) — cascading

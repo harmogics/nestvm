@@ -50,7 +50,7 @@ with the factory pass, not before.
 ## 4. Raw-value debt ledger (retired opportunistically, rule 6)
 
 1. ~~**The trace drawer block**~~ — **retired 2026-07-19** with the
-   trace restyle (design_proposal §6 step 1): the drawer died with the
+   trace restyle (proposal-centre-dock §6 step 1): the drawer died with the
    record lens's extraction (`centre-log`); actor colours lifted into
    `--actor-learner/machine/world`; the dark code-block idiom kept only
    on raw-record disclosure as `--code-ground`/`--code-ink`.

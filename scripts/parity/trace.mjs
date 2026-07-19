@@ -1,4 +1,4 @@
-// Parity oracle for the trace projector (design_proposal §6 step 1):
+// Parity oracle for the trace projector (proposal-centre-dock §6 step 1):
 // derive row expectations independently from the raw JSONL — actor by a
 // producer-class table (stated from Vol. 04's producer thinking, not from
 // the formers' code), form by mechanical namespace, uid straight from the

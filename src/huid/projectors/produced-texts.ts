@@ -1,7 +1,7 @@
 import "server-only";
 
 // The produced-texts projector — the document lens's formation
-// (design_proposal §3.2): the block-former registry that was the client's
+// (proposal-centre-dock §3.2): the block-former registry that was the client's
 // `canvasRenderers` embryo, moved to the plane — a new block form is a
 // registered former here plus a render case in a view (new information is
 // a formation change; a new look is a presentation change). Blocks append

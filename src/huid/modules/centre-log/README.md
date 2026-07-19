@@ -3,9 +3,9 @@
 **Role.** The centre carousel's record lens (`centre.log`): everything the
 session committed, one paper-integrated row per tuple, actor-classified,
 with the raw record one disclosure away. The first extracted centre
-module (design_proposal §6 step 1; seed §4.6).
+module (proposal-centre-dock §6 step 1; seed §4.6).
 
-**Governing texts:** seed §4.3/§4.6; design_proposal §3.3 (the trace
+**Governing texts:** seed §4.3/§4.6; proposal-centre-dock §3.3 (the trace
 product), §7 (the factory), §12.5.4 (the host-injected tuple reader);
 ADR-008 D3 (templates front the record); HUID 02 (module contract);
 HUID 04 §3.3/§5 (raw truth one disclosure away; read-weight surface).

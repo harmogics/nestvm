@@ -4,7 +4,7 @@
 // module's disclosure parameters. Every knot card renders model fields
 // only — the wound state and grade are the committed record's, never a
 // register's (Vol. 02 §4.7); the strata disclosure composes the shared
-// row widget (design_proposal §7, trap 4 — a kneaded card composes
+// row widget (proposal-centre-dock §7, trap 4 — a kneaded card composes
 // factory widgets, it is not one). Interim liberties, recorded: the
 // catalogue (immutable package data, Vol. 08 §8) and the shelf (the
 // declared sources, awaiting their own contract) arrive as host-injected

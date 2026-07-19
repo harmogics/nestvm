@@ -71,7 +71,7 @@ demands, integration, and retained multi-turn sessions.
   cross-level slices grown by the target system (admit → sow → ground →
   seat) with the source guild's ideology travelling as content, never as
   code; anchored in the ecosystem's package flows and PHILOSOPHY §5.
-- [Design proposal: the centre dock on snapshot contracts](./design_proposal.md)
+- [Design proposal: the centre dock on snapshot contracts](./history/proposal-centre-dock.md)
   is the living analysis of applying the projector/contract principles to
   the central panel: the centre as a dock with three view-modules, three
   data-product projectors (scene-detail, produced-texts, trace), the view

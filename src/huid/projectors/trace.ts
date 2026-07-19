@@ -1,6 +1,6 @@
 import "server-only";
 
-// The trace projector — the record lens's formation (design_proposal
+// The trace projector — the record lens's formation (proposal-centre-dock
 // §3.3): an append fold producing one bounded row per tuple through the
 // shared row-former registry (row-formers.ts). The observer-class claim
 // (`factTypes: "*"`) is justified by the lens itself: its data product is

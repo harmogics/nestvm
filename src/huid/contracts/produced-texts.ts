@@ -1,5 +1,5 @@
 // The produced-texts contract — the document lens's data product
-// (design_proposal §3.2; seed §4.2): the session's produced texts as
+// (proposal-centre-dock §3.2; seed §4.2): the session's produced texts as
 // blocks in offset order, every kind always formed — lens toggles are
 // client select parameters and never parameterise the wire. The block
 // list is append-shaped; acceptance state rides beside it as small

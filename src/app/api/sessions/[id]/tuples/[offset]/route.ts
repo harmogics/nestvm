@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadSession } from "@/nest/wave/store";
 
-// The raw-tuple endpoint (design_proposal §10 P4): a Class L materialised
+// The raw-tuple endpoint (proposal-centre-dock §10 P4): a Class L materialised
 // reading (Vol. 14 §1) — one committed tuple by offset, verbatim. The
 // precondition for bounded panel snapshots (payloads never ride the panel
 // wire) and for the lazy raw-JSON widget: raw truth stays one disclosure

@@ -37,7 +37,7 @@ restated); known deviations are ledgered and retired opportunistically
    absent capability *states* its absence — affordances are never
    silently hidden (seed §9 discipline).
 4. **Monotonic snapshots.** A snapshot with `asOfOffset` ≤ the held one
-   is dropped. *Ledgered gap (§6.1): designed in design_proposal §5, not
+   is dropped. *Ledgered gap (§6.1): designed in proposal-centre-dock §5, not
    yet guarded in the host.*
 
 ## 3. The construction paradigm — functional, atomic, stratified

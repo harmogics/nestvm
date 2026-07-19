@@ -4,7 +4,7 @@
 the view shapes. One of two places that turn `factType` into meaning for
 display — the other is the projector plane (`src/huid/projectors/`),
 where the trace row-formers and produced-texts block-formers live since
-the centre migration (design_proposal §6; the text-canvas derivation
+the centre migration (proposal-centre-dock §6; the text-canvas derivation
 moved there 2026-07-19). This region keeps what the host still consumes
 client-side during the interim (the session projection) and shrinks as
 contracts land (drift criterion: client imports reach zero at

@@ -1,10 +1,10 @@
 # widgets — the presentation face of the tuple factory
 
-**Role.** The client half of the form/widget factory (design_proposal §7;
+**Role.** The client half of the form/widget factory (proposal-centre-dock §7;
 preparation P5): pure components keyed by server-stamped **form keys**,
 resolved per lens through the declarative table in
 [registry.ts](./registry.ts) — cascade exact form → family → the
-**lazy raw-JSON floor**. Governing texts: design_proposal §7 (the cut and
+**lazy raw-JSON floor**. Governing texts: proposal-centre-dock §7 (the cut and
 the four traps), §12.5.4 (widgets never fetch — the host injects the
 tuple reader), HUID 04 §3.3 (raw truth one disclosure away), themes rule 4
 (a widget names its class scope and consumed tokens).

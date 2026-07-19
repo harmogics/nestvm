@@ -4,7 +4,7 @@
 phases 1–3 depth (goal, constraints, anchors); not an ADR. Anchors:
 ECOSYSTEM (packages, the two flows, boundaries), PHILOSOPHY §5/§8/§9,
 Vol. 06 §7, Vol. 09, Vol. 12–13, HUID 02, meta-bind-01,
-[design_proposal](./design_proposal.md) §7–8.
+[proposal-centre-dock](./history/proposal-centre-dock.md) §7–8.
 
 ## 1. The vision
 
@@ -106,7 +106,7 @@ the guild lives: the target's geometry, the seed's ideology
 
 The current work is this vision's precondition path, not a detour:
 
-1. **The widget fallback chain** (design_proposal §7) — once the factory
+1. **The widget fallback chain** (proposal-centre-dock §7) — once the factory
    stands, presentation is growable from schemas alone: a seed's fact
    family renders through generic widgets on day one, gaining custom
    forms only where the target registers them.

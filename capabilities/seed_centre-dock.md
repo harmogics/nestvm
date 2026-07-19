@@ -3,10 +3,11 @@
 ## 1. Identity
 
 - **kind:** guild · **id:** `guild.centre-dock` · **version:** 0.2.0
-- **status:** manifested-in-source (2026-07-19; the cycle stands at its
-  closing acceptance — the living canvas
-  [spec/design_proposal.md](../spec/design_proposal.md) governs until the
-  human accepts and it retires to history — FORMAT §3.1)
+- **status:** manifested-in-source (cycle closed 2026-07-19: the arc
+  accepted, the canvas retired to
+  [spec/history/proposal-centre-dock.md](../spec/history/proposal-centre-dock.md),
+  source pinned at commit `4b3d74ee367ea157edd90219b83c5289ae7d7794` —
+  **this seed is now the governing description**, FORMAT §3.1)
 - **provenance:** the NestVM study workbench, this repository's
   collaboration, 2026-07-18; the human-facing name is "the central
   canvas" — the machine name stays `centre-dock` because the centre is a
@@ -184,7 +185,7 @@ declared, named:
    not render them yet — the reads of §4.1 kept truthful.
 3. **`integration.value` is a presentation form**: formed in `select`
    from the snapshot's kneaded `accepted` map — the block list itself
-   stays append-pure (delta-ready, design_proposal §5).
+   stays append-pure (delta-ready, proposal-centre-dock §5).
 4. **The row-former registry is shared in the plane**
    (`src/huid/projectors/row-formers.ts`) — §11.3 of the analysis
    answered at the gate (§12.5.1): trace rows and scene strata form

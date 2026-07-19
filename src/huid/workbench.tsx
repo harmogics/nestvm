@@ -42,7 +42,7 @@ type ComposerMode = { mode: "plain" } | ComposerTarget;
 // The named parameter space (HUID 01 §4, preparation P2): one flat record
 // of navigation state — client-held, never committed, never on the wire.
 // Host keys are fixed here; `composer.target` is the promoted shared key
-// (design_proposal §12.5.3): written by centre surfaces, read by the
+// (proposal-centre-dock §12.5.3): written by centre surfaces, read by the
 // composer; absent → the composer rests in plain mode. Module keys are
 // namespaced `<moduleId>.<key>` and ride the same record.
 type HostParams = {
@@ -64,7 +64,7 @@ type ContractSnapshot = { model: unknown; asOfOffset: number };
 
 // Everything a seated centre module receives from the board: the formed
 // snapshots, the parameter space, the port, and the Class L tuple reader
-// (design_proposal §12.5.4 — modules and widgets never fetch).
+// (proposal-centre-dock §12.5.4 — modules and widgets never fetch).
 type CentreContext = {
   snapshots: Record<string, ContractSnapshot>;
   params: Params;
@@ -155,7 +155,7 @@ const centreViews: readonly CentreViewEntry[] = [
   }
 ];
 
-// The capability filter — the flag point (design_proposal §12.5.2):
+// The capability filter — the flag point (proposal-centre-dock §12.5.2):
 // seating is configuration; an absent entry leaves the carousel shorter,
 // never a dead tab. A deployment flag filters this list and nothing else.
 const seatedCentreViews: readonly CentreViewEntry[] = centreViews;
@@ -260,7 +260,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   // stream — deduplicated, shared by every consuming panel. Refreshed on
   // load and after every command result; SSE replaces the refetch when
   // the events channel lands. Monotonic: a snapshot at or behind the held
-  // asOfOffset is dropped (design_proposal §5; CONVENTIONS §2.4 — the
+  // asOfOffset is dropped (proposal-centre-dock §5; CONVENTIONS §2.4 — the
   // §6.1 deviation retired here).
   const refreshPanels = useCallback(async () => {
     await Promise.all(
@@ -420,7 +420,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     navigate
   };
 
-  // The host-owned Class L reader (design_proposal §12.5.4): raw truth by
+  // The host-owned Class L reader (proposal-centre-dock §12.5.4): raw truth by
   // offset for the widgets' one-disclosure-away rule — modules and
   // widgets themselves never fetch.
   const readTuple: TupleReader = useCallback(

@@ -1,4 +1,4 @@
-// Parity oracle for the produced-texts projector (design_proposal §6
+// Parity oracle for the produced-texts projector (proposal-centre-dock §6
 // step 2): derive block expectations independently from the raw JSONL —
 // scene ownership via the `.close` naming convention (the deliberately
 // different path, unlike the projector's emittedBy joins), block

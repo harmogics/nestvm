@@ -3,7 +3,7 @@
 // the actor filter (a pure parameter application, HUID 02 §1); the view
 // renders rows through the widget factory — resolve("log", form) — whose
 // floor guarantees no tuple is ever invisible. The raw record is one
-// disclosure away via the host-injected reader (design_proposal §12.5.4);
+// disclosure away via the host-injected reader (proposal-centre-dock §12.5.4);
 // the module never fetches and never computes semantics.
 
 import type { TraceActor, TraceRow, TraceSnapshot } from "../../contracts/trace";

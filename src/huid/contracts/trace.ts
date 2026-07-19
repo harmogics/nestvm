@@ -1,4 +1,4 @@
-// The trace contract — the record lens's data product (design_proposal
+// The trace contract — the record lens's data product (proposal-centre-dock
 // §3.3; seed §4.3): one bounded row per committed tuple, actor-classified,
 // in offset order. Payloads never ride this wire (Vol. 03 §8; CONVENTIONS
 // §1.4) — the raw record is one disclosure away through the Class L
@@ -15,7 +15,7 @@ export type TraceActor = "learner" | "machine" | "world";
 // factType namespaces (Vol. 04 §6; the factType idiom, CONVENTIONS §1.5).
 // Stamped mechanically by namespace; richer per-factType forms grow by
 // former registration (ADR-008 D3), additively. Governance:
-// design_proposal §12.3.6 — keys live beside their contract.
+// proposal-centre-dock §12.3.6 — keys live beside their contract.
 export type TraceRowForm =
   | "row.topology" // sys.knot.defined · sys.descriptor.defined
   | "row.readiness" // sys.knot.ready

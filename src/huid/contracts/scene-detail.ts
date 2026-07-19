@@ -1,5 +1,5 @@
 // The scene-detail contract — the figure lens's data product
-// (design_proposal §3.1; seed §4.1): every scene in depth, kneaded,
+// (proposal-centre-dock §3.1; seed §4.1): every scene in depth, kneaded,
 // parameter-free — `select` picks the focus client-side. Cards are
 // projections of committed tuples only (Vol. 02 §4.7): definition
 // records, winding-protocol tuples and readiness snapshots. The strata

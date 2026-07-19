@@ -1,7 +1,7 @@
 import "server-only";
 
 // The scene-detail projector — the figure lens's formation
-// (design_proposal §3.1): the kneaded product of every scene in depth,
+// (proposal-centre-dock §3.1): the kneaded product of every scene in depth,
 // ported from the client projection at the centre migration's last step.
 // Ownership resolves by provenance joins only (`emittedBy`, close-bind
 // registration, knotId + uid correlation — Vol. 03 §3.3); registers are

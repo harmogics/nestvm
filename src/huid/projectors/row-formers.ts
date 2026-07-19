@@ -1,6 +1,6 @@
 import "server-only";
 
-// The shared row-former registry (design_proposal §12.5.1 — the third
+// The shared row-former registry (proposal-centre-dock §12.5.1 — the third
 // append-shaped consumer arrived, so the registry lives once in the
 // plane): each former claims tuples the way collection rules and
 // controller claims do elsewhere in the machine; first claim wins in

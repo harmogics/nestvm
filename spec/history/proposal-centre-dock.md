@@ -613,3 +613,31 @@ strip migration, the machine split.
 **This canvas is ready to retire to spec/history/ upon the human's
 acceptance of the arc (Art. 9) — until that acceptance it remains the
 governing document of the open cycle.**
+
+---
+
+## Closing note — the cycle retired (2026-07-19)
+
+This canvas served the **`guild.centre-dock`** cycle
+([capabilities/seed_centre-dock.md](../../capabilities/seed_centre-dock.md))
+from its opening analysis (2026-07-18) through the gate register (§12)
+to the landed implementation (§13). The human accepted the arc on
+2026-07-19; governance inverts per the cycle: **the seed now governs**,
+and this document is history — read, never edited.
+
+**The resulting source is pinned at commit
+`4b3d74ee367ea157edd90219b83c5289ae7d7794`** («add capabilities impl &&
+center widgets») — seed v0.2.0 (manifested-in-source), the three
+contracts and projectors, the three centre modules, the widget seam, the
+four parity oracles, and the amended living volumes, all in one tree: a
+reader holds the capability description, this working canvas, and the
+unambiguous code they produced.
+
+The body above is retired **verbatim**: its relative links were written
+from `spec/` and predate the move — resolve them from there.
+
+**Landing records:** seed §11 (manifestation record — deviations and
+liberties, each with a successor); design_proposal §12 (the gate
+register, frozen here); refimpl 03 §3 (the migration ledger);
+themes/nestvm-ink (ledger item 1 retired);
+attributions/imprint-002-claude-fable-5.

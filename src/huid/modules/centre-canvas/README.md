@@ -3,10 +3,10 @@
 **Role.** The centre carousel's document lens (`centre.canvas`): the
 session's produced texts as a document flow — integrations always,
 learner turns / answers / evidence by toggle — approaching a business
-artefact. The second extracted centre module (design_proposal §6 step 2;
+artefact. The second extracted centre module (proposal-centre-dock §6 step 2;
 seed §4.5).
 
-**Governing texts:** seed §4.2/§4.5; design_proposal §3.2 (the
+**Governing texts:** seed §4.2/§4.5; proposal-centre-dock §3.2 (the
 produced-texts product; toggles are select parameters), §12.4 (form keys
 stay additive-ready for `integration.revised`/supersession); ADR-003
 (reframe retargets the one composer); HUID 01 §4.3 (`composer.target` —

@@ -48,7 +48,7 @@ the human sees is identical across surfaces.
 **Art. 7 — Growth is registration on declared rails.** New capability
 plugs into named extension points, one registration site each; the core
 and the counted invariants widen only by recorded decision.
-*Governed by:* Vol. 11 §1–2; PHILOSOPHY §10; design_proposal §8.
+*Governed by:* Vol. 11 §1–2; PHILOSOPHY §10; capabilities/FORMAT.md §1.
 *Checked by:* the motherboard diff test; the routing table.
 
 **Art. 8 — Honest incompleteness.** Stalls, refusals, unknowns, and
@@ -127,8 +127,9 @@ pretending is the only non-conforming option.
    truthful, single-source.
 4. **The mechanical gate** — `tsc`, `npm run parity`, the diff test —
    every change.
-5. **The persona network** (design_proposal §9) — every surface change:
-   author, configurator, learner questions.
+5. **The persona network** — the author, configurator, and learner
+   question sets, instantiated by each cycle's canvas for its own
+   surfaces — every surface change.
 6. **Fixtures and live smoke including honest refusals** — every
    behaviour change.
 7. **The seven matrices** (Vol. 14 §4) — every substantial change, ADR,

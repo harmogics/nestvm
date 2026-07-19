@@ -10,7 +10,7 @@ and semantic content do.
 ## 1. One format, a taxonomy of kinds
 
 Capability kinds map one-to-one onto the registration sites of the
-growth table (design_proposal §8) — a capability *is* a distributable
+growth table (the routing table, src/README.md) — a capability *is* a distributable
 registration:
 
 | kind | what it declares | registration in a target |

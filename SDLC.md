@@ -26,8 +26,11 @@ moment a capability leaves as a seed, carrying experience without code.
 
 ```text
 want ──► seed (capabilities/: the want in distributable form)
-   ──► proposal (spec/: the working canvas — seven phases,
-        Truth → Responsibility, artefact per phase)
+   ──► study pass (the sources first-hand: the anchor ring closed,
+        the surroundings layer walked, the terminology checked —
+        the read map reported before any technical plan)
+   ──► proposal (spec/: the working canvas, named for its capability —
+        seven phases, Truth → Responsibility, artefact per phase)
    ──► the gate (the human's go — never implied)
    ──► code (the radial tree; the construction paradigm;
         conventions as the shared language)
@@ -40,6 +43,16 @@ want ──► seed (capabilities/: the want in distributable form)
    ──► proposal retired (spec/history/ — the development's own log)
         … and the next want finds the seed waiting.
 ```
+
+Between the seed and the proposal stands the study pass — the first
+cycle's lesson: reading a canvas's citations is not reading the law.
+The sources are opened first-hand, one ring beyond the direct anchors;
+the surrounding product layer is walked whether cited or not (adjacent
+plans and known gaps live there); every new identifier passes the
+terminology check; and the pass closes with a reported read map — read,
+deliberately not read, collisions found, adjacencies touched — each
+becoming a register entry, never silently held. The operational
+checklist is CLAUDE.md (Capability intake — the study pass).
 
 Every arrow appends; nothing rewrites. Corrections are new dated acts;
 the history of the development is governed by the same Article 1 as the
@@ -113,16 +126,17 @@ both directions. That is the understanding this bind publishes:
 CONSTITUTION.md (fourteen articles, the ethic, the ladder) ·
 PROTOCOL_DEV.md (seven phases; the cycle; the gate) · meta/meta-bind-01
 (the recurring figure; the fractal test) · capabilities/ (FORMAT, the
-kind taxonomy, seed_centre-dock) · themes/ (tokens · composition ·
+kind taxonomy, the first seed) · themes/ (tokens · composition ·
 weights; the ledgers) · src/CONVENTIONS.md (wire shapes; flow; the
 construction paradigm; the carrier framework) · CLAUDE.md Vector choice
-· spec/guild-seeds.md · spec/design_proposal.md (the open working
-canvas) · spec/history/ (awaiting its first resident).
+· spec/guild-seeds.md ·
+spec/history/ (the retirement log of closed cycles).
 
 ## Open questions preserved
 
-The centre-dock cycle stands at its gate (preparations P1–P5, then
-trace → produced-texts → scene-detail); SSE and the events channel;
+The first capability cycle is closed — its seed governs and carries its
+own open register; still open at this altitude: SSE and the events
+channel;
 obligation sockets with WaveSession; declarative folds for seed-grown
 formation; the seed format's YAML profile; the first commons candidate.
 Held open, not hidden — the next phase's collection begins here.

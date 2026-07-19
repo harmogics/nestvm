@@ -9,14 +9,14 @@ artefact, and checks from the instrument ladder (CONSTITUTION §III).
 This protocol is a record, not an invention: it names the method already
 practised — the alignment loop
 ([architectural-starting-points §2.2](./spec/architectural-starting-points.md))
-phase-structured, with the centre-dock work
-([spec/design_proposal.md](./spec/design_proposal.md)) as the worked
-thread cited per phase. The protocol itself passes the fractal test
+phase-structured, with the first closed cycle — preserved in
+[spec/history/](./spec/history/README.md) — as the worked thread cited
+per phase. The protocol itself passes the fractal test
 (meta-bind-01): phases 1–3 are its collection, 4–5 its accumulation,
 6–7 and the gate its publication.
 
 **The artefact rule.** Each phase appends a section to a living proposal
-document (the `design_proposal.md` form, in `spec/`); phases produce
+document (a living proposal named for its capability — `spec/proposal-<capability>.md`); phases produce
 text, not meetings. Decisions taken along the way become ADRs; a
 cross-level principle, a meta-bind. Every cell answers or records its
 gap (Vol. 14 §4.8) — pretending is the only non-conforming option.
@@ -68,14 +68,14 @@ architect (author/configurator), to the operator (the learner)? No
 solutions yet; wants stated so they can later be checked, not admired.
 
 **Draw from.** The request itself; the persona network
-(design_proposal §9); PHILOSOPHY (is the want inside the non-goals?).
+(each canvas's persona network); PHILOSOPHY (is the want inside the non-goals?).
 
 **Produce.** The goal statement and a persona-value table.
 
 **Check.** Every claim traces to something inspectable (Truth matrix,
 Vol. 14 §4.1); personas are the constitution's, not ad hoc.
 
-*Worked:* design_proposal §1 (the four questions of the centre) and §7's
+*Worked:* the first canvas §1 (the four questions of the centre) and §7's
 value statement — total coverage, user representation choice, minimal
 specific code.
 
@@ -96,7 +96,7 @@ proposed structure; run the cheapest instruments against reality — P0 of
 the worked thread caught a live defect (the stale store cache) the day
 it ran.
 
-*Worked:* design_proposal §10 (P0–P5).
+*Worked:* the first canvas §10 (P0–P5).
 
 ## Phase 3 — Connect: the web of existing law
 
@@ -114,7 +114,7 @@ collision register (each resolved or recorded).
 **Check.** Cross-references resolve (Connect matrix, Vol. 14 §4.3);
 terminology canonical; nothing renamed silently.
 
-*Worked:* design_proposal §2–4 — the dock/module resolution anchored in
+*Worked:* the first canvas §2–4 — the dock/module resolution anchored in
 HUID 01 §6 and the diff test; the lens formalised against Vol. 08 §8.
 
 ## Phase 4 — Service: the architectural points of change
@@ -124,7 +124,7 @@ as a precisely delineated module, contract, former, or registration —
 keeping the planes thin — and never as mechanism growth?
 
 **Draw from.** The routing table (`src/README.md`); the
-growth-is-registration table (design_proposal §8); the module and
+growth-is-registration table (the first canvas §8); the module and
 projector contracts (HUID 02); the theme grammar (`themes/`) for
 presentation fragments.
 
@@ -136,7 +136,7 @@ class scope, consumed tokens, and act weights.
 will be); Art. 5–7 of the constitution; the import DAG untouched; no
 raw visual values outside token definitions (themes rule 1).
 
-*Worked:* design_proposal §3 (three contracts by data product) and §7
+*Worked:* the first canvas §3 (three contracts by data product) and §7
 (factory landing: one former server-side + one widget client-side + one
 resolution-table line).
 
@@ -148,7 +148,7 @@ the three points (system, architect, operator). This is the design's
 defended articulation — the same result contract the product asks of its
 learners, applied to ourselves.
 
-**Draw from.** Phases 1–4; the target shape (design_proposal §8).
+**Draw from.** Phases 1–4; the target shape (the first canvas §8).
 
 **Produce.** Numbered vision crystals, each naming who experiences it.
 
@@ -156,7 +156,7 @@ learners, applied to ourselves.
 nowhere; every crystal traceable back to a Truth want and a Service
 site.
 
-*Worked:* design_proposal §8 — "the centre is a dock; growth is
+*Worked:* the first canvas §8 — "the centre is a dock; growth is
 registration everywhere; what the human sees is formed once".
 
 ## Phase 6 — Evolution: vector alignment and drift criteria
@@ -177,7 +177,7 @@ carry the want.
 **Check.** The Evolution matrix (Vol. 14 §4.6); the motherboard diff
 test; meta guards (no symmetry-forcing, no ontology inflation).
 
-*Worked:* design_proposal §9 — written before a line of the centre
+*Worked:* the first canvas §9 — written before a line of the centre
 migration exists.
 
 ## Phase 7 — Responsibility: clarifications and hard guidelines
@@ -198,7 +198,7 @@ gate — implementation starts only on the explicit go (the working mode).
 **Check.** No decision silently taken that belongs to the human; every
 touched volume listed; refusal paths designed, not hoped away.
 
-*Worked:* design_proposal §11; the explicit asks of this collaboration
+*Worked:* the first canvas §11; the explicit asks of this collaboration
 (the `src/` root decision, the ADR-010 confirmation).
 
 ---

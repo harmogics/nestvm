@@ -7,8 +7,8 @@ bind as a form), Vol. 07 §1/§6 (the membrane's two receptions), Vol. 08
 §8 (derived readings); PHILOSOPHY §3, §9, non-goals; ECOSYSTEM (the two
 flows, boundary 6); HUID 00 §5 (the formation boundary); ADR-007 (lids),
 ADR-009/ADR-010 (projectors, contracts);
-[design_proposal §8–9](../spec/design_proposal.md) (the recurring form,
-the fractal test).
+[capabilities/FORMAT.md §2.3](../capabilities/FORMAT.md) (the fractal
+passport required of every seed).
 
 ## 1. The principle
 
@@ -56,7 +56,7 @@ missing a phase is either *degenerate* (and says so) or *off the rails*
 
 ## 4. What the principle powers
 
-1. **The fractal test** (design_proposal §9): for any addition, name its
+1. **The fractal test** (Art. 12; FORMAT §2.3): for any addition, name its
    three parts; a piece whose parts cannot be named is off the rails —
    the cheapest drift detector the system has.
 2. **Placement**: the three parts locate a fragment in the tree —

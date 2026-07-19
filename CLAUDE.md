@@ -222,8 +222,9 @@ this order:
 - `capabilities/` — the seed register: distributable declarations of
   growable capabilities (FORMAT.md — one format, a kind taxonomy, guild
   as the maximal composite; atomic capabilities as degenerate guilds).
-  First seed: `guild.centre-dock`, the centre projected from
-  design_proposal. Code never travels in a seed.
+  First seed: `guild.centre-dock` — manifested-in-source; its
+  cycle's canvas is retired to `spec/history/`. Code never travels in a
+  seed.
 - `themes/` — the visual layer on rails: tokens as the declared
   vocabulary (collection), module/widget composition (accumulation),
   act-weighted rendering (publication); one field, sibling accents;
@@ -256,6 +257,55 @@ this order:
   routing table lives in `src/README.md`.
 - `fixtures/sessions/` — recorded session goldens (the ADR-005 replay pin).
 - `concepts_ui/` — UI concept screenshots to reuse and develop.
+
+## Capability intake — the study pass
+
+When a capability enters discussion (a seed is named, or a new one is
+proposed), two stages run in order; the technical plan does not open
+until stage 2 has been walked and reported.
+
+1. **Functional understanding first** — the want, the persona triple,
+   the end-user walkthrough, applicability and failure examples;
+   product language only, no mechanism talk.
+2. **The study pass — first-hand, before any technical plan.** Reading
+   the seed and its canvas is not сверка: every load-bearing citation
+   is opened at its primary source, in this order —
+   1. law and procedure re-read: CONSTITUTION (articles + ladder),
+      PROTOCOL_DEV (phases + cycle), SDLC;
+   2. the capability pair: the seed and its living proposal
+      (`spec/proposal-<capability>.md`), with capabilities/FORMAT.md
+      and the register;
+   3. anchor closure: every document the pair cites, first-hand, plus
+      one ring wider — the texts those anchors name as governing on
+      load-bearing points (specifications/ volumes and sections, the
+      huid/ volumes and both refimpl books, ADRs by status, meta-binds,
+      themes registers, src/CONVENTIONS.md);
+   4. the surroundings, cited or not: PHILOSOPHY, ECOSYSTEM,
+      spec/manifest-of-conscious-movement.md, spec/attention-matrix.md,
+      spec/open-bind-architecture.md,
+      spec/architectural-starting-points.md (esp. §3 open tensions),
+      spec/first-turn-log-protocol.md, spec/ui-panel-rails.md,
+      spec/cross-source-concept-analysis.md — the layer where adjacent
+      plans, planned fact families, and known gaps live;
+   5. ground truth: the routing table and region lids, the named
+      registration sites in src/, the honest ledgers (CONVENTIONS
+      deviations, themes debt, refimpl migration ledger), fixtures;
+      the mechanical gate run fresh (tsc + parity);
+   6. a Vol. 15 terminology pass over the capability's own vocabulary
+      (bare-word collisions, the reserved lists, adjacent-corpus
+      terms).
+
+   The pass closes with a report in chat: the read map (read /
+   deliberately not read), confirmed alignments, collisions and drift
+   found, and the adjacencies the capability touches — each becoming an
+   entry in the proposal's registers, never silently held.
+3. Only then the technical plan. Findings that need a human decision
+   are asked (Art. 9); the rest land as register entries in the canvas.
+
+The pass scales down with the capability (an atomic seed — a degenerate
+guild — needs the pair, its direct anchors, and the terminology pass);
+at cycle re-entry only what changed since the recorded read map is
+re-checked.
 
 ## Working mode
 

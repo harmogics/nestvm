@@ -170,7 +170,7 @@ DECLARED / PROPOSED / SEED). The layer as a whole is SEED: its rules bind
 the product's shells (`../spec/`, `components/`, `lib/`) and do not bind the
 machine. Terminology defers to Vol. 15; reserved machine terms (plane,
 ledger, lane, head, demand) are not reused for device concepts. Amendment
-(2026-07-19, the centre-dock gate register — design_proposal §12.2): the
+(2026-07-19, the centre-dock gate register — proposal-centre-dock §12.2): the
 bare words stay machine-owned; qualified compounds naming device-side
 concepts («the projector plane», «the formation plane») are sanctioned —
 they were already in use across HUID 01 §7 and the ADRs, and this note

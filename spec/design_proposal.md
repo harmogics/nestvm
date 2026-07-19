@@ -447,3 +447,169 @@ scripts suffice); drawer CSS cleanup (dies with the trace restyle).
    preference deserves promotion to a shared host key, and whether
    preferences persist beyond the session (they are navigation, never
    truth — persistence would be a convenience cache at most).
+
+## 12. The gate register — Phase 7 completion (2026-07-19)
+
+Appended at the implementation gate, closing the Responsibility phase:
+the touched sources as hard guidelines, the collision register, owners on
+§11, the adjacency register, and the decisions the go ratifies.
+
+### 12.1 Hard guidelines — touched sources and the constraint each imposes
+
+- **Vol. 02 §4.7** — registers are never programme-addressable: every
+  model field derives from committed tuples only, never from machine
+  state.
+- **Vol. 02 §5.1** — no retroactive delivery: no centre surface implies
+  re-delivery of facts committed before a registration.
+- **Vol. 03 §3.3–4** — provenance joins only, never adjacency, in every
+  fold and former.
+- **Vol. 03 §8** (extended by CONVENTIONS §1.4) — bounded at formation:
+  payloads never ride the panel wire; full bodies live behind
+  one-disclosure endpoints.
+- **Vol. 04 §1.2** — tolerant reading: an unknown factType rows through
+  the generic former, never fails. **§6** — the form-key vocabulary is a
+  light mirror of the factType namespace: additive, collision-reviewed;
+  projectors read protocol facts and never forge them.
+- **Vol. 08 §7** — honest states are model fields; **§8** — everything
+  shown derives from the log; a missing datum widens the protocol first.
+- **Vol. 14 §1** — the whole centre stays Class L; **§3** — behaviour
+  and documentation land in the same work item; **§4** — the seven
+  matrices close the arc.
+- **Vol. 15 / Art. 13** — a terminology pass on every new identifier.
+- **HUID 00 §5 / Art. 6** — formation server-side, presentation
+  client-side; the `server-only` guard is mechanical.
+- **HUID 01** — §2 feed rules; §4 the parameter space (shared keys enter
+  only by recorded promotion); §6 the carousel renders from a registry;
+  §7 the projector plane rules.
+- **HUID 02** — the module contract entire: pure single-pass folds,
+  declared gestures, station rules, physical enforcement, panels never
+  infer.
+- **HUID 03 §1–4** — the conformance checklists, the motherboard diff
+  test (also the removal/flag acceptance), fixture verification.
+- **HUID 04** — the load contract: budget, disclosure over dialogs, no
+  unsolicited interruption, weight by kind of act, raw truth one
+  disclosure away.
+- **ADR-004** — the session API and response envelope stay binding:
+  batch acks preserved; the idempotency path (clientTurnId) left
+  unobstructed.
+- **ADR-005 D2/D3, ADR-008 D1/D3, ADR-009, ADR-010** — instruments and
+  strata; the request path and the trace trajectory; the
+  projector/contract shape.
+- **themes rules 1–6** — raw values only in token definitions; accents
+  carry act semantics; widgets declare class scope and consumed tokens;
+  ledger items retire with the sections they live in.
+- **meta-bind-01** — every addition names collection · accumulation ·
+  publication; degeneracy is named, never hidden.
+
+**Verdict:** no widening is needed; every fragment lands as a
+registration on existing rails.
+
+### 12.2 Collision and drift register
+
+1. **«plane»** — a reserved machine term (Vol. 15 §5; HUID 00 §7)
+   reused across the device layer in qualified compounds («the projector
+   plane», «the formation plane») without a recorded amendment.
+   Resolution, ratified at this gate: HUID 00 §7 is amended in this work
+   item — bare terms stay machine-owned; qualified compounds naming
+   device-side concepts are sanctioned.
+2. **«canvas»** — Vol. 15 §3 holds «understanding canvas (*aka*
+   canvas)»; the document lens shares the bare word. Disambiguation
+   rule: in machine-adjacent text prefer «the document lens»; the guild
+   id stays `centre-dock` for this exact reason (seed provenance note).
+3. **«scene head»** (seed §4.4) — ambiguous beside sown head facts; the
+   seed wording becomes «scene heading» at the cycle-close seed update.
+4. **Landed-reference drift.** Recorded, not edited (ADRs are frozen):
+   ADR-009 consequence 4 cites «HUID 01 §8» — the projector plane landed
+   as §7. Corrected in this work item (living volumes): HUID 04 §3.3
+   (ADR-008 D4 → D3); HUID 01 §3 source paths (`lib/…` →
+   `src/nest/readings/…`).
+5. **«lens»** — this proposal's term (contract × select × view-form) is
+   distinct from the «semantic lenses» of the adjacent multidimensional
+   drafts (cross-source-concept-analysis §2), and the three centre
+   lenses are presentation forms — not epistemic levels (L0/L1/L2) and
+   not depth.
+
+### 12.3 Owners on the open questions (§11)
+
+1. `scene-detail` granularity — system; default stands (one kneaded
+   product); revisited at the scene-detail grounding if fixtures show
+   depth pressure.
+2. Payload endpoint shape — system; single-offset lands with P4; the
+   range form waits for virtualised scrolling in the record lens.
+3. Former-infrastructure sharing — **answered at this gate** (§12.5.1).
+4. `composer.target` — human; **ratified by the go**: the name enters
+   the host key registry at P2 with the absent → plain default
+   (§12.5.3).
+5. `session-meta` contract — system; after the centre, same pattern.
+6. Form-key vocabulary governance — system; the vocabulary lives beside
+   the contracts (each contract file declares its keys); additions are
+   collision-reviewed in this register.
+7. Representation preferences — system for session-scoped parameters
+   (never persisted); any future persistence is the human's decision.
+
+### 12.4 Adjacency register — planned facts and tensions this cycle must not obstruct
+
+- **`learning.integration.revised` + supersession seams** (manifest of
+  conscious movement §4/§7.1; ADR-004 D1 planned family): the
+  produced-texts form keys stay additive-ready; no block shape may
+  preclude a revision/superseded kind.
+- **The command journal and idempotency keys** (ADR-004 D2.1;
+  open-bind-architecture command boundary): P1/P2 preserve the batch-ack
+  flow and leave `clientTurnId` insertion trivial.
+- **The attention queue** (manifest §7.3; ADR-009 context): scene-detail
+  keeps the candidate panel separable (seed §10).
+- **Qualification badge language** (open-bind product OQ5) — owner:
+  human; arises at the document lens; until then only the existing kind
+  marks.
+- **`learning.signal.submitted`** (first-turn-log-protocol OQ1) — if it
+  ever lands, trace claims grow additively; no action now.
+
+### 12.5 Decisions the go ratifies
+
+1. **The row-former registry is shared in the plane** from the
+   scene-detail step — §11.3 answered: the third append-shaped consumer
+   arrived (scene-detail's strata and tact rows, 2026-07-19 analysis).
+2. **A capability flag over the registries** is an acceptance line of
+   P3/P5: seating is filterable configuration; «off» is verified by the
+   removal test (HUID 03 §3) — models of remaining surfaces
+   byte-identical over fixtures.
+3. **`composer.target`** is the promoted shared key (HUID 01 §4.3):
+   written by centre modules, read by the composer; absent → the
+   composer rests in plain mode — no writer, no coupling.
+4. **Widgets never fetch.** The lazy raw-JSON widget receives a
+   host-injected `resolveTuple(offset)` reader over the P4 endpoint —
+   drift criterion «a module calling fetch is drift» stays literal.
+5. **Fold expression stays source code in the plane** — the declarative
+   fold-strategy successor remains recorded (guild-seeds §6.2),
+   reaffirmed.
+
+### 12.6 The go
+
+2026-07-19 — the human's explicit go received (the working-mode gate).
+Mechanical gate at entry: `tsc` clean; parity 18 sessions, 0 failures.
+Implementation proceeds P1 → P5, then trace → produced-texts →
+scene-detail; each step admits, sows, grounds, seats, and retires its
+legacy surface per §6/§10 and seed §9.
+
+## 13. Landing note (2026-07-19)
+
+The implementation landed the same day the gate opened: P1–P5, then
+trace → produced-texts → scene-detail, each step closing with the
+instruments green (tsc; four independent parity oracles over 18 recorded
+sessions; live smoke including honest refusals; the diff discipline —
+every addition entered at registration sites only). The learned detail
+is back-propagated to the seed (§11 there, version 0.2.0,
+manifested-in-source); the deviations and interim liberties are named
+there and in the module lids. One seating omission during the work —
+`centre.focus` missing from the host's seated-modules list — was caught
+by the live smoke and fixed by the single line P1 promised.
+
+Open questions that remain live: §11.1 (granularity), §11.2 (range
+endpoint), §11.5 (session-meta/shelf contract — now also carrying the
+focus lens's injected props), §11.6–7; §11.3 and §11.4 closed at the
+gate (§12.5.1, §12.5.3). Deliberately still not now: SSE, left rail and
+strip migration, the machine split.
+
+**This canvas is ready to retire to spec/history/ upon the human's
+acceptance of the arc (Art. 9) — until that acceptance it remains the
+governing document of the open cycle.**

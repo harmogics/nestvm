@@ -19,6 +19,13 @@
   --terra: #b4552c;
   --terra-wash: #f2e2d4;
   --olive: #6a6f3f;
+  /* actor lanes (themes/nestvm-ink §4.1 — the first ledger retirement) */
+  --actor-learner: #c86a3f;
+  --actor-machine: #5f7ea8;
+  --actor-world: #8fa06a;
+  /* the one dark idiom kept: raw-record code blocks (HUID 04 §3.3) */
+  --code-ground: #23282e;
+  --code-ink: #cfd4c2;
   --serif: 'Playfair Display', Georgia, serif;
   --prose: 'Source Serif 4', Georgia, serif;
   --sans: Manrope, Arial, sans-serif;
@@ -828,82 +835,76 @@ a:hover { text-decoration: underline; }
   background: #f2eddd; border: 1px solid var(--line); padding: 8px 10px;
 }
 
-.trace-drawer.central {
-  position: static;
-  transform: none;
-  width: auto;
-  max-width: none;
-  max-height: none;
-  border: 1px solid #1a1e23;
-  border-top: 3px solid var(--terra);
-  box-shadow: 6px 6px 0 #b3a88c3d;
-  padding: 20px 24px 26px;
-}
+/* ------------------------------------------------- trace — the record lens */
+/* Paper-integrated rows (seed §4.6): actor colour as a hairline rule, mono
+   type; the raw payload keeps the dark code-block idiom on disclosure.
+   Tokens only — the dark drawer and its raw-value block are retired
+   (themes/nestvm-ink §4.1). */
 
-/* -------------------------------------------------------------------- trace */
-
-.trace-drawer {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 100%;
-  max-width: 1580px;
-  z-index: 70;
-  border-top: 3px solid var(--terra);
-  background: #23282e;
-  color: #cfd4c2;
-  padding: 20px 4% 30px;
-  max-height: 58vh;
-  overflow: auto;
-  box-shadow: 0 -20px 60px #0006;
+.trace-log { padding: 2px 0 10px; }
+.trace-log h4 {
+  font: 600 10px var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 6px;
 }
-.trace-close {
-  border: 1px solid #5a4436 !important;
-  color: #e0a37e !important;
-  background: transparent;
-  padding: 6px 12px;
-  font: 600 9px var(--mono);
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  cursor: pointer;
+.trace-log .trace-note {
+  font: 400 11px/1.6 var(--sans); color: var(--muted); margin: 0 0 14px; max-width: 720px;
 }
-.trace-close:hover { background: #3a2f28; }
-.trace-drawer h4 { font: 600 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: #8fa0b5; margin: 0 0 6px; }
-.trace-drawer .trace-note { font: 400 11px/1.6 var(--sans); color: #97a08e; margin: 0 0 14px; max-width: 720px; }
 .trace-head { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; justify-content: space-between; }
 .trace-filters { display: flex; gap: 6px; padding-top: 2px; }
 .trace-filters button {
-  border: 1px solid #3d4650;
+  border: 1px solid var(--line-strong);
   background: transparent;
-  color: #8fa0b5;
+  color: var(--muted);
   padding: 6px 12px;
   font: 600 9px var(--mono);
   letter-spacing: .12em;
   text-transform: uppercase;
   cursor: pointer;
 }
-.trace-filters button.on { background: #313a44; color: #e8e4d2; border-color: #4c5763; }
-.tuple-row { border-top: 1px solid #343b43; padding: 6px 0; border-left: 3px solid transparent; }
-.tuple-row.actor-learner { border-left-color: #c86a3f; }
-.tuple-row.actor-machine { border-left-color: #5f7ea8; }
-.tuple-row.actor-world { border-left-color: #8fa06a; }
-.tuple-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; cursor: pointer; padding-left: 10px; }
-.tuple-head .off { color: #7d8794; min-width: 30px; font: 400 10.5px var(--mono); }
+.trace-filters button.on { background: var(--blue-wash); color: var(--blue-deep); border-color: var(--blue); }
+.trace-row { border-top: 1px solid var(--line); padding: 6px 0 6px 10px; border-left: 3px solid transparent; }
+.trace-row.actor-learner { border-left-color: var(--actor-learner); }
+.trace-row.actor-machine { border-left-color: var(--actor-machine); }
+.trace-row.actor-world { border-left-color: var(--actor-world); }
+.trace-row-line { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+.trace-row-line .off { color: var(--faint); min-width: 30px; font: 400 10.5px var(--mono); }
 .actor-chip {
   font: 600 8.5px var(--mono);
   letter-spacing: .1em;
   text-transform: uppercase;
-  padding: 2px 7px;
+  padding: 1px 7px;
   border: 1px solid;
 }
-.actor-chip.learner { color: #e0a37e; border-color: #c86a3f66; }
-.actor-chip.machine { color: #9db8dd; border-color: #5f7ea866; }
-.actor-chip.world { color: #b8c78f; border-color: #8fa06a66; }
-.tuple-head .summary { font: 400 12px/1.5 var(--sans); color: #d6d3c4; flex: 1; min-width: 220px; }
-.tuple-head .uid { color: #8fb0d8; font: 400 10px var(--mono); }
-.tuple-head .kind-tag { color: #79828d; font: 400 9.5px var(--mono); letter-spacing: .04em; }
-.tuple-payload { margin: 6px 0 4px 52px; white-space: pre-wrap; word-break: break-word; color: #b9bfae; font: 400 10.5px/1.5 var(--mono); max-height: 260px; overflow: auto; }
+.actor-chip.learner { color: var(--actor-learner); border-color: var(--actor-learner); }
+.actor-chip.machine { color: var(--actor-machine); border-color: var(--actor-machine); }
+.actor-chip.world { color: var(--actor-world); border-color: var(--actor-world); }
+.trace-row-line .summary { font: 400 12px/1.5 var(--sans); color: var(--ink); flex: 1; min-width: 220px; }
+.trace-row-line .uid { color: var(--blue); font: 400 10px var(--mono); }
+.trace-row-line .kind-tag { color: var(--faint); font: 400 9.5px var(--mono); letter-spacing: .04em; }
+
+/* the strata disclosure of the figure lens — rows compose the same widget */
+.stratum { margin: 8px 0 4px; }
+.stratum-label {
+  display: block;
+  font: 600 9px var(--mono); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--faint); margin: 10px 0 2px;
+}
+
+/* the raw-record disclosure — the widget seam's total fallback */
+.raw-tuple { margin: 2px 0 2px 40px; }
+.raw-tuple summary {
+  cursor: pointer; color: var(--faint);
+  font: 500 9px var(--mono); letter-spacing: .1em; text-transform: uppercase;
+}
+.raw-tuple summary:hover { color: var(--muted); }
+.raw-tuple-payload {
+  margin: 6px 0 4px; white-space: pre-wrap; word-break: break-word;
+  background: var(--code-ground); color: var(--code-ink);
+  border-top: 2px solid var(--terra);
+  padding: 10px 12px; font: 400 10.5px/1.5 var(--mono);
+  max-height: 260px; overflow: auto;
+}
+.raw-tuple-absent { margin: 6px 0 4px; color: var(--muted); font: 400 11px var(--sans); }
 
 /* ------------------------------------------------------- session archive */
 

@@ -31,6 +31,8 @@ token; a target may self-host the same families.
 | `--blue` / `--blue-deep` / `--blue-wash` | `#2e4a76` / `#22375a` / `#e3e5d9` | the identity accent: blueprint ink-blue — links, active states, machine labels |
 | `--terra` / `--terra-wash` | `#b4552c` / `#f2e2d4` | **reserved for activation/readiness/acceptance moments** (the `:root` header rule): accept ctas, ready grades, learner lane |
 | `--olive` | `#6a6f3f` | the world/completion note (world actor, completed marks) |
+| `--actor-learner` / `--actor-machine` / `--actor-world` | `#c86a3f` / `#5f7ea8` / `#8fa06a` | actor lanes of the record lens: hairline rules and chips (lifted from the drawer debt, 2026-07-19) |
+| `--code-ground` / `--code-ink` | `#23282e` / `#cfd4c2` | the one dark idiom kept: raw-record code blocks on disclosure (HUID 04 §3.3) |
 
 ## 3. Act-weight carriers today (documented, with blur points)
 
@@ -47,11 +49,11 @@ with the factory pass, not before.
 
 ## 4. Raw-value debt ledger (retired opportunistically, rule 6)
 
-1. **The trace drawer block** — the largest: `#23282e` ground,
-   `#cfd4c2` text, actor colours (`#c86a3f`, `#5f7ea8`, `#8fa06a`) and
-   their chip variants, filter greys. Dies with the trace restyle
-   (design_proposal §6.1), which lifts actor colours into tokens
-   (`--actor-learner/machine/world` candidates).
+1. ~~**The trace drawer block**~~ — **retired 2026-07-19** with the
+   trace restyle (design_proposal §6 step 1): the drawer died with the
+   record lens's extraction (`centre-log`); actor colours lifted into
+   `--actor-learner/machine/world`; the dark code-block idiom kept only
+   on raw-record disclosure as `--code-ground`/`--code-ink`.
 2. **Shadow hexes** — `.frame` (`#5d543c33`), `.produced`/card shadows.
 3. **Status-chip colours** in the spec reading map.
 4. Scattered greys in the composer hint and payload blocks.

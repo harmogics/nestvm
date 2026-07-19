@@ -1,30 +1,180 @@
 "use client";
 
-// The study workspace of ADR-003: one scene in focus (bind heading + knots),
-// left rail of root material and released values, right rail of child scenes,
-// one composer whose context changes the meaning of a turn. Every durable
-// visible state is derived from the committed tuple log via project() — the
-// browser holds no semantic history of its own.
+// The study workspace of ADR-003, playing the host (HUID 01) until step 2
+// of the migration completes: snapshot transport per contract, the named
+// parameter space, the one port, the centre carousel registry, dock
+// chrome. The centre lenses are contract-backed modules (scene-detail /
+// produced-texts / trace); the client projection below serves only the
+// strip, the left rail and the result panel until their contracts land
+// (recorded interim — refimpl 03 §3). The browser holds no semantic
+// history of its own.
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PRODUCED_TEXTS, type ProducedTextsSnapshot } from "@/huid/contracts/produced-texts";
 import { SCENE_REGISTRY, type SceneRegistrySnapshot } from "@/huid/contracts/scene-registry";
+import { TRACE, type TraceSnapshot } from "@/huid/contracts/trace";
+import type { ModuleManifest, ModulePort } from "@/huid/manifest";
+import { SCENE_DETAIL, type SceneDetailSnapshot } from "@/huid/contracts/scene-detail";
+import { centreCanvasManifest } from "@/huid/modules/centre-canvas/manifest";
+import { CentreCanvas, selectCentreCanvas } from "@/huid/modules/centre-canvas/view";
+import { centreFocusManifest } from "@/huid/modules/centre-focus/manifest";
+import {
+  CentreFocus,
+  selectCentreFocus,
+  type Catalogue,
+  type ComposerTargetParam
+} from "@/huid/modules/centre-focus/view";
+import { centreLogManifest } from "@/huid/modules/centre-log/manifest";
+import { CentreLog, selectCentreLog } from "@/huid/modules/centre-log/view";
+import { depthRailManifest } from "@/huid/modules/depth-rail/manifest";
 import { DepthRail, selectDepthRail } from "@/huid/modules/depth-rail/view";
+import { sessionArchiveManifest } from "@/huid/modules/session-archive/manifest";
 import { SessionArchiveChip } from "@/huid/modules/session-archive/strip";
-import { buildCanvas, defaultCanvasOptions, type CanvasOptions } from "@/nest/readings/canvas";
+import type { TupleReader } from "@/huid/widgets/registry";
 import { project } from "@/nest/readings/projection";
-import type { KnotView, SceneView } from "@/nest/readings/views";
-import type { SessionMeta, WaveTuple } from "@/nest/wave/envelope";
+import type { ResourceRef, SessionMeta, WaveTuple } from "@/nest/wave/envelope";
 import type { CommandResult, DecisionBody, TurnBody } from "@/product/commands";
 
-type ComposerMode =
-  | { mode: "plain" }
-  | { mode: "answer" | "challenge"; knotId: string }
-  | { mode: "unfold" }
-  | { mode: "reframe"; targetOffset: number; targetTitle: string };
+type ComposerTarget = NonNullable<ComposerTargetParam>;
 
-type Catalogue = {
-  volumes: { slug: string; label: string; sections: { anchor: string; heading: string }[] }[];
+type ComposerMode = { mode: "plain" } | ComposerTarget;
+
+// The named parameter space (HUID 01 §4, preparation P2): one flat record
+// of navigation state — client-held, never committed, never on the wire.
+// Host keys are fixed here; `composer.target` is the promoted shared key
+// (design_proposal §12.5.3): written by centre surfaces, read by the
+// composer; absent → the composer rests in plain mode. Module keys are
+// namespaced `<moduleId>.<key>` and ride the same record.
+type HostParams = {
+  "focus.bindId": string | null;
+  "centre.view": string; // a centre-registry entry id
+  "composer.target": ComposerTarget | null;
 };
+
+type Params = HostParams & Record<string, unknown>;
+
+const initialParams: Params = {
+  "focus.bindId": null,
+  "centre.view": "focus",
+  "composer.target": null
+};
+
+// One backend-formed snapshot per contract (ADR-010 Decision 4).
+type ContractSnapshot = { model: unknown; asOfOffset: number };
+
+// Everything a seated centre module receives from the board: the formed
+// snapshots, the parameter space, the port, and the Class L tuple reader
+// (design_proposal §12.5.4 — modules and widgets never fetch).
+type CentreContext = {
+  snapshots: Record<string, ContractSnapshot>;
+  params: Params;
+  port: ModulePort;
+  readTuple: TupleReader;
+  // Interim host facilities (recorded liberties, centre-focus lid): the
+  // corpus catalogue (immutable package data) and the declared-sources
+  // shelf, until a shelf/session-meta contract lands.
+  catalogue: Catalogue | null;
+  shelf: ResourceRef[];
+};
+
+// The centre carousel registry (HUID 01 §6, preparation P3): the switch
+// renders from here; exactly one entry is active via `centre.view`. A
+// module entry carries its render seat (select + View over the context);
+// entries without one are legacy views still rendering inline in the host
+// until each extracts (HUID 03 §6 step 2). Adding a centre view = one
+// entry here plus its module directory.
+type CentreViewEntry = {
+  id: string;
+  title: string;
+  render?: (ctx: CentreContext) => ReactNode;
+};
+
+const centreViews: readonly CentreViewEntry[] = [
+  {
+    id: "focus",
+    title: "focus",
+    render: (ctx) => (
+      <CentreFocus
+        model={selectCentreFocus(
+          (ctx.snapshots[SCENE_DETAIL]?.model as SceneDetailSnapshot | undefined) ?? {
+            scenes: []
+          },
+          {
+            focusBindId: (ctx.params["focus.bindId"] as string | null) ?? null,
+            composerTarget: (ctx.params["composer.target"] as ComposerTargetParam) ?? null,
+            sourceMenuKnotId: (ctx.params["centre.focus.sourceMenu"] as string | null) ?? null,
+            catVolume: String(ctx.params["centre.focus.catVolume"] ?? ""),
+            catSection: String(ctx.params["centre.focus.catSection"] ?? ""),
+            busy: Boolean(ctx.params["session.busy"] ?? false),
+            completed: ctx.params["session.status"] === "completed"
+          }
+        )}
+        port={ctx.port}
+        readTuple={ctx.readTuple}
+        catalogue={ctx.catalogue}
+        shelf={ctx.shelf}
+      />
+    )
+  },
+  {
+    id: "canvas",
+    title: "canvas",
+    render: (ctx) => (
+      <CentreCanvas
+        model={selectCentreCanvas(
+          (ctx.snapshots[PRODUCED_TEXTS]?.model as ProducedTextsSnapshot | undefined) ?? {
+            blocks: [],
+            accepted: {},
+            awaiting: []
+          },
+          {
+            turns: Boolean(ctx.params["centre.canvas.turns"] ?? true),
+            answers: Boolean(ctx.params["centre.canvas.answers"] ?? false),
+            evidence: Boolean(ctx.params["centre.canvas.evidence"] ?? false),
+            busy: Boolean(ctx.params["session.busy"] ?? false),
+            completed: ctx.params["session.status"] === "completed"
+          }
+        )}
+        port={ctx.port}
+      />
+    )
+  },
+  {
+    id: "log",
+    title: "log",
+    render: (ctx) => (
+      <CentreLog
+        model={selectCentreLog(
+          (ctx.snapshots[TRACE]?.model as TraceSnapshot | undefined) ?? { rows: [] },
+          { actor: String(ctx.params["centre.log.actor"] ?? "all") }
+        )}
+        port={ctx.port}
+        readTuple={ctx.readTuple}
+      />
+    )
+  }
+];
+
+// The capability filter — the flag point (design_proposal §12.5.2):
+// seating is configuration; an absent entry leaves the carousel shorter,
+// never a dead tab. A deployment flag filters this list and nothing else.
+const seatedCentreViews: readonly CentreViewEntry[] = centreViews;
+
+// The seated modules — the host's interim registry (dock frames still
+// render them inline until HUID 03 §6 step 2 completes; the snapshot
+// transport below is already driven by it). Seating a contract-backed
+// panel = adding its manifest here, nothing else (preparation P1).
+const seatedModules: readonly ModuleManifest[] = [
+  depthRailManifest,
+  sessionArchiveManifest,
+  centreFocusManifest,
+  centreCanvasManifest,
+  centreLogManifest
+];
+
+const consumedContracts: readonly string[] = [
+  ...new Set(seatedModules.flatMap((manifest) => manifest.consumes))
+];
 
 function payloadOf(tuple: WaveTuple): Record<string, unknown> {
   return (tuple.payload ?? {}) as Record<string, unknown>;
@@ -44,119 +194,47 @@ function truncate(text: string, limit: number): string {
   return text.length > limit ? text.slice(0, limit - 1).replace(/\s+\S*$/, "") + "…" : text;
 }
 
-// The trace as a stream of thought: who moved (the learner, the machine's
-// own structures, or the world behind the membrane) and what the move was.
-type TraceActor = "learner" | "machine" | "world";
-
-function describeTuple(tuple: WaveTuple): { actor: TraceActor; summary: string } {
-  const p = payloadOf(tuple) as Record<string, unknown>;
-  if (tuple.kind === "sys.knot.defined") {
-    const config = p.config as { condition?: { questions?: string[] } } | undefined;
-    return {
-      actor: "machine",
-      summary: `knot ${p.id} registered — "${truncate(String(config?.condition?.questions?.[0] ?? ""), 70)}"`
-    };
-  }
-  if (tuple.kind === "sys.descriptor.defined") {
-    const operator = p.operator as { demands?: unknown[]; return_to?: string } | undefined;
-    return {
-      actor: "machine",
-      summary: `close bind ${p.id} registered — ${operator?.demands?.length ?? 0} demands${
-        operator?.return_to ? `, returns to ${operator.return_to}` : ""
-      }`
-    };
-  }
-  if (tuple.kind === "sys.knot.ready") {
-    const understanding = p.understanding as { grade?: number } | undefined;
-    return {
-      actor: "machine",
-      summary: `readiness reified — ${p.knotId} (grade ${Number(understanding?.grade ?? 0).toFixed(2)})`
-    };
-  }
-  const d = factDataOf(tuple);
-  const type = tupleLabel(tuple);
-  const src = d.source ? ` (${d.source})` : "";
-  switch (type) {
-    case "learning.session.opened": {
-      const subject = d.subject as { title?: string; text?: string } | undefined;
-      return { actor: "learner", summary: `session opened — ${truncate(String(subject?.title ?? subject?.text ?? ""), 70)}` };
-    }
-    case "learning.source.declared":
-      return { actor: "learner", summary: `source declared on the shelf — ${truncate(String((d.resource as { title?: string })?.title ?? ""), 64)}` };
-    case "learning.source.presented":
-      return {
-        actor: "machine",
-        summary: `source presented to ${d.knotId ?? d.bindId} — ${truncate(String((d.resource as { title?: string })?.title ?? ""), 54)}`
-      };
-    case "learning.turn.submitted":
-      if (d.operator) return { actor: "learner", summary: `turn — operator ${(d.operator as { id?: string }).id} requested` };
-      if (d.targetKnotId) return { actor: "learner", summary: `turn — ${d.vector ?? "answer"} aimed at ${d.targetKnotId}` };
-      return { actor: "learner", summary: `plain signal — "${truncate(String(d.text ?? ""), 70)}"` };
-    case "learning.bind.selected":
-      return { actor: "machine", summary: `bind ${d.bindId} selected (operator ${d.operatorId})` };
-    case "service.request":
-      return { actor: "machine", summary: `${d.bindId} gathered its scope and projected intention ${d.uid}` };
-    case "service.failed":
-      return { actor: "world", summary: `service failed — ${truncate(String(d.reason ?? ""), 70)}` };
-    case "learning.knot.seeded":
-      return { actor: "machine", summary: `head fact seeded ${d.knot} — angle "${d.angle}"` };
-    case "learning.scene.unfolded": {
-      const result = d.result as { title?: string } | undefined;
-      return { actor: "world", summary: `scene published — "${truncate(String(result?.title ?? ""), 60)}"${src}` };
-    }
-    case "learning.answer.submitted":
-      return { actor: "learner", summary: `${d.vector ?? "answer"} → ${d.knotId}: "${truncate(String(d.answer ?? ""), 60)}"` };
-    case "learning.evidence.registered":
-      return { actor: "machine", summary: `evidence registered → ${d.knotId} (${(d.excerpts as unknown[])?.length ?? 0} excerpts)` };
-    case "inference.request":
-      return { actor: "machine", summary: `${d.knotId} projected winding intention ${d.uid} (${(d.deltas as unknown[])?.length ?? 0} deltas)` };
-    case "inference.response":
-      return { actor: "world", summary: `world integrated → ${d.knotId}, grade ${Number(d.grade ?? 0).toFixed(2)}${src}` };
-    case "inference.reasoning":
-      return { actor: "world", summary: `reasoning behind ${d.uid}` };
-    case "inference.failed":
-      return { actor: "world", summary: `winding failed — ${truncate(String(d.reason ?? ""), 70)}` };
-    case "learning.knot.marked":
-      return { actor: "learner", summary: `marked explicitly unknown — ${d.knotId}` };
-    case "learning.integration.candidate":
-      return { actor: "world", summary: `${d.bindId} published the integration candidate${src}` };
-    case "learning.integration.returned":
-      return { actor: "world", summary: `${d.bindId} published the return → ${d.parentKnotId}${src}` };
-    case "learning.integration.accepted":
-      return { actor: "learner", summary: `accepted — released as ${d.valueId}` };
-    case "learning.session.result.candidate":
-      return { actor: "machine", summary: "result candidate assembled — the completion gate passed" };
-    case "learning.session.completed":
-      return { actor: "learner", summary: "session completed — attested" };
-    default:
-      return { actor: "machine", summary: type };
-  }
-}
-
 export function Workbench({ sessionId }: { sessionId: string }) {
   const [meta, setMeta] = useState<SessionMeta | null>(null);
   const [tuples, setTuples] = useState<WaveTuple[] | null>(null);
-  const [depthPanel, setDepthPanel] = useState<SceneRegistrySnapshot | null>(null);
+  const [snapshots, setSnapshots] = useState<Record<string, ContractSnapshot>>({});
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [focusSceneId, setFocusSceneId] = useState<string | null>(null);
-  const [composer, setComposer] = useState<ComposerMode>({ mode: "plain" });
+  const [params, setParams] = useState<Params>(initialParams);
   const [input, setInput] = useState("");
-  const [centreView, setCentreView] = useState<"focus" | "canvas" | "log">("focus");
-  const [canvasOptions, setCanvasOptions] = useState<CanvasOptions>(defaultCanvasOptions);
-  const [traceFilter, setTraceFilter] = useState<TraceActor | "all">("all");
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
-  const [sourceMenuKnotId, setSourceMenuKnotId] = useState<string | null>(null);
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
-  const [catVolume, setCatVolume] = useState("");
-  const [catSection, setCatSection] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Every parameter write funnels through navigate (HUID 01 §4.4); reads
+  // go through the declared keys. Parameters never reach the wire or the
+  // log — consequence-bearing coordinates seal inside committed payloads.
+  const navigate = useCallback((patch: Readonly<Record<string, unknown>>) => {
+    setParams((current) => ({ ...current, ...patch }));
+  }, []);
+
+  const focusSceneId = params["focus.bindId"];
+
+  // The composer is host chrome: when a centre surface retargets it
+  // through the promoted key, the input takes focus here.
+  const composerTargetParam = params["composer.target"];
+  useEffect(() => {
+    if (composerTargetParam && (composerTargetParam as ComposerTarget).mode !== "unfold") {
+      inputRef.current?.focus();
+    }
+  }, [composerTargetParam]);
+  // Never a dead tab: a `centre.view` pointing at an unseated entry falls
+  // back to the first seated one (seed §9 degradation discipline).
+  const centreView = seatedCentreViews.some((view) => view.id === params["centre.view"])
+    ? params["centre.view"]
+    : seatedCentreViews[0]?.id;
+  const composer: ComposerMode = params["composer.target"] ?? { mode: "plain" };
 
   // The catalogue of static study material, fetched once when a knot's
   // evidence menu first opens.
+  const sourceMenuOpen = params["centre.focus.sourceMenu"] != null;
   useEffect(() => {
-    if (!sourceMenuKnotId || catalogue) return;
+    if (!sourceMenuOpen || catalogue) return;
     let cancelled = false;
     (async () => {
       try {
@@ -164,7 +242,9 @@ export function Workbench({ sessionId }: { sessionId: string }) {
         const data = (await response.json()) as Catalogue;
         if (!cancelled) {
           setCatalogue(data);
-          if (data.volumes.length > 0) setCatVolume(data.volumes[0].slug);
+          if (data.volumes.length > 0) {
+            navigate({ "centre.focus.catVolume": data.volumes[0].slug });
+          }
         }
       } catch {
         // the menu stays useful without the catalogue
@@ -173,21 +253,32 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [sourceMenuKnotId, catalogue]);
+  }, [sourceMenuOpen, catalogue, navigate]);
 
-  // The host's snapshot transport (ADR-009/ADR-010): one fetch per
-  // contract, feeding every consuming panel — never the tuple stream.
-  // Refreshed on load and after every command result; SSE replaces the
-  // refetch when the events channel lands.
+  // The host's snapshot transport (ADR-009/ADR-010, preparation P1): one
+  // fetch per contract consumed by a seated module — never the tuple
+  // stream — deduplicated, shared by every consuming panel. Refreshed on
+  // load and after every command result; SSE replaces the refetch when
+  // the events channel lands. Monotonic: a snapshot at or behind the held
+  // asOfOffset is dropped (design_proposal §5; CONVENTIONS §2.4 — the
+  // §6.1 deviation retired here).
   const refreshPanels = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/sessions/${sessionId}/snapshots/${SCENE_REGISTRY}`);
-      if (!response.ok) return; // the panel keeps its last snapshot
-      const data = (await response.json()) as { model: SceneRegistrySnapshot };
-      setDepthPanel(data.model);
-    } catch {
-      // transport hiccup — the last snapshot stands until the next refresh
-    }
+    await Promise.all(
+      consumedContracts.map(async (contract) => {
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}/snapshots/${contract}`);
+          if (!response.ok) return; // the panel keeps its last snapshot
+          const snapshot = (await response.json()) as ContractSnapshot;
+          setSnapshots((held) => {
+            const current = held[contract];
+            if (current && snapshot.asOfOffset <= current.asOfOffset) return held;
+            return { ...held, [contract]: snapshot };
+          });
+        } catch {
+          // transport hiccup — the last snapshot stands until the next refresh
+        }
+      })
+    );
   }, [sessionId]);
 
   useEffect(() => {
@@ -212,31 +303,33 @@ export function Workbench({ sessionId }: { sessionId: string }) {
   }, [sessionId, refreshPanels]);
 
   const projection = useMemo(() => project(tuples ?? []), [tuples]);
-  const canvasBlocks = useMemo(
-    () => buildCanvas(tuples ?? [], projection, canvasOptions),
-    [tuples, projection, canvasOptions]
-  );
+
+  // Host keys `session.busy` / `session.status` (HUID 01 §4.1) mirrored
+  // into the parameter space for consuming modules.
+  useEffect(() => {
+    navigate({ "session.busy": busy, "session.status": projection.status });
+  }, [busy, projection.status, navigate]);
   const completed = projection.status === "completed";
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [focusSceneId]);
 
-  const rootScene = projection.scenes.find((s) => !s.parentBindId) ?? null;
-  const focusedScene =
-    projection.scenes.find((s) => s.bindId === focusSceneId) ?? rootScene ?? null;
+  // The centre's truth arrives formed (scene-detail); the client
+  // projection below serves only the strip, the left rail and the result
+  // panel until their contracts land (recorded interim).
+  const sceneDetail =
+    (snapshots[SCENE_DETAIL]?.model as SceneDetailSnapshot | undefined) ?? { scenes: [] };
+  const rootSceneId = sceneDetail.scenes.find((scene) => !scene.parentBindId)?.bindId ?? null;
+  const focusedBindId = focusSceneId ?? rootSceneId;
 
-  const ancestry: SceneView[] = useMemo(() => {
-    const chain: SceneView[] = [];
-    let current = focusedScene;
-    while (current?.parentBindId) {
-      const parent = projection.scenes.find((s) => s.bindId === current?.parentBindId);
-      if (!parent) break;
-      chain.unshift(parent);
-      current = parent;
+  const knotQuestion = (knotId: string): string => {
+    for (const scene of sceneDetail.scenes) {
+      const knot = scene.knots.find((k) => k.knotId === knotId);
+      if (knot) return knot.question;
     }
-    return chain;
-  }, [focusedScene, projection.scenes]);
+    return "";
+  };
 
   const applyResult = useCallback((result: CommandResult) => {
     if (result.tuples.length > 0) {
@@ -249,8 +342,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
       .reverse()
       .find((t) => tupleLabel(t) === "learning.bind.selected");
     if (selected) {
-      setFocusSceneId(String(factDataOf(selected).bindId ?? ""));
-      setCentreView("focus");
+      navigate({ "focus.bindId": String(factDataOf(selected).bindId ?? ""), "centre.view": "focus" });
     }
     return result;
   }, [refreshPanels]);
@@ -305,8 +397,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     const result = await post(`/api/sessions/${sessionId}/turns`, body);
     if (result && !result.refused) {
       setInput("");
-      if (composer.mode !== "unfold") setComposer({ mode: "plain" });
-      else setComposer({ mode: "plain" });
+      navigate({ "composer.target": null });
     }
   }
 
@@ -316,31 +407,44 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     if (result && !result.refused) after?.(result);
   }
 
-  function focusVector(mode: "answer" | "challenge", knot: KnotView) {
-    setComposer({ mode, knotId: knot.knotId });
-    inputRef.current?.focus();
-  }
+  // The one port modules receive (HUID 01 §5, preparation P2): two verbs,
+  // nothing else. Bodies route by shape — a decision carries `kind`.
+  const port: ModulePort = {
+    commit: (body) =>
+      post(
+        "kind" in body
+          ? `/api/sessions/${sessionId}/decisions`
+          : `/api/sessions/${sessionId}/turns`,
+        body
+      ),
+    navigate
+  };
 
-  function knotById(knotId: string | undefined): KnotView | null {
-    if (!knotId) return null;
-    for (const scene of projection.scenes) {
-      const knot = scene.knots.find((k) => k.knotId === knotId);
-      if (knot) return knot;
-    }
-    return null;
-  }
+  // The host-owned Class L reader (design_proposal §12.5.4): raw truth by
+  // offset for the widgets' one-disclosure-away rule — modules and
+  // widgets themselves never fetch.
+  const readTuple: TupleReader = useCallback(
+    async (offset: number) => {
+      const response = await fetch(`/api/sessions/${sessionId}/tuples/${offset}`);
+      if (!response.ok) throw new Error(`tuple ${offset} unavailable`);
+      const data = (await response.json()) as { tuple: unknown };
+      return data.tuple;
+    },
+    [sessionId]
+  );
 
-  function producedTuples(scene: SceneView): WaveTuple[] {
-    const uid = scene.requestUid;
-    return (tuples ?? []).filter((tuple) => {
-      const payload = payloadOf(tuple);
-      const data = factDataOf(tuple);
-      if (uid && payload.emittedBy === uid) return true; // sown records
-      if (uid && data.emittedBy === uid) return true; // heads, publication
-      const owner = typeof data.bindId === "string" ? data.bindId : null;
-      return owner === scene.bindId || (scene.closeBindId != null && owner === scene.closeBindId);
-    });
-  }
+  const activeCentreEntry = seatedCentreViews.find((view) => view.id === centreView);
+
+  const centreContext: CentreContext = {
+    snapshots,
+    params,
+    port,
+    readTuple,
+    catalogue,
+    shelf: projection.sources
+  };
+
+
 
   if (loadError) {
     return (
@@ -373,7 +477,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
     ) : (
       <>
         {composer.mode === "answer" ? "Answer" : "Challenge"} →{" "}
-        {truncate(knotById(composer.knotId)?.question ?? "", 46)}
+        {truncate(knotQuestion(composer.knotId), 46)}
       </>
     );
 
@@ -405,14 +509,14 @@ export function Workbench({ sessionId }: { sessionId: string }) {
           </button>
         )}
         <span className="view-switch">
-          {(["focus", "canvas", "log"] as const).map((view) => (
+          {seatedCentreViews.map((view) => (
             <button
               type="button"
-              key={view}
-              className={centreView === view ? "on" : ""}
-              onClick={() => setCentreView(view)}
+              key={view.id}
+              className={centreView === view.id ? "on" : ""}
+              onClick={() => navigate({ "centre.view": view.id })}
             >
-              {view}
+              {view.title}
             </button>
           ))}
         </span>
@@ -517,504 +621,29 @@ export function Workbench({ sessionId }: { sessionId: string }) {
         </aside>
 
         <section className="scene">
-          {centreView === "focus" && (focusedScene ? (
-            <>
-              <div className="scene-crumbs">
-                <button type="button" onClick={() => setFocusSceneId(rootScene?.bindId ?? null)}>
-                  Root
-                </button>
-                {ancestry.map((scene) => (
-                  <span key={scene.bindId}>
-                    {" / "}
-                    <button type="button" onClick={() => setFocusSceneId(scene.bindId)}>
-                      {truncate(scene.title, 34)}
-                    </button>
-                  </span>
-                ))}
-                <span>{ancestry.length > 0 || focusedScene !== rootScene ? " / " : ""}</span>
-                <span>{truncate(focusedScene.title, 44)}</span>
-              </div>
-              <div className="scene-head">
-                <span className="eyebrow">
-                  {focusedScene.bindId} · operator {focusedScene.operatorId} · {focusedScene.status}
-                </span>
-                <h2>{focusedScene.title}</h2>
-                {focusedScene.purpose && <p className="purpose">{focusedScene.purpose}</p>}
-                {focusedScene.sources.length > 0 && (
-                  <div className="chip-row">
-                    {focusedScene.sources.map((source) => (
-                      <span className="src-chip" key={`${source.store}:${source.ref}`}>
-                        {truncate(source.title ?? source.ref, 44)}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {focusedScene.status === "active" && focusedScene.knots.length > 0 && (
-                  <p className="barrier-note">
-                    close bind {focusedScene.closeBindId ?? "—"} · barrier{" "}
-                    {focusedScene.knots.filter((k) => k.ready || k.unknown || k.returned).length} /{" "}
-                    {focusedScene.knots.length} settled — it publishes its integration itself once
-                    every knot is ready, returned, or explicitly unknown
-                    {focusedScene.returnTo ? `; the return is addressed to ${focusedScene.returnTo}` : ""}
-                  </p>
-                )}
-              </div>
-
-              <details className="produced">
-                <summary>
-                  Produced by this bind — {producedTuples(focusedScene).length} tuples on the log
-                </summary>
-                {producedTuples(focusedScene).map((tuple) => {
-                  const { summary } = describeTuple(tuple);
-                  const isOpen = expanded.has(tuple.offset);
-                  return (
-                    <div className="produced-row" key={tuple.offset}>
-                      <div
-                        className="produced-head"
-                        onClick={() =>
-                          setExpanded((current) => {
-                            const nextSet = new Set(current);
-                            if (nextSet.has(tuple.offset)) nextSet.delete(tuple.offset);
-                            else nextSet.add(tuple.offset);
-                            return nextSet;
-                          })
-                        }
-                      >
-                        <span className="off">@{tuple.offset}</span>
-                        <span className="summary">{summary}</span>
-                        <span className="kind-tag">{tupleLabel(tuple)}</span>
-                      </div>
-                      {isOpen && (
-                        <pre className="produced-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>
-                      )}
-                    </div>
-                  );
-                })}
-              </details>
-
-              <div className="knot-list">
-                {focusedScene.knots.map((knot) => (
-                  <article
-                    className={`knot${knot.ready ? " ready" : ""}${knot.unknown ? " unknown" : ""}${
-                      (composer.mode === "answer" || composer.mode === "challenge") &&
-                      composer.knotId === knot.knotId
-                        ? " focused"
-                        : ""
-                    }`}
-                    key={knot.knotId}
-                  >
-                    <div className="knot-meta">
-                      <span className="angle">{knot.angle || knot.lane}</span>
-                      {knot.ready && <span className="ready-chip">ready</span>}
-                      {knot.returned && !knot.ready && <span className="ready-chip">returned</span>}
-                      {knot.unknown && <span className="unknown-chip">explicitly unknown</span>}
-                      <span className="grade-meter">
-                        <span className="bar">
-                          <b
-                            className={knot.grade >= knot.threshold ? "hot" : ""}
-                            style={{ width: `${Math.round(knot.grade * 100)}%` }}
-                          />
-                        </span>
-                        <span>
-                          grade {knot.grade.toFixed(2)} / {knot.threshold.toFixed(2)}
-                        </span>
-                      </span>
-                    </div>
-                    <p className="knot-question">{knot.question}</p>
-                    {knot.sources.length > 0 && (
-                      <div className="chip-row">
-                        {knot.sources.map((source, index) => (
-                          <span className="src-chip read" key={index}>
-                            read: {truncate(source.title ?? source.ref, 40)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {knot.state && <p className="knot-state">{knot.state}</p>}
-                    {knot.evidence.length > 0 && (
-                      <div className="knot-evidence">
-                        {knot.evidence.map((excerpt, index) => (
-                          <p key={index}>
-                            “{excerpt.excerpt}”{" "}
-                            <a href={`/spec/${excerpt.slug}#${excerpt.anchor}`} target="_blank" rel="noreferrer">
-                              {excerpt.volume} · {excerpt.section}
-                            </a>
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    {knot.returned && (
-                      <p className="returned-note">
-                        ↩ the child scene&rsquo;s integration returned to this knot
-                        {knot.returnedValueId ? ` (released as ${knot.returnedValueId})` : ""}
-                        {knot.returnOffset !== undefined ? ` · offset ${knot.returnOffset}` : ""}
-                      </p>
-                    )}
-                    <div className="knot-actions">
-                      <button
-                        type="button"
-                        className={`vec-btn${
-                          composer.mode === "answer" && composer.knotId === knot.knotId ? " on" : ""
-                        }`}
-                        disabled={completed}
-                        onClick={() => focusVector("answer", knot)}
-                      >
-                        Answer
-                      </button>
-                      <button
-                        type="button"
-                        className={`vec-btn${
-                          composer.mode === "challenge" && composer.knotId === knot.knotId ? " on" : ""
-                        }`}
-                        disabled={completed}
-                        onClick={() => focusVector("challenge", knot)}
-                      >
-                        Challenge
-                      </button>
-                      <button
-                        type="button"
-                        className={`vec-btn${sourceMenuKnotId === knot.knotId ? " on" : ""}`}
-                        disabled={busy || completed}
-                        onClick={() => {
-                          if (projection.sources.length === 0) {
-                            decide({ kind: "evidence", knotId: knot.knotId });
-                          } else {
-                            setSourceMenuKnotId((current) =>
-                              current === knot.knotId ? null : knot.knotId
-                            );
-                          }
-                        }}
-                      >
-                        Evidence
-                      </button>
-                      {knot.childBindId ? (
-                        <button
-                          type="button"
-                          className="vec-btn"
-                          onClick={() => setFocusSceneId(knot.childBindId!)}
-                        >
-                          Open child scene
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="vec-btn"
-                          disabled={busy || completed}
-                          onClick={() => decide({ kind: "deepen", knotId: knot.knotId })}
-                        >
-                          Deepen
-                        </button>
-                      )}
-                      {!knot.ready && !knot.unknown && (
-                        <button
-                          type="button"
-                          className="vec-btn"
-                          disabled={busy || completed}
-                          onClick={() => decide({ kind: "markUnknown", knotId: knot.knotId })}
-                        >
-                          Mark unknown
-                        </button>
-                      )}
-                    </div>
-                    {sourceMenuKnotId === knot.knotId && (
-                      <div className="src-menu">
-                        <span className="eyebrow">Ground this knot in evidence</span>
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => {
-                            setSourceMenuKnotId(null);
-                            decide({ kind: "evidence", knotId: knot.knotId });
-                          }}
-                        >
-                          Search the specification set for this question
-                        </button>
-                        {projection.sources.map((source) => (
-                          <button
-                            type="button"
-                            key={`${source.store}:${source.ref}`}
-                            disabled={busy}
-                            onClick={() => {
-                              setSourceMenuKnotId(null);
-                              decide({
-                                kind: "readSource",
-                                knotId: knot.knotId,
-                                store: source.store,
-                                ref: source.ref
-                              });
-                            }}
-                          >
-                            Read into the knot: {truncate(source.title ?? source.ref, 60)}
-                          </button>
-                        ))}
-                        {catalogue && (
-                          <div className="cat-browse">
-                            <span className="eyebrow">Or pick a chapter from the catalogue</span>
-                            <select
-                              value={catVolume}
-                              onChange={(event) => {
-                                setCatVolume(event.target.value);
-                                setCatSection("");
-                              }}
-                            >
-                              {catalogue.volumes.map((volume) => (
-                                <option key={volume.slug} value={volume.slug}>
-                                  {volume.label}
-                                </option>
-                              ))}
-                            </select>
-                            <select value={catSection} onChange={(event) => setCatSection(event.target.value)}>
-                              <option value="">Whole volume</option>
-                              {catalogue.volumes
-                                .find((volume) => volume.slug === catVolume)
-                                ?.sections.map((section) => (
-                                  <option key={section.anchor} value={section.anchor}>
-                                    {section.heading}
-                                  </option>
-                                ))}
-                            </select>
-                            <button
-                              type="button"
-                              className="op-btn"
-                              disabled={busy || !catVolume}
-                              onClick={() => {
-                                setSourceMenuKnotId(null);
-                                decide({
-                                  kind: "readSource",
-                                  knotId: knot.knotId,
-                                  store: "spec",
-                                  ref: catSection ? `${catVolume}#${catSection}` : catVolume
-                                });
-                              }}
-                            >
-                              Read the chapter into the knot
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </article>
-                ))}
-              </div>
-
-              {focusedScene.candidate && focusedScene.status !== "integrated" && (
-                <div className="candidate-panel">
-                  <span className="eyebrow">
-                    {focusedScene.returnTo
-                      ? `Published by ${focusedScene.closeBindId} — already returned to ${focusedScene.returnTo}; accepting releases it to the left rail`
-                      : `Published by ${focusedScene.closeBindId} at its barrier — seams preserved`}
-                  </span>
-                  <h3>{focusedScene.title}</h3>
-                  <p className="statement">{focusedScene.candidate.statement}</p>
-                  {focusedScene.candidate.contributions.length > 0 && (
-                    <div className="seams">
-                      {focusedScene.candidate.contributions.map((contribution, index) => (
-                        <p className="seam" key={index}>
-                          <b>{contribution.source}</b>
-                          {contribution.note}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  {focusedScene.candidate.openQuestions.length > 0 && (
-                    <ul className="open-qs">
-                      {focusedScene.candidate.openQuestions.map((question, index) => (
-                        <li key={index}>open: {question}</li>
-                      ))}
-                    </ul>
-                  )}
-                  <div className="scene-actions">
-                    <button
-                      type="button"
-                      className="op-btn terra"
-                      disabled={busy || completed}
-                      onClick={() =>
-                        decide(
-                          {
-                            kind: "accept",
-                            bindId: focusedScene.bindId,
-                            candidateOffset: focusedScene.candidate!.offset
-                          },
-                          () => {
-                            if (focusedScene.parentBindId) setFocusSceneId(focusedScene.parentBindId);
-                          }
-                        )
-                      }
-                    >
-                      Accept — release to the left
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
+          {activeCentreEntry?.id === "focus" && sceneDetail.scenes.length === 0 ? (
+            <div className="scene-head">
+              <span className="eyebrow">Root · no scene yet</span>
+              <h2>{truncate(subjectLabel, 90)}</h2>
+              <p className="purpose">
+                Write your root material below — it is committed as a plain signal and rests
+                quietly. When you are ready, switch the composer to the unfold operator to form
+                the first scene of question knots.
+              </p>
+            </div>
           ) : (
-            <>
-              <div className="scene-head">
-                <span className="eyebrow">Root · no scene yet</span>
-                <h2>{truncate(subjectLabel, 90)}</h2>
-                <p className="purpose">
-                  Write your root material below — it is committed as a plain signal and rests
-                  quietly. When you are ready, switch the composer to the unfold operator to form
-                  the first scene of question knots.
-                </p>
-              </div>
-            </>
-          ))}
-
-          {centreView === "canvas" && (
-            <div className="canvas-view">
-              <div className="canvas-head">
-                <span className="eyebrow">The log as a text canvas — every block is a tuple</span>
-                <div className="canvas-toggles">
-                  {(
-                    [
-                      ["turns", "learner turns"],
-                      ["answers", "answers"],
-                      ["evidence", "evidence"]
-                    ] as const
-                  ).map(([optionKey, label]) => (
-                    <label key={optionKey}>
-                      <input
-                        type="checkbox"
-                        checked={canvasOptions[optionKey]}
-                        onChange={() =>
-                          setCanvasOptions((current) => ({
-                            ...current,
-                            [optionKey]: !current[optionKey]
-                          }))
-                        }
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {canvasBlocks.length === 0 && (
-                <p className="purpose" style={{ marginTop: 18 }}>
-                  Nothing to show yet — integrations published by binds will read here as text.
-                </p>
-              )}
-              {canvasBlocks.map((block) => (
-                <article className={`canvas-block ${block.kind} actor-${block.actor}`} key={block.offset}>
-                  <div className="canvas-block-meta">
-                    <span className="off">@{block.offset}</span>
-                    <span>{block.meta}</span>
-                    {block.valueId && <span className="value-chip">released as {block.valueId}</span>}
-                    {block.isCandidate && <span className="cand-chip">candidate — awaiting review</span>}
-                  </div>
-                  {block.title && <h3>{block.title}</h3>}
-                  <p className="canvas-body">{block.body}</p>
-                  <div className="canvas-actions">
-                    {block.bindId && (
-                      <button
-                        type="button"
-                        className="vec-btn"
-                        onClick={() => {
-                          setFocusSceneId(block.bindId!);
-                          setCentreView("focus");
-                        }}
-                      >
-                        Open its bind
-                      </button>
-                    )}
-                    {block.isCandidate && block.bindId && (
-                      <button
-                        type="button"
-                        className="vec-btn"
-                        disabled={busy || completed}
-                        onClick={() =>
-                          decide({ kind: "accept", bindId: block.bindId!, candidateOffset: block.offset })
-                        }
-                      >
-                        Accept — release left
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="vec-btn"
-                      disabled={completed}
-                      onClick={() => {
-                        setComposer({
-                          mode: "reframe",
-                          targetOffset: block.offset,
-                          targetTitle: block.title ?? `@${block.offset}`
-                        });
-                        inputRef.current?.focus();
-                      }}
-                    >
-                      Reframe
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-
-          {centreView === "log" && (
-            <div className="trace-drawer central">
-              <div className="trace-head">
-                <div>
-                  <h4>The session&rsquo;s wave log</h4>
-                  <p className="trace-note">
-                    The stream of thought of the machine you are studying, as it is committed: the
-                    learner supplies facts and judgement, the machine&rsquo;s structures register,
-                    wind and gather, and the world behind the membrane answers. Click a row for its
-                    payload.
-                  </p>
-                </div>
-                <div className="trace-filters">
-                  {(["all", "learner", "machine", "world"] as const).map((filter) => (
-                    <button
-                      type="button"
-                      key={filter}
-                      className={traceFilter === filter ? "on" : ""}
-                      onClick={() => setTraceFilter(filter)}
-                    >
-                      {filter}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {tuples.map((tuple) => {
-                const { actor, summary } = describeTuple(tuple);
-                if (traceFilter !== "all" && actor !== traceFilter) return null;
-                const data = factDataOf(tuple);
-                const uid = typeof data.uid === "string" ? data.uid : null;
-                const isOpen = expanded.has(tuple.offset);
-                return (
-                  <div className={`tuple-row actor-${actor}`} key={tuple.offset}>
-                    <div
-                      className="tuple-head"
-                      onClick={() =>
-                        setExpanded((current) => {
-                          const nextSet = new Set(current);
-                          if (nextSet.has(tuple.offset)) nextSet.delete(tuple.offset);
-                          else nextSet.add(tuple.offset);
-                          return nextSet;
-                        })
-                      }
-                    >
-                      <span className="off">{tuple.offset}</span>
-                      <span className={`actor-chip ${actor}`}>{actor}</span>
-                      <span className="summary">{summary}</span>
-                      {uid && <span className="uid">{uid}</span>}
-                      <span className="kind-tag">{tupleLabel(tuple)}</span>
-                    </div>
-                    {isOpen && (
-                      <pre className="tuple-payload">{JSON.stringify(tuple.payload, null, 2)}</pre>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            activeCentreEntry?.render?.(centreContext)
           )}
         </section>
 
         <DepthRail
-          model={selectDepthRail(depthPanel ?? { scenes: [] }, {
-            focusBindId: focusedScene?.bindId ?? null
-          })}
-          port={{ navigate: (patch) => setFocusSceneId(patch["focus.bindId"]) }}
+          model={selectDepthRail(
+            (snapshots[SCENE_REGISTRY]?.model as SceneRegistrySnapshot | undefined) ?? {
+              scenes: []
+            },
+            { focusBindId: focusedBindId }
+          )}
+          port={port}
         />
       </div>
 
@@ -1041,7 +670,7 @@ export function Workbench({ sessionId }: { sessionId: string }) {
           className={`vec-btn${composer.mode === "unfold" ? " on" : ""}`}
           disabled={completed}
           onClick={() =>
-            setComposer((current) => (current.mode === "unfold" ? { mode: "plain" } : { mode: "unfold" }))
+            navigate({ "composer.target": composer.mode === "unfold" ? null : { mode: "unfold" } })
           }
         >
           Unfold

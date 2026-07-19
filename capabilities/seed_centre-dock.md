@@ -2,10 +2,11 @@
 
 ## 1. Identity
 
-- **kind:** guild · **id:** `guild.centre-dock` · **version:** 0.1.0-seed
-- **status:** SEED (not yet manifested; the analysis it derives from is
-  live: [spec/design_proposal.md](../spec/design_proposal.md), which
-  governs on divergence until promotion — FORMAT §3.1)
+- **kind:** guild · **id:** `guild.centre-dock` · **version:** 0.2.0
+- **status:** manifested-in-source (2026-07-19; the cycle stands at its
+  closing acceptance — the living canvas
+  [spec/design_proposal.md](../spec/design_proposal.md) governs until the
+  human accepts and it retires to history — FORMAT §3.1)
 - **provenance:** the NestVM study workbench, this repository's
   collaboration, 2026-07-18; the human-facing name is "the central
   canvas" — the machine name stays `centre-dock` because the centre is a
@@ -82,7 +83,7 @@ tuple still rows through the generic former — total coverage.
 Consumes `scene-detail`. Params: `focus.bindId`. Commits: `evidence`,
 `readSource`, `deepen`, `markUnknown`, `accept`. Navigates:
 `focus.bindId`, `centre.view`, `composer.target` (promoted shared key —
-§6). View intent: the opened lid — scene head, strata disclosure, knot
+§6). View intent: the opened lid — scene heading, strata disclosure, knot
 cards composing factory widgets in their disclosures, candidate panel.
 
 ### 4.5 `module:centre.canvas`
@@ -167,3 +168,37 @@ endpoint shape, former-infrastructure sharing, `composer.target` naming,
 session-meta strip contract) plus guild-specific: whether `centre.focus`
 splits its candidate panel as a fourth member module once the attention
 queue lands.
+
+## 11. Manifestation record (2026-07-19)
+
+Landed in source per §9's order — P1–P5, then trace → produced-texts →
+scene-detail; every step admitted (tsc + manifests), sowed, grounded
+(fixtures + an independent parity oracle per contract — four oracles,
+18 recorded sessions each, zero divergences), seated (registry entries)
+and retired its legacy inline surface. Deviations from this seed as
+declared, named:
+
+1. **Tact rows carry `deltaCount`, never delta bodies** — bounded at
+   formation (CONVENTIONS §1.4) tightened over §4.1's "winding tacts".
+2. **Knot answers ride the contract** (`answers[]`) though the lens does
+   not render them yet — the reads of §4.1 kept truthful.
+3. **`integration.value` is a presentation form**: formed in `select`
+   from the snapshot's kneaded `accepted` map — the block list itself
+   stays append-pure (delta-ready, design_proposal §5).
+4. **The row-former registry is shared in the plane**
+   (`src/huid/projectors/row-formers.ts`) — §11.3 of the analysis
+   answered at the gate (§12.5.1): trace rows and scene strata form
+   identically; both lenses route `row.*` to one shared row widget.
+5. **Widgets never fetch**: the raw-JSON floor reads through the
+   host-injected `resolveTuple` over the P4 endpoint (§12.5.4).
+6. **Interim liberties with successors**: the corpus catalogue and the
+   declared-sources shelf reach `centre.focus` as host-injected props
+   until a shelf/session-meta contract lands (§12.3.5); the pre-scene
+   state renders in the host, which still holds the session subject.
+7. The dark drawer is retired; actor lanes are theme tokens
+   (`--actor-*`, nestvm-ink §4.1 ledger item 1 closed); the raw-record
+   dark idiom is `--code-ground`/`--code-ink` on disclosure only.
+
+Fixtures: `fixtures/sessions/` unchanged (recorded, never handcrafted);
+oracles: `scripts/parity/{scene-registry,trace,produced-texts,scene-detail}.mjs`
+behind `npm run parity`.

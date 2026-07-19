@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "parity": "node scripts/parity/scene-registry.mjs"
+    "parity": "node scripts/parity/scene-registry.mjs && node scripts/parity/trace.mjs && node scripts/parity/produced-texts.mjs && node scripts/parity/scene-detail.mjs"
   },
   "dependencies": {
     "next": "^15.5.9",

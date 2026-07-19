@@ -55,7 +55,8 @@ Panels never infer (HUID 02 §7).
 | --- | --- |
 | right rail (depth) | contract-backed: `scene-registry` end to end |
 | strip (archive) | module, fold-less by nature |
-| centre (focus/canvas/log), left rail, composer | interim: formed client-side in the monolith from the tuple replica — awaiting their contracts |
+| centre (focus/canvas/log) | contract-backed 2026-07-19: `scene-detail` / `produced-texts` / `trace` — three modules seated from the carousel registry; the shared row-former registry and the widget seam (resolution table, raw-JSON floor) landed with them |
+| left rail, strip counters, result panel, composer | interim: formed client-side from the tuple replica — awaiting their contracts (shelf/session-meta) |
 | host proper | interim: the workbench plays it; HUID 03 §6 step 2 |
 | SSE events channel | pending; refetch-per-command until then |
 | obligation sockets | reserved (ADR-005 §1.4), arrive with WaveSession |

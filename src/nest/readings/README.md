@@ -1,9 +1,14 @@
 # nest/readings — pure derivations
 
-**Role.** Pure functions of the tuple log: the canonical projection, the
-text-canvas blocks, and (arriving with the HUID migration) trace summaries
-and scene strata. The only place that turns `factType` into meaning for
-display.
+**Role.** Pure functions of the tuple log: the canonical projection and
+the view shapes. One of two places that turn `factType` into meaning for
+display — the other is the projector plane (`src/huid/projectors/`),
+where the trace row-formers and produced-texts block-formers live since
+the centre migration (design_proposal §6; the text-canvas derivation
+moved there 2026-07-19). This region keeps what the host still consumes
+client-side during the interim (the session projection) and shrinks as
+contracts land (drift criterion: client imports reach zero at
+completion).
 
 **Governed by.** Vol. 08 §8; ADR-005 Decision 1; HUID 02 §2 (fold rules).
 

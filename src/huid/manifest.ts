@@ -5,6 +5,8 @@
 // (src/huid/projectors/manifest.ts) — presentation declares what it
 // consumes, never what the log contains.
 
+import type { CommandResult, DecisionBody, TurnBody } from "@/product/commands";
+
 export type ModuleDock = "strip" | "left" | "centre" | "right" | "composer";
 
 export type ModuleManifest = {
@@ -17,4 +19,13 @@ export type ModuleManifest = {
   commits?: readonly string[]; // decision kinds / operator ids shaped
   navigates?: readonly string[]; // parameter keys written
   // reserved key: claims — obligation sockets (ADR-005 §1.4), not yet open
+};
+
+// The module port — the presentation side's two verbs (HUID 01 §5,
+// HUID 02 §1): `commit` shapes a declared body through the one session-API
+// client, `navigate` patches the parameter space. Nothing else crosses the
+// board; a module that fetches has left the contract.
+export type ModulePort = {
+  commit(body: TurnBody | DecisionBody): Promise<CommandResult | null>;
+  navigate(patch: Readonly<Record<string, unknown>>): void;
 };

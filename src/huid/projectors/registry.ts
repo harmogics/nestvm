@@ -8,12 +8,18 @@ import "server-only";
 // assembly is the app's job. The wave itself stays panel-ignorant.
 
 import { onCommit } from "@/nest/wave/store";
+import { producedTextsProjector } from "./produced-texts";
+import { sceneDetailProjector } from "./scene-detail";
 import { sceneRegistryProjector } from "./scene-registry";
+import { traceProjector } from "./trace";
 import { advanceOnCommit, type SnapshotProjector } from "./runtime";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const projectors = new Map<string, SnapshotProjector<any, any>>([
-  [sceneRegistryProjector.manifest.contract, sceneRegistryProjector]
+  [sceneRegistryProjector.manifest.contract, sceneRegistryProjector],
+  [traceProjector.manifest.contract, traceProjector],
+  [producedTextsProjector.manifest.contract, producedTextsProjector],
+  [sceneDetailProjector.manifest.contract, sceneDetailProjector]
 ]);
 
 export function projectorFor(contractId: string): SnapshotProjector | undefined {

@@ -6,6 +6,7 @@
 // transports snapshots per contract.
 
 import type { SceneCard, SceneRegistrySnapshot } from "../../contracts/scene-registry";
+import type { ModulePort } from "../../manifest";
 import { truncate } from "../../text";
 
 export type DepthRailModel = {
@@ -32,7 +33,7 @@ export function DepthRail({
   port
 }: {
   model: DepthRailModel;
-  port: { navigate: (patch: { "focus.bindId": string }) => void };
+  port: ModulePort;
 }) {
   return (
     <aside className="rail right">

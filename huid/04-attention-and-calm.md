@@ -47,7 +47,7 @@ work the machine exists to host.
    lightweight controls (details, select, file input, `title` hints) are
    preferred to constructed overlays.
 3. **Raw truth one gesture away.** As trace rows grow matched, readable
-   templates (ADR-008 Decision 4), the underlying JSON payload stays
+   templates (ADR-008 Decision 3), the underlying JSON payload stays
    exactly one disclosure away — the business reading never replaces the
    inspectable record, it fronts it.
 

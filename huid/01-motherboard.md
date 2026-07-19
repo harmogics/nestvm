@@ -115,8 +115,8 @@ declare them (`derives`):
 
 | Id | Derivation | Source |
 | --- | --- | --- |
-| `projection` | the canonical session read model | `lib/projection.ts` |
-| `canvas` | text-canvas blocks | `lib/canvas.ts` |
+| `projection` | the canonical session read model | `src/nest/readings/projection.ts` |
+| `canvas` | text-canvas blocks | retired 2026-07-19 → the `produced-texts` contract (its projector's block formers) |
 | `trace` | per-tuple actor + summary | trace registry (migration step 1) |
 | `strata` | per-scene admission / sowing / harvest grouping | strata derivation (migration step 1) |
 

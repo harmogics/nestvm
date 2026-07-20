@@ -127,9 +127,8 @@ pretending is the only non-conforming option.
    truthful, single-source.
 4. **The mechanical gate** — `tsc`, `npm run parity`, the diff test —
    every change.
-5. **The persona network** — the author, configurator, and learner
-   question sets, instantiated by each cycle's canvas for its own
-   surfaces — every surface change.
+5. **The persona network** (HUID 03 §8) — every surface change: the
+   author, configurator, and learner question sets.
 6. **Fixtures and live smoke including honest refusals** — every
    behaviour change.
 7. **The seven matrices** (Vol. 14 §4) — every substantial change, ADR,

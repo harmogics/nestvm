@@ -38,7 +38,9 @@ that is not politeness, it is Article 9 of the constitution.
 
 The short path: [README](./README.md) → [PHILOSOPHY](./PHILOSOPHY.md) →
 [CONSTITUTION](./CONSTITUTION.md) → [PROTOCOL_DEV](./PROTOCOL_DEV.md) →
-[src/README](./src/README.md). Deeper: the machine specification in
+[src/README](./src/README.md). Want to build a panel right away?
+[MODULE_MANUAL](./MODULE_MANUAL.md) is the ten-minute version in plain
+web-stack terms. Deeper: the machine specification in
 `specifications/`, the interaction device in `huid/`. Everything is
 cross-linked, and every folder carries a README — a "lid" — saying what
 belongs inside it and what never does.

@@ -1,6 +1,6 @@
 # HUID 03 — Conformance, Worked Examples, Migration
 
-Status: SEED · Snapshot date: 2026-07-17 ·
+Status: SEED · Snapshot date: 2026-07-19 ·
 Previous: [02-module-contract.md](./02-module-contract.md) ·
 Next: [04-attention-and-calm.md](./04-attention-and-calm.md)
 
@@ -197,3 +197,78 @@ visible defect.
 6. **Reflexive study** — whether the HUID volumes join the studied corpus,
    so the workbench can study its own interaction device the way it studies
    its machine (the bootstrap of Vol. 13 §7 turned one level up).
+
+## 8. The persona network — the standing self-check (2026-07-19)
+
+The third level of drift detection, beside the checklists and the diff
+test. Every cell has a demonstrable answer or a recorded gap —
+pretending is the only non-conforming option (Vol. 14 §4.8). Drift is a
+question that used to have an answer and lost it.
+
+**The panel author asks (human or model alike):**
+
+1. Where exactly do I write this? — one module directory; the routing
+   table names it without guessing.
+2. Where does my data come from? — a contract; and if none fits: one
+   contract file, one projector, one registry line.
+3. Who forms my data, under which frames? — a projector: claims from its
+   own manifest, a pure fold, a snapshot with `asOfOffset`, rebuildable
+   from the log, server-only.
+4. What may my view do? — render model fields and speak two verbs;
+   never fetch, never classify.
+5. How do I know I broke nothing? — the compiler, the parity oracle, the
+   diff test: my change touches only my registration sites.
+6. Is my manifest truthful to a reader who never opens my code? —
+   `consumes` equals my fetches; `commits` equals my controls.
+
+**The platform architect (configurator) asks:**
+
+1. Can I see, without reading implementations, which contracts exist,
+   who forms each, and who consumes each? — manifests as the complete
+   review surface.
+2. Is widget placement configuration, not code? — the resolution table
+   is a declarative artefact; re-routing is a table line, never an edit
+   to widget or former.
+3. Can I predict the exact blast radius of adding or removing a panel,
+   widget, or contract? — the diff test, including removal restoring
+   byte-identical models elsewhere.
+4. Can I trace any pixel to its formation? — widget → form key →
+   projector → claims → tuples, every step named and inspectable.
+5. Are the two sides mechanically separated? — the `server-only` guard
+   and the import DAG, not convention.
+6. Do configurations compose without coordination? — registries are
+   additive; overlapping claims are normal; no factType has an owner.
+
+**The learner's experience asks (silently):**
+
+1. Does the same fact look consistent wherever it appears — and is its
+   truth identical across surfaces?
+2. Where representation varies, is it my visible, per-place, reversible
+   choice — and does choosing ever change the truth? (It must not.)
+3. Is the raw record one disclosure away from every representation?
+4. Do I ever need to know which widget, module, or contract serves me?
+   — plumbing surfacing to the learner is drift.
+5. Can I predict what a control does from its weight and place before
+   reading its label? (HUID 04 §5.)
+6. Does anything move, appear, or interrupt unbidden? (HUID 04 §4.)
+
+## 9. Growth is registration — the table (2026-07-19)
+
+The device-side statement of the growth rule (Vol. 11 §1 mirrored): each
+want has exactly one registration site, and nothing else moves.
+
+| Wanted | Registration site (and nothing else) |
+| --- | --- |
+| a new fact family | machine template (+ projector claims where read) |
+| a new data product | contract file + projector + one registry line |
+| a new lens / view | module directory + one dock-registry entry |
+| a new row / block form | one former (plane) + one widget (client) |
+| a new representation | one widget + one resolution-table line |
+| a new gesture | product body + machine handler + `commits` entry |
+| a new world capability | membrane adapter + configuration record |
+
+A wanted change with no row here is a layer widening — the
+recorded-decision path (HUID 00 §3), never an improvisation. Seating is
+configuration: dock registries are filterable; an absent entry shortens
+its dock honestly — never a dead tab — and «off» is verified by the
+removal test (§3).

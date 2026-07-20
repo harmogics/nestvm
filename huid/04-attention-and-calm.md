@@ -1,6 +1,6 @@
 # HUID 04 — Attention and Calm: the Load Contract
 
-Status: SEED · Snapshot date: 2026-07-17 ·
+Status: SEED · Snapshot date: 2026-07-19 ·
 Previous: [03-conformance-and-migration.md](./03-conformance-and-migration.md)
 
 The device serves inductive work: it shows what the next judgement needs and
@@ -34,6 +34,8 @@ work the machine exists to host.
 3. A control appears where and when its gesture is possible — not
    permanently "in case". Empty states stay quiet: no diagnostic prose for
    valid inactivity (ADR-003).
+4. Representation and preference controls rest in the quiet meta line or
+   appear on disclosure — never as standing chrome (2026-07-19).
 
 ## 3. Disclosure over dialogs
 

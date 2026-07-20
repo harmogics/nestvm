@@ -1,6 +1,6 @@
 # HUID 01 — The Motherboard: Host, Feed, Docks
 
-Status: SEED · Snapshot date: 2026-07-17 ·
+Status: SEED · Snapshot date: 2026-07-19 ·
 Previous: [00-overview.md](./00-overview.md) ·
 Next: [02-module-contract.md](./02-module-contract.md)
 
@@ -175,7 +175,11 @@ module declares its dock and MUST NOT relocate at runtime.
 
 Adding a centre view adds its switch button by registration alone; adding a
 rail module adds its section in declared order. The host's dock frames do
-not change.
+not change. Seating is configuration (2026-07-19): the dock registries
+are filterable — a deployment flag selects entries; an absent entry
+shortens its dock honestly, never a dead tab, and a stale dock selection
+falls back to the first seated entry (the removal test, HUID 03 §3, is
+the acceptance of «off»).
 
 ## 7. The projector plane — where folds evaluate
 
@@ -195,7 +199,13 @@ output controller — controllers discharge exactly once and address the
 world, and their UI face is the reserved obligation socket (ADR-005 §1.4).
 The component-by-component sides and the wire contract are the map in §1;
 the contract-join shape is HUID 02 §8; the worked walk-through is the
-refimpl book ([refimpl/00-map.md](./refimpl/00-map.md)).
+refimpl book ([refimpl/00-map.md](./refimpl/00-map.md)). Two transport
+obligations (2026-07-19): the host accepts snapshots **monotonically** —
+a snapshot at or behind the held `asOfOffset` is dropped; and the
+declared SSE target is **one events channel per session, multiplexed by
+contract** — `{contract, model, asOfOffset}`, replay-then-live — where
+append-shaped contracts (HUID 02 §9) admit delta messages and kneaded
+ones travel whole.
 
 ## 8. What never crosses the board
 

@@ -1,6 +1,6 @@
 # HUID 02 — The Module Contract
 
-Status: SEED · Snapshot date: 2026-07-17 ·
+Status: SEED · Snapshot date: 2026-07-19 ·
 Previous: [01-motherboard.md](./01-motherboard.md) ·
 Next: [03-conformance-and-migration.md](./03-conformance-and-migration.md)
 
@@ -204,3 +204,58 @@ new data product is one contract file, one projector file, and one
 registry line — the motherboard diff test (HUID 03 §3) holds across both
 sides. The worked walk-through is the refimpl book
 ([huid/refimpl](./refimpl/00-map.md)).
+
+## 9. Contract shapes and the lens law (2026-07-19)
+
+1. **A view is a lens: view = contract × select × view-form.** The
+   contract's projector fixes which tuples participate and what of them
+   survives (the formation filter); the module fixes how the survivors
+   read (the presentation form). Every lens preserves offset order and
+   provenance joins: it re-forms truth, never reorders or invents it.
+   Adding a lens therefore adds no truth and no mechanism — one contract
+   if new information is needed, one module if only a new form.
+2. **A contract declares its shape.** *Append-shaped* products grow only
+   at the tail (rows and blocks keyed by offset); *kneaded* products are
+   cards mutated by later tuples (keyed by identity). The shape is part
+   of the declaration: append products admit natural delta transport
+   (`{contract, appendFrom, items}`); kneaded products travel as whole
+   snapshots. A product may keep its append list pure by carrying
+   late-arriving effects (an acceptance, a supersession) in small
+   kneaded side-maps beside it, re-formed in `select`.
+3. **Overlapping claims are normal.** Any number of projectors may claim
+   the same kinds and factTypes; readings are independent, rebuildable,
+   and share the one log. No factType has an owner, and no exclusivity
+   rule exists or should.
+
+## 10. The presentation factory: forms and widgets (2026-07-19)
+
+Offset-anchored items render through a two-sided factory split exactly
+along the formation boundary (HUID 00 §5):
+
+1. **Form keys are formed server-side.** A projector's former registry
+   classifies each offset-anchored item and stamps a `form` key plus the
+   fields that survive formation, plus always the offset. Formers claim
+   tuples the way collection rules and controller claims do elsewhere;
+   first claim wins in declared order; a **generic former closes every
+   chain**, so an unknown factType still forms — the total-coverage
+   property: no tuple is ever invisible. Form keys use the factType
+   idiom (dotted lowercase) and evolve additively, collision-reviewed.
+2. **Widgets resolve client-side.** A shared library of pure components
+   is routed by a declarative resolution table keyed **(lens, form)** —
+   never `form` alone — cascading exact form → family (`<family>.*`) →
+   the **lazy raw-JSON widget**, the total fallback every chain ends in.
+   Re-routing a form is a table line, never a widget edit; the user's
+   representation choice is an ordinary per-form navigation parameter
+   selecting within the resolved candidates.
+3. **Raw truth crosses only through the host.** The raw widget receives
+   a host-injected tuple reader over the payload endpoint (a Class L
+   materialised reading); widgets and modules never fetch. Templates
+   front the record and never replace it: the committed tuple stays one
+   disclosure away (HUID 04 §3.3).
+4. **Must never:** a resolution table keyed without the lens (a
+   god-object); widgets parsing payloads (classification lives in
+   projectors only); representation preferences as standing chrome
+   (icons rest in the quiet meta line or on disclosure); an aggregate
+   card treated as a factory item — kneaded cards (identity-keyed
+   aggregates) **compose** factory widgets inside their disclosures,
+   they are not instances of it.

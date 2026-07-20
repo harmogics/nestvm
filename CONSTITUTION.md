@@ -116,7 +116,10 @@ ethic; this repository does not define the field (ECOSYSTEM boundary 6).
 ## III. The check protocol 
 
 Instruments in ascending cost; apply the cheapest that answers, and for
-substantial changes climb the ladder. The rule throughout is Vol. 14
+substantial changes climb the ladder — the rungs are not redundant:
+each catches a defect class invisible below it (shape — the compiler;
+formation — oracles and fixtures; assembly — live smoke; experience —
+the personas). The rule throughout is Vol. 14
 §4.8: every cell has a demonstrable answer or a recorded gap —
 pretending is the only non-conforming option.
 

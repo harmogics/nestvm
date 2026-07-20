@@ -135,8 +135,9 @@ spec/history/ (the retirement log of closed cycles).
 ## Open questions preserved
 
 The first capability cycle is closed — its seed governs and carries its
-own open register; still open at this altitude: SSE and the events
-channel;
+own open register; still open at this altitude: the study pass's
+scale-down for atomic capabilities (recorded, untested); SSE and the
+events channel;
 obligation sockets with WaveSession; declarative folds for seed-grown
 formation; the seed format's YAML profile; the first commons candidate.
 Held open, not hidden — the next phase's collection begins here.

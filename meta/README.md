@@ -28,3 +28,6 @@ still gathering evidence.
 
 - [meta-bind-01](./meta-bind-01.md) — the recurring figure:
   collection · accumulation · publication (OBSERVED).
+- [meta-bind-02](./meta-bind-02.md) — the two flows: experience rises
+  by abstraction, rails descend as constraints; provenance is not
+  dependence (OBSERVED).

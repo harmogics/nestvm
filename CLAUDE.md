@@ -311,5 +311,9 @@ re-checked.
 
 - Current phase: accumulate context and understanding in chat first; move to
   implementation only on an explicit instruction from the user.
+- Autonomy follows the gates: inside a gate the human has explicitly
+  opened, move without asking; at the seams between cycles (the go,
+  acceptance, retirement) stop — the assistant's job is to make the
+  human's decisions one word long.
 - Do not rename Nest primitives to match adjacent materials; reconcile
   explicitly (see `spec/cross-source-concept-analysis.md`).

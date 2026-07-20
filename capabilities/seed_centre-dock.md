@@ -168,7 +168,11 @@ Inherited live from the analysis (§11: scene-detail granularity, payload
 endpoint shape, former-infrastructure sharing, `composer.target` naming,
 session-meta strip contract) plus guild-specific: whether `centre.focus`
 splits its candidate panel as a fourth member module once the attention
-queue lands.
+queue lands. Added at the first reflection (2026-07-20): a mechanical
+seating check — a dev-time warning when a dock entry's consumed contract
+is absent from the seated union (the one defect of the manifestation was
+exactly this seam); and the parity oracles' dependence on a manually
+started dev server (a self-starting harness as the successor).
 
 ## 11. Manifestation record (2026-07-19)
 

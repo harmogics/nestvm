@@ -154,7 +154,9 @@ learners, applied to ourselves.
 
 **Check.** The Knowledge matrix (Vol. 14 §4.5): complete, duplicated
 nowhere; every crystal traceable back to a Truth want and a Service
-site.
+site. And the translation test (2026-07-20): the crystals re-told in a
+foreign vocabulary — plain developer terms, another persona's language —
+without loss; a translation that fails is a defect found cheap.
 
 *Worked:* the first canvas §8 — "the centre is a dock; growth is
 registration everywhere; what the human sees is formed once".
@@ -194,6 +196,10 @@ Responsibility matrix (Vol. 14 §4.7); the open-questions registers.
 **Produce.** The open-questions register with owners; the list of
 touched specifications with the constraint each imposes; the go/no-go
 gate — implementation starts only on the explicit go (the working mode).
+Assembled together as the **gate register** appended to the canvas
+(2026-07-20): hard guidelines, the collision register, owners,
+adjacencies, and the decisions the go ratifies — recorded at the moment
+of deciding, so the landing never re-derives them.
 
 **Check.** No decision silently taken that belongs to the human; every
 touched volume listed; refusal paths designed, not hoped away.
@@ -214,7 +220,10 @@ The phases produce the proposal; they do not produce code. On the go:
    behaviour, parity oracles for formation moves;
 3. record the landing: ADR for decisions, refimpl chapters for shapes
    worth teaching, worked examples for discovered boundaries, a dated
-   note in the proposal closing what it opened;
+   note in the proposal closing what it opened; and **harvest the
+   generals** — principles the cycle proved are abstracted into their
+   governing layers, restated without the particular (provenance may
+   credit, never depend — meta-bind-02);
 4. **update the seed** — back-propagate the learned detail into the
    capability's description in `capabilities/`, bump its version and
    advance its status (the cycle, step 5);

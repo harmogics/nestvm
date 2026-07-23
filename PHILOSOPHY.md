@@ -111,6 +111,13 @@ provenance, applicability, fixtures, and known failure conditions. Reuse enters
 fresh context and fresh admission; precedent informs a new act but does not
 silently become law.
 
+An ecosystem project may place Nest VM at its executable centre and grow around
+it a centre of its own: people, purpose, context, policy, and responsibility.
+High-level [guilde manifests](./manifests/README.md) may orient that growth
+without making the environment's vocabulary part of the machine contract. The
+machine carries declared movement; the surrounding project and its people
+remain responsible for why that movement matters and what it may change.
+
 ## 9. Experience reaches the commons through a threshold
 
 A raw log belongs to the context in which people and systems produced it. It

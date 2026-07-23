@@ -15,7 +15,9 @@ This public project is part of **Harmogics** and is intended to live at
 `nestvm.harmogics.com`. Read the
 [philosophy](./PHILOSOPHY.md) for the project's commitments and the
 [ecosystem map](./ECOSYSTEM.md) for the relationship between Nest VM,
-Harmogics, HUID, CoAgnes, Florispace, and The Algorithmic Company.
+Harmogics, HUID, CoAgnes, Florispace, and The Algorithmic Company. The
+[semantic bridge](./BRIDGE.md) states how independently governed ecosystem
+projects may inform Nest VM without entering its code or authority.
 
 ## What this repository contains
 
@@ -31,6 +33,9 @@ Harmogics, HUID, CoAgnes, Florispace, and The Algorithmic Company.
    wave-log-shaped session histories.
 4. **Product and architecture records** — ADRs, interaction rails, and the
    human-role manifest in [`spec/`](./spec/README.md).
+5. **Ecosystem guilde manifests** — non-normative orientations in
+   [`manifests/`](./manifests/README.md) for projects that grow their own human
+   and institutional environments around an independent Nest VM centre.
 
 ## Current status: Nest studying Nest
 
@@ -98,6 +103,7 @@ marked `simulated`; provider choice does not change the persisted tuple shape.
 | `specifications/` | Normative Nest Runtime Specification Set, Vol. 00–15, plus the refimpl book |
 | `huid/` | SEED Human Interaction Device specification |
 | `spec/` | Product decisions, interaction architecture, and human-role records |
+| `manifests/` | High-level ecosystem orientations; not machine specifications or capability packages |
 | `src/nest/wave/` | Tuple vocabulary and append-only session store |
 | `src/nest/readings/` | Pure projections and canvas readings |
 | `src/nest/membrane/` | Inference port, semantic tasks, and resource resolvers |

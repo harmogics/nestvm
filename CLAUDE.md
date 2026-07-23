@@ -139,24 +139,22 @@ this order:
   winding follows learner material. Close binds carry no gates yet;
   unknown-marks stand in for barrier re-scoping.
 
-## Project frame: The Algorithmic Company
+## External ecosystem frame: CoAgnes and The Algorithmic Company
 
-- The whole project is named **The Algorithmic Company** (as presented in the
-  `concepts_ui/` landing screenshot: 7 × 5 × 3 · 105 states, the maturity cube,
-  "one algorithm, three carriers of practice, a shared alphabet").
-- **Positioning is corporate from the start**: a workbench product for
-  companies of different sizes — first a simple study workbench that
-  accumulates study templates (**with attribution down to the person**), then
-  internal workbenches for groups/segments/guilds (e.g. AML specialists, risk
-  assessors, antifraud analytics).
-- The three cube carriers (Employee · Process · Organization) are the scaling
-  path of the product; the L3 "articulable" column is the ladder the workbench
-  helps climb: can explain (E) → recorded in process (P) → fixed as norm (O).
-- **Visual language**: borrow styles from
-  `related/ai_maturity_cube_three_faces.html` and the `concepts_ui/`
-  screenshots — aged-paper/blueprint aesthetic, serif display type,
-  terracotta accent, uppercase letterspaced labels, dense matrix tables,
-  CSS-variable theming.
+- Nest VM is an independently governed Harmogics project, not the CoAgnes or
+  The Algorithmic Company codebase. CoAgnes may assemble a released Nest VM and
+  grow its own organisational environment around it; no CoAgnes module,
+  product policy, or release cycle silently governs this repository.
+- The Algorithmic Company is a CoAgnes-facing corporate projection (the
+  maturity cube and its Employee · Process · Organization carriers), not a
+  Nest VM product identity or machine ontology. Materials in `concepts_ui/`
+  and `related/` remain adjacent references with their stated provenance.
+- CoAgnes scenarios may disclose useful requirements to Nest VM through the
+  semantic boundary stated in `BRIDGE.md`. A requirement affects the machine
+  only after Nest VM's own specification, widening, and verification process.
+- Ecosystem guilde manifests in `manifests/` may orient other independently
+  governed environments around the same machine centre without importing
+  their vocabulary or authority into Nest VM.
 
 ## Implementation phasing
 
@@ -165,9 +163,10 @@ this order:
    adapted toward the target Nest session contract (turns / decisions /
    SSE projections) so the simulation can be swapped out later.
 2. **Later (core)**: once user experience stabilises and the typical scenario
-   is walked end to end, the core is written per `specifications/` — driven by
-   real scenarios, data flows, and the UI/UX requirements discovered in
-   phase 1. Product needs drive runtime growth (Vol. 13 §1 rule).
+   is walked end to end, the core is written per `specifications/` — informed
+   by real scenarios and evidence gathered in phase 1. Product and ecosystem
+   needs may propose runtime growth; only methodology-independent obligations
+   admitted through Nest VM's own widening discipline enter the core.
 3. The binding contract for the swap is `spec/ADR-004-session-runtime-context.md`:
    the session API and the machine port stay stable; backend-owned storage
    (command journal, workshop drafts, registry — the only mutable plane, always
@@ -225,6 +224,11 @@ this order:
   First seed: `guild.centre-dock` — manifested-in-source; its
   cycle's canvas is retired to `spec/history/`. Code never travels in a
   seed.
+- `manifests/` — non-normative ecosystem guilde manifests: high-level
+  orientations for independently governed projects that place Nest VM at
+  their executable centre and grow a human and institutional environment
+  around it. A guilde is not a capability guild, package, assembly, or
+  machine extension; `vision_guilde.md` carries the common movement.
 - `themes/` — the visual layer on rails: tokens as the declared
   vocabulary (collection), module/widget composition (accumulation),
   act-weighted rendering (publication); one field, sibling accents;

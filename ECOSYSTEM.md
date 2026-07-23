@@ -17,7 +17,7 @@ one programme or one storage system.
 | **Nest VM** | The specification-defined machine that executes declared figures, records their movement in a wave log, and makes their histories readable. | CURRENT specification; simulated workbench |
 | **Nest Studio** | A workbench shell over Nest VM concepts: today it presents the specification and lets a person study it through Nest-shaped session histories. | Experimental product surface |
 | **HUID** | The Human Interaction Device specification: a stable host, feed, parameter space, docks, and module contract for building shells without making each panel a new mechanism. | SEED device layer |
-| **CoAgnes** | The organisational experience direction: evidence-backed descriptions, professional gestures, guild and company libraries, trials, assessment, and reviewed promotion. | SEED extension direction |
+| **CoAgnes** | An independently governed organisational experience direction: evidence-backed descriptions, professional gestures, guild and company libraries, trials, assessment, and reviewed promotion. | External ecosystem direction; SEED relationship |
 | **Florispace** | The related context-formation direction: graph-based selection and assembly of the material a knot or figure needs, including weighted relationships and alternative context algorithms. | Related design direction; not a Nest VM contract here |
 | **The Algorithmic Company** | An application frame for making employee, process, and organisational capability articulable and teachable through the same field. | Product and design frame |
 
@@ -39,6 +39,29 @@ The public Nest VM site may therefore be hosted as `nestvm.harmogics.com`
 while remaining a distinct specification and workbench. Being part of
 Harmogics supplies its public context; it does not weaken its conformance
 boundary.
+
+## Projects growing around a Nest VM centre
+
+An ecosystem project may assemble Nest VM as its executable and recording
+centre while remaining independently governed. Around the machine it grows a
+contextual centre of its own: human purpose, domain material, relationships,
+policy, responsibility, and the surfaces through which its community reads and
+acts. Nest VM does not absorb that environment, and the environment does not
+silently redefine the machine.
+
+The [`manifests/`](./manifests/README.md) layer offers high-level **guilde
+manifests** for studying such compositions. The common
+[vision guilde](./manifests/vision_guilde.md) describes the recurring movement;
+later marketplace, analytics, FinOps, or other manifests may disclose different
+environmental figures. They are orientations rather than packages or machine
+extensions: each external project retains its own code, authority, lifecycle,
+and right to interpret or refuse what the shared field proposes.
+
+Where two independently governed projects need to state how their meanings
+meet, a [semantic bridge](./BRIDGE.md) may name the relationship without
+creating hidden technical ownership. Requirements may cross that bridge as
+scenarios and evidence; capability enters Nest VM only through its own
+specification and widening discipline.
 
 ## Harmogics as a commons of figures
 
@@ -90,15 +113,18 @@ formed from experience; it is not the accidental exposure of experience.
 
 ## CoAgnes: experience inside organisations
 
-CoAgnes concerns the level at which gestures belong to professions, guilds,
-teams, and companies. Its source material may include explanations, decisions,
-exceptions, evidence, competing practices, and the paths by which experienced
-people recognise what to do.
+CoAgnes is an independently governed environment concerned with the level at
+which gestures belong to professions, guilds, teams, and companies. Its source
+material may include explanations, decisions, exceptions, evidence, competing
+practices, and the paths by which experienced people recognise what to do.
 
-Nest VM can execute and record figures used to elicit, teach, test, and revise
-that experience. CoAgnes adds the organisational contracts: tenancy, roles,
-review authority, attribution, evaluation independence, promotion, retention,
-and transfer between personal, group, and organisational layers.
+CoAgnes may assemble Nest VM to execute and record figures used to elicit,
+teach, test, and revise that experience. The CoAgnes environment adds the
+organisational contracts: tenancy, roles, review authority, attribution,
+evaluation independence, promotion, retention, and transfer between personal,
+group, and organisational layers. Those contracts remain under CoAgnes
+authority; their usefulness may disclose requirements to Nest VM but does not
+make them machine primitives.
 
 Personal attribution and public anonymity are not opposites. An organisation
 may preserve precise internal authorship while publishing only a reviewed,

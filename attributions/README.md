@@ -34,3 +34,4 @@ act, kept apart deliberately).
 | --- | --- | --- |
 | [imprint-001](./imprint-001-claude-fable-5.md) | Claude Fable 5 | the pluggable-UI rails and the law layer |
 | [imprint-002](./imprint-002-claude-fable-5.md) | Claude Fable 5 | the centre-dock manifestation (P1–P5; trace · produced-texts · scene-detail) |
+| [imprint-003](./imprint-003-gpt-5-codex.md) | OpenAI GPT-5 | the ecosystem guilde-manifest layer and independent-project boundary |

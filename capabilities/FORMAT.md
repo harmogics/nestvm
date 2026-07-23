@@ -7,6 +7,12 @@ profile arrives when manifestation is mechanised). Companion to
 growable capability; **code never travels in a seed** — declared forms
 and semantic content do.
 
+This format does not govern ecosystem [guilde manifests](../manifests/README.md).
+Those are high-level orientations for an environment around Nest VM, not
+distributable capabilities. A guilde may name capability needs, but each need
+that crosses into this register still requires its own seed, admission, and
+trial.
+
 ## 1. One format, a taxonomy of kinds
 
 Capability kinds map one-to-one onto the registration sites of the

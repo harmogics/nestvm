@@ -20,6 +20,14 @@ forms plus semantic content — questions, angles, thresholds, rubrics,
 close instructions, schemas, fixtures, provenance, applicability,
 licence. Distribution is publication; installation is growth.
 
+**Naming boundary.** A capability **guild** is not an ecosystem **guilde**
+manifest. The former is a distributable cross-level capability declaration
+governed by [`capabilities/FORMAT.md`](../capabilities/FORMAT.md); the latter is
+a non-normative orientation for how an independently governed project may grow
+around a Nest VM centre ([`manifests/`](../manifests/README.md)). A guilde may
+help a project discover or compose many capability seeds, but carries none of
+them and installs nothing.
+
 ## 2. What the corpus already provides
 
 The vision is anticipated, not invented — the anchors:

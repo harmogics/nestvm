@@ -100,6 +100,13 @@ figures of work, each entering fresh contexts under fresh admission,
 "portable without erasing the context from which they came"
 (PHILOSOPHY, the narrower promise).
 
+Above any one capability, an ecosystem
+[guilde manifest](./manifests/README.md) may orient how a separately governed
+project grows people, purpose, context, and responsibility around a Nest VM
+centre. It does not alter this lifecycle or distribute code: it helps the
+project see which figures and capabilities it may need, while every concrete
+seed still crosses its own threshold.
+
 ## 6. Honest incompleteness as method
 
 This SDLC never presents itself as finished: ledgers hold the known
